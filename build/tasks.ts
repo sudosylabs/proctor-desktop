@@ -40,21 +40,17 @@ export const tasks: Readonly<Record<string, Task>> = {
 	'test:electron': { group: 'test', description: 'Real-Electron suites (needs npm run setup)' },
 	'test:editor': { group: 'test', description: 'Editor suites' },
 	'test:native': { group: 'native', description: 'Rust native-package tests' },
-	'test:security-utility': { group: 'test', description: 'Security-utility suite' },
+	'test:native-agent': {
+		group: 'test',
+		description: 'Native agent process and Electron-main service suite'
+	},
 	'test:window-skeleton': { group: 'test', description: 'Window skeleton suite' },
 	'test:desktop-identity': { group: 'test', description: 'Desktop identity suite' },
-	'build:security-utility': { group: 'build', description: 'Bundle the security utility' },
 	'build:browser-harness': { group: 'build', description: 'Bundle the Chromium test harness' },
 	'build:base-common-tests': { group: 'build', description: 'Bundle base common tests' },
 	'build:platform-foundation-tests': { group: 'build', description: 'Bundle platform tests' },
 	'build:editor-core-tests': { group: 'build', description: 'Bundle editor core tests' },
 	'build:window-skeleton': { group: 'build', description: 'Bundle the window skeleton' },
-	'stage:native-service': { group: 'native', description: 'Stage the macOS native service' },
-	'verify:native-service': { group: 'native', description: 'Verify the macOS native service' },
-	'inventory:native-service:windows': {
-		group: 'native',
-		description: 'Windows native-service inventory'
-	},
 	generate: { group: 'maintain', description: 'Write generated artifacts' },
 	'api:sync': { group: 'maintain', description: 'Sync the server API snapshot' },
 	'audit:upstream': { group: 'maintain', description: 'Audit VS Code port manifests' },

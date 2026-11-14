@@ -50,6 +50,23 @@ export interface components {
             readonly sequence: number;
         };
         /**
+         * Connect security
+         * @description Which admission the connect consumes: a fresh preflight for first admission and Ready rejoin, or the current Participation for a same-generation reconnect.
+         */
+        readonly connect_security: {
+            /** @constant */
+            readonly kind: "preflight";
+            readonly preflight_id: string;
+            /** @description The digest the report receipt returned; the report must be at most 30 seconds old. */
+            readonly report_digest: string;
+        } | {
+            readonly generation: number;
+            /** @constant */
+            readonly kind: "resume";
+            readonly participation_id: components["schemas"]["id"];
+            readonly policy_digest: string;
+        };
+        /**
          * Event frame
          * @description The envelope of every server-to-client event. sequence is assigned by the connection, increases by one per event, and is what a reconnecting client offers as sequence_number.
          */
@@ -83,9 +100,49 @@ export interface components {
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
-            readonly reason_code?: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
+            readonly reason_code?: "secure_connectivity_lost" | "focus_policy_review_required" | "native_policy_review_required" | "manager_suspended";
             /** @enum {string} */
             readonly state: "suspended" | "active";
+        };
+        /**
+         * Exam Attempt connect
+         * @description Binds this WebSocket to the candidate's Attempt in the Sitting: admits a new Attempt, rejoins a Ready one, or resumes the current Participation.
+         */
+        readonly exam_attempt_connect: {
+            readonly configuration_manifest_fingerprint: string;
+            /** @description The Attempt Connection's continuity credential, chosen by Desktop at connect. */
+            readonly continuity_credential: string;
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** @description Repeating the same connect with the same key replays its result. */
+            readonly idempotency_key: string;
+            /** @description Exactly the OpenAPI component AttemptConfigurationCandidate. Sent on first admission; omitted when rejoining or resuming. */
+            readonly initial_configuration?: Record<string, never>;
+            readonly security: components["schemas"]["connect_security"];
+        };
+        /** Exam Attempt connect reply */
+        readonly exam_attempt_connect_reply: {
+            readonly attempt_connection_id: components["schemas"]["id"];
+            readonly attempt_id: components["schemas"]["id"];
+            /** @description Exactly the OpenAPI component CandidateBrowserPolicy, or null when the Exam has no Browser policy. */
+            readonly browser_policy: Record<string, never> | null;
+            /** @description Exactly the OpenAPI component CandidateRuntimeCapabilities. */
+            readonly candidate_runtime_capabilities: Record<string, never>;
+            readonly first_admission: boolean;
+            readonly generation: number;
+            readonly lease_expires_at: components["schemas"]["instant"];
+            readonly live_corrections: readonly Record<string, never>[];
+            readonly participation_id: components["schemas"]["id"];
+            /**
+             * @description How often to send exam_attempt.renew, in seconds. The same value as AdmittedSecurity.renewal_interval_seconds.
+             * @constant
+             */
+            readonly renewal_interval_seconds: 5;
+            /** @description The connect repeated an earlier one with the same idempotency key. */
+            readonly replayed: boolean;
+            /** @description Exactly the OpenAPI component AdmittedSecurity. The immutable admitted binding receipt, including the effective native policy. */
+            readonly security: Record<string, never>;
+            readonly started_at: components["schemas"]["instant"];
+            readonly workspace_id: components["schemas"]["id"];
         };
         /**
          * Attempt Connection changed
@@ -103,6 +160,42 @@ export interface components {
             readonly state: "open" | "closed";
         };
         /**
+         * Exam Attempt Focus Loss
+         * @description Reports one completed loss of focus of the candidate window. Sequences are per generation and increase by one; a skipped sequence is recorded as a gap.
+         */
+        readonly exam_attempt_focus_loss: {
+            /** @description The Attempt Connection's continuity credential, chosen by Desktop at connect. */
+            readonly continuity_credential: string;
+            readonly duration_milliseconds: number;
+            readonly generation: number;
+            /** @constant */
+            readonly schema_version: 1;
+            readonly sequence: number;
+            /**
+             * @description Optional classification of what lost focus.
+             * @enum {string}
+             */
+            readonly source?: "window_blur" | "document_hidden" | "application_backgrounded" | "fullscreen_exited";
+        };
+        /**
+         * Exam Attempt Focus Loss reply
+         * @description Acknowledges the signal. It tells the candidate's Desktop only what it must act on: never the threshold, outcome or Flag.
+         */
+        readonly exam_attempt_focus_loss_reply: {
+            readonly accepted_sequence: number;
+            readonly discrepancy_recorded: boolean;
+            readonly duplicate: boolean;
+            readonly gap_detected: boolean;
+            readonly generation: number;
+            /** @description The Exam does not collect Focus Loss; the signal was only acknowledged. */
+            readonly policy_disabled: boolean;
+            readonly received_at: components["schemas"]["instant"];
+            /** @description The Attempt was suspended and this Connection closed. */
+            readonly suspension_created: boolean;
+            /** @description Show the candidate the Focus Loss warning. */
+            readonly warning_created: boolean;
+        };
+        /**
          * Focus Loss warning
          * @description Warns the candidate that their Focus Loss crossed the policy threshold. No counts, thresholds or evidence are included.
          */
@@ -115,7 +208,7 @@ export interface components {
         };
         /**
          * Attempt Integrity Flag raised
-         * @description A Focus Loss Integrity Flag, its policy outcome and how many evidence episodes were kept or overflowed. The evidence itself is never included.
+         * @description An Integrity Flag a policy raised or added evidence to (Focus Loss, or native.<capability> when an enforce rule's occurrence opens), its policy outcome and how many evidence episodes were kept or overflowed. The evidence itself is never included.
          */
         readonly exam_attempt_integrity_flagged: {
             readonly candidate_user_id: components["schemas"]["id"];
@@ -128,8 +221,7 @@ export interface components {
             readonly integrity_flag_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly outcome: "flag" | "flag_and_warn" | "flag_and_suspend";
-            /** @constant */
-            readonly policy_kind: "focus_loss";
+            readonly policy_kind: string;
             readonly retained_evidence_count: number;
         };
         /**
@@ -143,6 +235,50 @@ export interface components {
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly suspension_id: components["schemas"]["id"];
+        };
+        /**
+         * Exam Attempt renewal
+         * @description Renews the Participation lease and carries the security control. The whole data object is at most 16 KiB.
+         */
+        readonly exam_attempt_renew: {
+            /** @description The Attempt Connection's continuity credential. */
+            readonly continuity_credential: string;
+            /** @description The Participation generation. */
+            readonly generation: number;
+            readonly security_control: components["schemas"]["security_control"];
+            /** @description The renewal's own sequence within the generation. */
+            readonly sequence: number;
+        };
+        /** Exam Attempt renewal reply */
+        readonly exam_attempt_renew_reply: {
+            readonly accepted_sequence: number;
+            readonly database_time: components["schemas"]["instant"];
+            /** @description The renewal sequence was already accepted; the lease was not extended again. */
+            readonly duplicate: boolean;
+            /** @description The Participation generation. */
+            readonly generation: number;
+            readonly lease_expires_at: components["schemas"]["instant"];
+            readonly security_control: components["schemas"]["security_control_result"];
+        };
+        /**
+         * Screen clips requested
+         * @description Tells the candidate's Desktop that its Attempt has screen clip requests it has not taken, so it reads them now instead of at its next poll. Neither the requests nor who made them are included.
+         */
+        readonly exam_attempt_screen_clips_requested: {
+            readonly changed_at: components["schemas"]["instant"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+        };
+        /**
+         * Exam Attempt security update
+         * @description Carries a security control between renewals. It never extends the lease. The whole data object is at most 16 KiB.
+         */
+        readonly exam_attempt_security_update: {
+            /** @description The Attempt Connection's continuity credential. */
+            readonly continuity_credential: string;
+            /** @description The Participation generation. */
+            readonly generation: number;
+            readonly security_control: components["schemas"]["security_control"];
         };
         /**
          * Attempt submitted
@@ -408,6 +544,14 @@ export interface components {
             readonly state: "uploading" | "parsing" | "preview_ready" | "executing" | "completed" | "completed_with_errors" | "canceled" | "failed";
         };
         /**
+         * Plugin settings changed
+         * @description The plugin whose settings an administrator changed, and their revision after the committed change. No setting values are included.
+         */
+        readonly plugin_settings_changed: {
+            readonly plugin_id: string;
+            readonly revision: number;
+        };
+        /**
          * Pong
          * @description The reply to ping.
          */
@@ -432,6 +576,44 @@ export interface components {
         readonly resource: {
             readonly id: string;
             readonly type: string;
+        };
+        /**
+         * Security control
+         * @description Desktop's security control: its sequence, the binding it renews and the delivery watermarks it has allocated. At most 16 KiB. The server identifies a control by the SHA-256 of its canonical JSON (object keys sorted, integers only, JSON.stringify string escaping), so key order and whitespace do not matter; duplicate keys, unknown members and non-integer numbers are refused. A retained sequence sent again with different content is refused with exam.security.control_conflict; an older sequence changes nothing. The server refuses a control whose policy is no longer current with exam.security.policy_changed.
+         */
+        readonly security_control: {
+            readonly control_sequence: number;
+            /** @description The admitted native stream and the Browser sources owned by the current Participation, each at most once. At most 50. */
+            readonly delivery_watermarks: readonly {
+                /** @description At most allocated_through_sequence. */
+                readonly acknowledged_through_sequence: number;
+                readonly allocated_through_sequence: number;
+                /** @enum {string} */
+                readonly family: "native" | "browser";
+                /** @description For the native family, the admitted delivery_stream_id; for a Browser source, that source's ID. */
+                readonly source_id: string;
+            }[];
+            readonly policy_digest: string;
+            readonly security_session_id: string;
+            /** @description The admitted native delivery stream: exactly AdmittedSecurity.delivery_stream_id from the connect reply. A control naming another stream is refused. */
+            readonly stream_id: string;
+        };
+        /**
+         * Security control result
+         * @description How the server processed Desktop's latest security control. A control never changes whether the candidate may interact; only closing native delivery does.
+         */
+        readonly security_control_result: {
+            /** @description At most 50. */
+            readonly delivery_watermark_rejections: readonly {
+                /** @enum {string} */
+                readonly family: "native" | "browser";
+                /** @enum {string} */
+                readonly reason: "closed_source" | "position_limit";
+                readonly source_id: string;
+            }[];
+            readonly processed_control_digest: string | null;
+            readonly processed_control_sequence: number;
+            readonly security_interaction_allowed: boolean;
         };
         /**
          * SHA-256 digest
@@ -504,6 +686,7 @@ export const serverEventCatalog = {
 	"exam_attempt_focus_warning": { "exam.sitting.participate": "exam_attempt_focus_warning" },
 	"exam_attempt_integrity_flagged": { "exam.sitting.view": "exam_attempt_integrity_flagged" },
 	"exam_attempt_reallowed": { "exam.sitting.view": "exam_attempt_reallowed" },
+	"exam_attempt_screen_clips_requested": { "exam.sitting.participate": "exam_attempt_screen_clips_requested" },
 	"exam_attempt_submitted": { "exam.sitting.participate": "exam_attempt_submitted_for_candidate", "exam.sitting.view": "exam_attempt_submitted" },
 	"exam_attempt_suspended": { "exam.sitting.view": "exam_attempt_suspended" },
 	"exam_attempt_workspace_changed": { "exam.sitting.participate": "exam_attempt_workspace_changed" },
@@ -526,6 +709,7 @@ export const serverEventCatalog = {
 	"job.changed": { "job.view": "job_changed" },
 	"manager.sitting_board.changed": { "exam.sitting.view": "sitting_board_invalidation" },
 	"onboarding_import.changed": { "@user": "onboarding_import_changed", "onboarding_batch.view": "onboarding_import_changed" },
+	"plugin_settings_changed": { "plugin.manage": "plugin_settings_changed" },
 	"user_profile_picture_changed": { "@user": "user_profile_picture_changed" },
 	"user_settings_changed": { "@user": "user_settings_changed" },
 } as const;
@@ -547,6 +731,7 @@ export interface ServerEventVariants {
 	"exam_attempt_focus_warning": { "exam.sitting.participate": components['schemas']["exam_attempt_focus_warning"] };
 	"exam_attempt_integrity_flagged": { "exam.sitting.view": components['schemas']["exam_attempt_integrity_flagged"] };
 	"exam_attempt_reallowed": { "exam.sitting.view": components['schemas']["exam_attempt_reallowed"] };
+	"exam_attempt_screen_clips_requested": { "exam.sitting.participate": components['schemas']["exam_attempt_screen_clips_requested"] };
 	"exam_attempt_submitted": { "exam.sitting.participate": components['schemas']["exam_attempt_submitted_for_candidate"]; "exam.sitting.view": components['schemas']["exam_attempt_submitted"] };
 	"exam_attempt_suspended": { "exam.sitting.view": components['schemas']["exam_attempt_suspended"] };
 	"exam_attempt_workspace_changed": { "exam.sitting.participate": components['schemas']["exam_attempt_workspace_changed"] };
@@ -569,6 +754,7 @@ export interface ServerEventVariants {
 	"job.changed": { "job.view": components['schemas']["job_changed"] };
 	"manager.sitting_board.changed": { "exam.sitting.view": components['schemas']["sitting_board_invalidation"] };
 	"onboarding_import.changed": { "@user": components['schemas']["onboarding_import_changed"]; "onboarding_batch.view": components['schemas']["onboarding_import_changed"] };
+	"plugin_settings_changed": { "plugin.manage": components['schemas']["plugin_settings_changed"] };
 	"user_profile_picture_changed": { "@user": components['schemas']["user_profile_picture_changed"] };
 	"user_settings_changed": { "@user": components['schemas']["user_settings_changed"] };
 }

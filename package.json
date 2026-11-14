@@ -36,8 +36,6 @@
     "check:layers": "node build/checks/main.ts --check source.graph",
     "check:provenance": "node build/checks/main.ts --check upstream.provenance",
     "check:source": "node build/checks/main.ts --check source.graph --check source.compositions --check source.css",
-    "stage:native-service": "node build/stageMacOsNativeService.ts",
-    "build:security-utility": "node build/buildSecurityUtility.ts",
     "build:browser-harness": "node build/buildBrowserHarness.ts",
     "build:base-common-tests": "node build/buildBaseCommonTests.ts",
     "build:platform-foundation-tests": "node build/buildPlatformFoundationTests.ts",
@@ -55,7 +53,7 @@
     "test:electron": "node scripts/test.ts electron",
     "test:editor": "node scripts/test.ts editor",
     "test:native": "node build/testNative.ts",
-    "test:security-utility": "node scripts/test.ts security-utility",
+    "test:native-agent": "node scripts/test.ts native-agent",
     "test:window-skeleton": "node scripts/test.ts window-skeleton",
     "test:unit": "node scripts/test.ts unit",
     "check:all": "npm run check && npm run test:electron && npm run test:native",
@@ -71,9 +69,7 @@
     "hooks:disable": "node scripts/hooks.ts --disable",
     "dev": "node scripts/developDesktop.ts",
     "test:desktop-identity": "node scripts/test.ts desktop-identity",
-    "api:sync": "node scripts/syncServerApi.ts",
-    "verify:native-service": "node build/verifyMacOsNativeService.ts",
-    "inventory:native-service:windows": "node build/generateWindowsNativeServiceInventory.ts"
+    "api:sync": "node scripts/syncServerApi.ts"
   },
   "allowScripts": {
     "esbuild": true
@@ -89,10 +85,10 @@
     "@vscode/tree-sitter-wasm": "0.3.1",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
-    "electron": "44.0.0",
+    "electron": "44.11.3",
     "highlight.js": "11.11.1",
     "lodash.throttle": "4.1.1",
-    "markdown-it": "14.2.0",
+    "markdown-it": "14.3.3",
     "morphdom": "2.7.8",
     "path-browserify": "1.0.1",
     "pdfjs-dist": "6.3.289",
@@ -105,6 +101,7 @@
     "yaml": "2.9.0"
   },
   "devDependencies": {
+    "@electron-forge/cli": "8.0.1",
     "@electron/asar": "4.3.0",
     "@electron/fuses": "2.1.3",
     "@types/js-yaml": "4.0.9",

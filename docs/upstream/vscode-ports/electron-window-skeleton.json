@@ -182,7 +182,7 @@
     {
       "id": "electron-runtime",
       "kind": "external-package",
-      "reference": "electron@44.0.0",
+      "reference": "electron@44.11.3",
       "rationale": "The pinned Electron runtime supplies BrowserWindow, contextBridge, and IPC primitives."
     },
     {

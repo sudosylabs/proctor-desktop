@@ -77,7 +77,7 @@
     {
       "id": "electron-runtime",
       "kind": "external-package",
-      "reference": "electron@44.0.0",
+      "reference": "electron@44.11.3",
       "rationale": "The pinned Electron WebContentsView/session boundary performs privileged request and navigation enforcement."
     },
     {

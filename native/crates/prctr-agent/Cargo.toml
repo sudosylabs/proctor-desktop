@@ -1,0 +1,22 @@
+[package]
+name = "prctr-agent"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[features]
+# A test-only capability driven by host events, so Electron-main tests can cause changes, losses,
+# failures, panics and hangs. Development and release builds never enable it.
+scripted-capabilities = []
+
+[dependencies]
+prctr-capabilities = { path = "../prctr-capabilities" }
+prctr-core = { path = "../prctr-core" }
+prctr-protocol = { path = "../prctr-protocol" }
+prctr-recorder = { path = "../prctr-recorder" }
+serde_json = { version = "=1.0.151" }
+
+[lints]
+workspace = true

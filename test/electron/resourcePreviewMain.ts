@@ -18,6 +18,9 @@ void app.whenReady().then(async () => {
 			webSecurity: true
 		}
 	});
+	// Windows and Linux lay out no page for a window that was never shown, and pdf.js renders
+	// its text layer only once the page has a layout; show it without taking focus.
+	if (process.platform !== 'darwin') window.showInactive();
 	try {
 		const remoteRequests: string[] = [];
 		window.webContents.session.webRequest.onBeforeRequest((details, callback) => {

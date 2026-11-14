@@ -52,9 +52,13 @@ for (const admission of policy.dependencies) {
 		requireExactDirectLicense('npm', admission, actual?.license, actual?.version);
 		continue;
 	}
-	const actual = cargoMetadata.packages.find(
+	// A crate can also appear at another version as a transitive dependency; the admission names
+	// the version Proctor's own manifests resolve.
+	const candidates = cargoMetadata.packages.filter(
 		(candidate) => candidate.source !== null && candidate.name === admission.package
 	);
+	const actual =
+		candidates.find((candidate) => candidate.version === admission.version) ?? candidates[0];
 	requireExactDirectLicense('Cargo', admission, actual?.license ?? undefined, actual?.version);
 }
 

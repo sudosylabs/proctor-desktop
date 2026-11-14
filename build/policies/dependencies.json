@@ -7,9 +7,12 @@
     "Apache-2.0",
     "Apache-2.0 OR MIT",
     "BSD-2-Clause",
+    "BSD-2-Clause OR MIT OR Apache-2.0",
     "BSD-3-Clause",
     "BlueOak-1.0.0",
+    "CC-BY-3.0",
     "CC-BY-4.0",
+    "CC0-1.0",
     "ISC",
     "MIT",
     "MIT OR Apache-2.0",
@@ -17,7 +20,8 @@
     "MPL-2.0",
     "OFL-1.1",
     "Python-2.0",
-    "Unlicense OR MIT"
+    "Unlicense OR MIT",
+    "Zlib OR Apache-2.0 OR MIT"
   ],
   "dependencies": [
     {
@@ -32,15 +36,6 @@
       "lifecycleScripts": "allowed",
       "declarations": [
         {
-          "manifest": "native/crates/native-node-bridge/Cargo.toml",
-          "alias": "napi",
-          "kind": "production",
-          "features": ["dyn-symbols", "napi8", "serde-json"],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": null
-        },
-        {
           "manifest": "native/crates/desktop-key-custody/Cargo.toml",
           "alias": "napi",
           "kind": "production",
@@ -50,7 +45,7 @@
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility", "electron-main"],
+      "processes": ["electron-main"],
       "networkBehavior": "None at runtime; Node-API calls remain process-local.",
       "nativeBehavior": "Links the platform Node-API symbols and uses its reviewed registration build support; it does not bundle a helper executable.",
       "transitiveRisk": "Adds napi-sys, registration support, futures primitives, serde conversion, and dynamic-symbol loading; exact transitive versions are locked and license checked.",
@@ -70,15 +65,6 @@
       "license": "MIT",
       "lifecycleScripts": "none",
       "declarations": [
-        {
-          "manifest": "native/crates/native-node-bridge/Cargo.toml",
-          "alias": "napi-derive",
-          "kind": "production",
-          "features": ["strict"],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": null
-        },
         {
           "manifest": "native/crates/desktop-key-custody/Cargo.toml",
           "alias": "napi-derive",
@@ -110,7 +96,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/native-node-bridge/Cargo.toml",
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
           "alias": "serde",
           "kind": "production",
           "features": ["derive"],
@@ -119,7 +105,7 @@
           "targetScope": null
         },
         {
-          "manifest": "native/crates/native-protocol/Cargo.toml",
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
           "alias": "serde",
           "kind": "production",
           "features": ["derive"],
@@ -128,16 +114,25 @@
           "targetScope": null
         },
         {
-          "manifest": "native/crates/native-security-helper/Cargo.toml",
+          "manifest": "native/crates/prctr-core/Cargo.toml",
           "alias": "serde",
           "kind": "production",
-          "features": [],
+          "features": ["derive"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-protocol/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": ["derive"],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility", "native-build", "native-security-helper"],
+      "processes": ["native-build", "native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust serialization traits and derive macros; no native library or helper process.",
       "transitiveRisk": "Adds the exact locked serde core and derive macro graph; generated DTO validation still runs independently after conversion.",
@@ -158,7 +153,52 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/native-security-helper/Cargo.toml",
+          "manifest": "native/crates/prctr-agent/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-core/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-protocol/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-xtask/Cargo.toml",
           "alias": "serde_json",
           "kind": "production",
           "features": [],
@@ -167,42 +207,12 @@
           "targetScope": null
         }
       ],
-      "processes": ["native-security-helper"],
+      "processes": ["native-agent", "build", "native-helper"],
       "networkBehavior": "None; all frames use private inherited process handles and are validated before nested allocation.",
       "nativeBehavior": "Pure Rust JSON encoding and decoding; ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Uses the exact locked itoa, memchr, serde_core, and zmij graph; fixed frame limits and generated protocol validation remain independent controls.",
       "bundleTreatment": "bundled",
       "localAlternative": "A handwritten JSON implementation would duplicate a security-sensitive parser and make generated cross-language protocol conformance harder to audit.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "hmac",
-      "version": "0.12.1",
-      "kind": "production",
-      "purpose": "Apply the standard HMAC construction to the opaque Attempt collection context and raw removable-device identity before any pseudonym crosses the source boundary.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/hmac/0.12.1",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "none",
-      "declarations": [
-        {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
-          "alias": "hmac",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": null
-        }
-      ],
-      "processes": ["exam-security-utility"],
-      "networkBehavior": "None.",
-      "nativeBehavior": "Pure Rust message-authentication construction; it ships no native library, helper, or lifecycle script.",
-      "transitiveRisk": "Reuses the exact locked digest graph admitted for SHA-256 and activates the exact locked constant-time subtle primitive; neither adds runtime I/O or platform integration.",
-      "bundleTreatment": "bundled",
-      "localAlternative": "A hand-rolled keyed-hash construction would enlarge the security-sensitive surface and duplicate a standard primitive.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
     },
@@ -218,7 +228,16 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
+          "alias": "sha2",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-xtask/Cargo.toml",
           "alias": "sha2",
           "kind": "production",
           "features": [],
@@ -227,7 +246,7 @@
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility"],
+      "processes": ["build"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust SHA-256 primitives; it ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Adds the exact locked digest, block-buffer, crypto-common, generic-array and typenum graph; the use is local HMAC derivation over bounded inputs.",
@@ -238,227 +257,686 @@
     },
     {
       "ecosystem": "cargo",
-      "package": "windows-sys",
-      "version": "0.61.2",
-      "kind": "production",
-      "purpose": "Typed Windows bindings for display, capture, snapshot process/session inventory, clipboard counters, print queues, mounted removable storage, network topology and proxy state, media-endpoint presence, and packaged helper image/signature verification.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/windows-sys/0.61.2",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "none",
-      "declarations": [
-        {
-          "manifest": "native/crates/capture-session-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Graphics_Gdi",
-            "Win32_System_LibraryLoader",
-            "Win32_System_Registry",
-            "Win32_System_RemoteDesktop",
-            "Win32_System_Threading",
-            "Win32_UI_WindowsAndMessaging"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/display-topology/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Devices_DeviceAndDriverInstallation",
-            "Win32_Devices_Display",
-            "Win32_Foundation",
-            "Win32_Graphics_Gdi",
-            "Win32_System_LibraryLoader",
-            "Win32_System_Threading",
-            "Win32_UI_WindowsAndMessaging"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/process-application-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Security",
-            "Win32_System_Diagnostics_Etw",
-            "Win32_System_Diagnostics_ToolHelp",
-            "Win32_System_Performance",
-            "Win32_System_RemoteDesktop",
-            "Win32_System_Threading",
-            "Win32_System_Time"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/interactive-session-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Security",
-            "Win32_System_RemoteDesktop",
-            "Win32_System_Services",
-            "Win32_System_Threading"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/clipboard-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": ["Win32_System_DataExchange"],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/print-spooler-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Globalization",
-            "Win32_Graphics_Gdi",
-            "Win32_Graphics_Printing",
-            "Win32_System_WindowsProgramming"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": ["Win32_Storage_FileSystem", "Win32_System_WindowsProgramming"],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/network-configuration-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_NetworkManagement_IpHelper",
-            "Win32_NetworkManagement_Ndis",
-            "Win32_Networking_WinHttp",
-            "Win32_Networking_WinSock"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/media-device-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Devices_DeviceAndDriverInstallation",
-            "Win32_Foundation",
-            "Win32_Media_Audio",
-            "Win32_Media_KernelStreaming"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/native-security-helper/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Security_Cryptography",
-            "Win32_Security_WinTrust",
-            "Win32_Storage_FileSystem",
-            "Win32_System_Threading",
-            "Win32_System_Pipes",
-            "Win32_System_IO",
-            "Win32_System_Services",
-            "Win32_Security_Authorization",
-            "Win32_System_JobObjects",
-            "Win32_System_RemoteDesktop",
-            "Win32_UI_Shell",
-            "Win32_System_Com"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        }
-      ],
-      "processes": [
-        "exam-security-utility",
-        "native-capture-session",
-        "native-display-topology",
-        "native-security-helper"
-      ],
-      "networkBehavior": "None; the crate provides generated Win32 bindings and links system libraries only.",
-      "nativeBehavior": "No bundled native binary or build script; generated declarations call reviewed Windows display/session, Toolhelp, clipboard, spooler, storage, IP Helper, WinHTTP, SetupAPI, media-class, BCrypt, live-process-image, and Authenticode trust APIs through system linking.",
-      "transitiveRisk": "Locks windows-link 0.2.1, which supplies Windows import linkage without lifecycle scripts or network behavior; it is target-scoped with windows-sys.",
-      "bundleTreatment": "external-platform",
-      "localAlternative": "Handwritten bindings for these ABI-sensitive Windows structures, handles, buffers, and lifecycle functions would enlarge the unsafe surface and increase memory-safety risk.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
       "package": "libc",
       "version": "0.2.189",
       "kind": "production",
-      "purpose": "Expose bounded macOS mount, network-interface and root-only process/audit inventory APIs to passive native adapters.",
+      "purpose": "Expose bounded macOS mount, network-interface and root-only process/audit inventory APIs to passive native adapters, and the account name the agent runs as on macOS and Linux for print-job attribution.",
       "owner": "native-capabilities",
       "source": "https://crates.io/crates/libc/0.2.189",
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
+          "manifest": "native/crates/prctr-os/Cargo.toml",
           "alias": "libc",
           "kind": "production",
           "features": [],
           "defaultFeatures": true,
           "optional": false,
-          "targetScope": "cfg(target_os=\"macos\")"
+          "targetScope": "cfg(target_os = \"macos\")"
         },
         {
-          "manifest": "native/crates/network-configuration-state/Cargo.toml",
+          "manifest": "native/crates/prctr-os/Cargo.toml",
           "alias": "libc",
           "kind": "production",
           "features": [],
           "defaultFeatures": true,
           "optional": false,
-          "targetScope": "cfg(target_os=\"macos\")"
-        },
-        {
-          "manifest": "native/crates/process-application-state/Cargo.toml",
-          "alias": "libc",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"macos\")"
+          "targetScope": "cfg(target_os = \"linux\")"
         }
       ],
-      "processes": ["exam-security-utility", "native-security-helper"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; the crate exposes platform C declarations only.",
       "nativeBehavior": "Links macOS system APIs already provided by the operating system and ships no helper or bundled native library.",
       "transitiveRisk": "No additional transitive runtime graph; the exact version is already locked by the native workspace.",
       "bundleTreatment": "external-platform",
       "localAlternative": "Maintaining local statfs, ifaddrs, flags, and target-ABI declarations would duplicate platform headers and increase unsafe layout risk.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "schemars",
+      "version": "1.2.3",
+      "kind": "production",
+      "purpose": "Derive the JSON Schema of the native agent protocol from its Rust types, so the committed schema, the protocol digest and the generated TypeScript come from one authority.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/schemars/1.2.3",
+      "license": "MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
+          "alias": "schemars",
+          "kind": "production",
+          "features": ["derive", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-protocol/Cargo.toml",
+          "alias": "schemars",
+          "kind": "production",
+          "features": ["derive", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
+      "processes": ["native-agent", "build", "native-helper"],
+      "networkBehavior": "None; schema generation is in-process and deterministic.",
+      "nativeBehavior": "Pure Rust derive and schema construction; no FFI and no build script beyond its derive macro crate.",
+      "transitiveRisk": "Adds schemars_derive, serde_derive_internals, dyn-clone and ref-cast; exact versions are locked and license checked. Default features (including its preserve_order map) are disabled.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "A hand-written schema would duplicate every protocol type and drift; the previous design generated Rust from hand-written schemas through a 1,825-line generator.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-app-kit",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "AppKit bindings for the native agent on macOS: the general pasteboard change count only. Content, types and owner are never read.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-app-kit/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-app-kit",
+          "kind": "production",
+          "features": ["NSPasteboard", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None; process-local Objective-C calls.",
+      "nativeBehavior": "Links the Objective-C runtime and the named system framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Adds objc2-foundation and block2 on macOS only; exact versions are locked and license checked.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written objc_msgSend declarations, as in the superseded crates, are untyped and easy to get wrong.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2",
+      "version": "0.6.5",
+      "kind": "production",
+      "purpose": "The Objective-C runtime bindings for the native agent on macOS: autorelease pools around framework calls made from polling threads.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2/0.6.5",
+      "license": "MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2",
+          "kind": "production",
+          "features": ["std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None; process-local Objective-C calls.",
+      "nativeBehavior": "Links the Objective-C runtime and the named system framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Already present transitively through the objc2 framework crates; declaring it directly adds no new crate.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written objc_msgSend declarations, as in the superseded crates, are untyped and easy to get wrong.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-core-foundation",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "CoreFoundation types for reading the CoreGraphics window list on macOS: arrays, dictionaries, numbers and strings, each type-checked before use.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-core-foundation/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-core-foundation",
+          "kind": "production",
+          "features": ["CFArray", "CFData", "CFURL", "CFDictionary", "CFNumber", "CFString", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None; CoreFoundation objects are process-local.",
+      "nativeBehavior": "Links the system CoreFoundation framework; unsafe element access is confined to prctr-os with documented safety and checked downcasts.",
+      "transitiveRisk": "Already present transitively through objc2-core-graphics; declaring it directly adds no new crate. Used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written CoreFoundation declarations would duplicate ABI details and lose the checked type downcasts.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-core-graphics",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "Maintained CoreGraphics bindings for the native agent on macOS: the online display list and display queries, and the window list that reads the candidate window sharing state and the bounds of windows above it. Replaces hand-written CoreGraphics and objc_msgSend declarations.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-core-graphics/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-core-graphics",
+          "kind": "production",
+          "features": [
+            "CGDirectDisplay",
+            "CGDisplayConfiguration",
+            "CGError",
+            "CGGeometry",
+            "CGSession",
+            "CGWindow",
+            "libc",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None; CoreGraphics queries are process-local.",
+      "nativeBehavior": "Links the system CoreGraphics framework. Most selected functions are safe wrappers; the remaining unsafe calls are confined to prctr-os with documented safety.",
+      "transitiveRisk": "Adds objc2, objc2-core-foundation, objc2-encode, bitflags and libc on macOS only; exact versions are locked and license checked. Used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written framework declarations, as in the superseded crates, duplicate ABI details the bindings already generate from Apple headers and are easy to get wrong.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-av-foundation",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "AVFoundation bindings for the native agent on macOS: which cameras and microphones exist, their transport type, whether one is suspended or used by another application, and the media authorization status and prompt. No device is opened and nothing is captured.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-av-foundation/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-av-foundation",
+          "kind": "production",
+          "features": ["AVCaptureDevice", "AVMediaFormat", "block2", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links the system AVFoundation framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2, objc2-foundation and block2; used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written Objective-C messaging for AVCaptureDevice would duplicate the class interface and its media type constants.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-foundation",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "Foundation bindings for the native agent on macOS: the NSArray and NSString values AVFoundation returns.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-foundation/0.3.2",
+      "license": "MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-foundation",
+          "kind": "production",
+          "features": ["NSArray", "NSEnumerator", "NSError", "NSString", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links the system Foundation framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Already in the graph through objc2-app-kit; now declared directly.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written NSArray and NSString messaging would duplicate the objc2 types the other bindings return.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "block2",
+      "version": "0.6.2",
+      "kind": "production",
+      "purpose": "Objective-C block support for the native agent on macOS: the completion handler of the camera and microphone permission request.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/block2/0.6.2",
+      "license": "MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "block2",
+          "kind": "production",
+          "features": ["std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Creates blocks the system frameworks call; confined to prctr-os.",
+      "transitiveRisk": "Already in the graph through the objc2 framework crates; now declared directly.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "A hand-written block ABI would duplicate the runtime layout block2 encodes.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "chacha20poly1305",
+      "version": "0.11.0",
+      "kind": "production",
+      "purpose": "Authenticated encryption for the screen evidence recorder: every local segment and the index are sealed with XChaCha20-Poly1305 under the recording key, and every clip chunk with ChaCha20-Poly1305 under a fresh clip key, which Electron main opens with node:crypto.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/chacha20poly1305/0.11.0",
+      "license": "Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
+          "alias": "chacha20poly1305",
+          "kind": "production",
+          "features": ["alloc", "zeroize"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Pure Rust; no OS calls. Nonces come from prctr-os, never from a userspace generator.",
+      "transitiveRisk": "Adds the RustCrypto aead, chacha20, poly1305, cipher, inout, hybrid-array, crypto-common, universal-hash, ctutils and cmov crates, all Apache-2.0 OR MIT; getrandom and rand_core are disabled.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "No OS offers ChaCha20-Poly1305 across macOS, Windows and Linux, and a hand-written AEAD would be unaudited cryptography.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "dispatch2",
+      "version": "0.3.1",
+      "kind": "production",
+      "purpose": "Grand Central Dispatch bindings for the screen recorder on macOS: the serial queue ScreenCaptureKit delivers frames on.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/dispatch2/0.3.1",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "dispatch2",
+          "kind": "production",
+          "features": ["std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links libdispatch from the system; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2, already admitted.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written dispatch declarations would duplicate the queue ABI objc2-screen-capture-kit already expects.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-core-media",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "Core Media bindings for the screen recorder on macOS: sample buffers, their data and attachments, H.264 parameter sets and media times.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-core-media/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-core-media",
+          "kind": "production",
+          "features": [
+            "CMBlockBuffer",
+            "CMFormatDescription",
+            "CMSampleBuffer",
+            "CMTime",
+            "objc2",
+            "objc2-core-video",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links the system CoreMedia framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2-core-foundation and objc2-core-video.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written Core Media declarations would duplicate the framework ABI the capture and encoder bindings return.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-core-video",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "Core Video bindings for the screen recorder on macOS: BGRA pixel buffers, locked to copy captured frames and to fill encoder input.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-core-video/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-core-video",
+          "kind": "production",
+          "features": [
+            "CVBase",
+            "CVBuffer",
+            "CVImageBuffer",
+            "CVPixelBuffer",
+            "CVReturn",
+            "bitflags",
+            "objc2",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links the system CoreVideo framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2-core-foundation.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written pixel-buffer declarations would duplicate the framework ABI.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-screen-capture-kit",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "ScreenCaptureKit bindings for the screen recorder on macOS: one stream of the main display at 5 fps, BGRA, with the cursor; no audio, no microphone and no window lists are read.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-screen-capture-kit/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-screen-capture-kit",
+          "kind": "production",
+          "features": [
+            "SCShareableContent",
+            "SCStream",
+            "block2",
+            "dispatch2",
+            "objc2-core-graphics",
+            "objc2-core-media",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links the system ScreenCaptureKit framework; needs the Screen Recording permission; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2, objc2-foundation, objc2-core-media, objc2-core-graphics, block2 and dispatch2.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "There is no other supported macOS capture API from macOS 15; hand-written bindings would duplicate the framework's classes and protocols.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-video-toolbox",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "VideoToolbox bindings for the screen recorder on macOS: one real-time H.264 compression session at about 1 Mbit/s with forced keyframes.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-video-toolbox/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-video-toolbox",
+          "kind": "production",
+          "features": [
+            "VTCompressionProperties",
+            "VTCompressionSession",
+            "VTErrors",
+            "VTSession",
+            "block2",
+            "objc2",
+            "objc2-core-media",
+            "objc2-core-video",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links the system VideoToolbox framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2-core-foundation, objc2-core-media, objc2-core-video and block2.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written compression-session declarations would duplicate the framework ABI; a software encoder would add a large dependency and use more power.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-io-kit",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "IOKit bindings for the native agent on macOS: which whole disks are removable or external and how they attach, and which USB interfaces are still-image (phone or camera) devices. Serials, names, labels and contents are never read.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-io-kit/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-io-kit",
+          "kind": "production",
+          "features": ["libc", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None; reads the local IORegistry only.",
+      "nativeBehavior": "Links the system IOKit framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2-core-foundation and libc, already admitted; used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written IOKit declarations would duplicate the framework ABI and its registry iteration constants.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-security",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "Security framework bindings for the native agent on macOS: the code signature of each process in the candidate's account (signing identifier, Team ID and the Apple anchor), matched on the device against the bundled application catalog.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-security/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-security",
+          "kind": "production",
+          "features": ["CSCommon", "SecCode", "SecRequirement", "SecStaticCode", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links the system Security framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2-core-foundation, already admitted; used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written code-signing declarations would duplicate the framework ABI and its information keys.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-system-configuration",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "SystemConfiguration bindings for the native agent on macOS: whether a manual, automatic-configuration or auto-discovery system proxy is enabled. Hosts, ports and scripts are never read.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-system-configuration/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-system-configuration",
+          "kind": "production",
+          "features": [
+            "SCDynamicStore",
+            "SCDynamicStoreCopySpecific",
+            "SCSchemaDefinitions",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent", "native-helper"],
+      "networkBehavior": "None; reads the local SystemConfiguration store only.",
+      "nativeBehavior": "Links the system SystemConfiguration framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2-core-foundation, already admitted; used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written SystemConfiguration declarations would duplicate the framework ABI and its CFString keys.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "windows",
+      "version": "0.62.2",
+      "kind": "production",
+      "purpose": "Microsoft's Windows API bindings for the native agent: the display configuration API, and the candidate window's display affinity and the visible, uncloaked windows above it.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/windows/0.62.2",
+      "license": "MIT OR Apache-2.0",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "windows",
+          "kind": "production",
+          "features": [
+            "Foundation",
+            "Graphics",
+            "Graphics_Capture",
+            "Graphics_DirectX",
+            "Graphics_DirectX_Direct3D11",
+            "Win32_Devices_DeviceAndDriverInstallation",
+            "Win32_Devices_Display",
+            "Win32_Foundation",
+            "Win32_Globalization",
+            "Win32_Security_WinTrust",
+            "Win32_Security_Cryptography_Catalog",
+            "Win32_Security_Cryptography_Sip",
+            "Win32_Graphics_Direct3D",
+            "Win32_Graphics_Direct3D11",
+            "Win32_Graphics_Dwm",
+            "Win32_Graphics_Dxgi",
+            "Win32_Graphics_Dxgi_Common",
+            "Win32_Graphics_Gdi",
+            "Win32_Graphics_Printing",
+            "Win32_Media_Audio",
+            "Win32_Media_MediaFoundation",
+            "Win32_NetworkManagement_IpHelper",
+            "Win32_NetworkManagement_Ndis",
+            "Win32_NetworkManagement_Rras",
+            "Win32_Networking_WinHttp",
+            "Win32_Networking_WinSock",
+            "Win32_Security",
+            "Win32_Security_Cryptography",
+            "Win32_Storage_FileSystem",
+            "Win32_System_Com",
+            "Win32_System_Com_StructuredStorage",
+            "Win32_System_DataExchange",
+            "Win32_System_Diagnostics_ToolHelp",
+            "Win32_System_IO",
+            "Win32_System_Ioctl",
+            "Win32_System_Ole",
+            "Win32_System_Registry",
+            "Win32_System_RemoteDesktop",
+            "Win32_System_Threading",
+            "Win32_System_Variant",
+            "Win32_System_WinRT",
+            "Win32_System_WinRT_Direct3D11",
+            "Win32_System_WinRT_Graphics_Capture",
+            "Win32_System_WindowsProgramming",
+            "Win32_UI_HiDpi",
+            "Win32_UI_WindowsAndMessaging",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"windows\")"
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None; display configuration queries are process-local.",
+      "nativeBehavior": "Links user32, setupapi, kernel32, advapi32, winspool, d3d11, dxgi and mfplat for display, device, storage, print-job, media and screen-capture queries; storage devices are opened with no data access; unsafe calls are confined to prctr-os with documented safety.",
+      "transitiveRisk": "Adds windows-core, windows-link, windows-result, windows-strings and their companions on Windows only; exact versions are locked and license checked.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "windows-sys gives raw declarations only; the windows crate adds typed results and safe defaults for the structures the agent reads.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
     },
@@ -500,14 +978,14 @@
     },
     {
       "package": "electron",
-      "version": "44.0.0",
+      "version": "44.11.3",
       "kind": "production",
       "purpose": "Run the dedicated security utility process and transfer its private MessagePort from Electron main.",
       "owner": "toolchain",
-      "source": "https://www.npmjs.com/package/electron/v/44.0.0",
+      "source": "https://www.npmjs.com/package/electron/v/44.11.3",
       "license": "MIT",
       "lifecycleScripts": "none",
-      "processes": ["electron-main", "exam-security-utility"],
+      "processes": ["electron-main"],
       "networkBehavior": "The development package API acquires the checksum-verified exact Electron distribution on explicit tool invocation when it is absent; the packaged application uses its bundled runtime and product networking remains separately owned.",
       "nativeBehavior": "Installs the exact Electron runtime and its Chromium/Node native binaries for the host platform.",
       "transitiveRisk": "Acquisition and archive extraction dependencies are reachable only from explicit development tooling; the lockfile pins their resolved graph and the application does not import this package as an ordinary Node dependency.",
@@ -888,11 +1366,11 @@
     },
     {
       "package": "markdown-it",
-      "version": "14.2.0",
+      "version": "14.3.3",
       "kind": "production",
       "purpose": "Render authorized local documents in the isolated resource preview host.",
       "owner": "resource-preview",
-      "source": "https://www.npmjs.com/package/markdown-it/v/14.2.0",
+      "source": "https://www.npmjs.com/package/markdown-it/v/14.3.3",
       "license": "MIT",
       "lifecycleScripts": "blocked",
       "processes": ["renderer"],
@@ -1151,6 +1629,16 @@
       "localAlternative": "Electron offers vibrancy but no Liquid Glass API; writing the AppKit bridge again would duplicate this package.",
       "updateOwner": "design-system",
       "removalOwner": "design-system"
+    },
+    {
+      "package": "@electron-forge/cli",
+      "version": "8.0.1",
+      "kind": "development",
+      "purpose": "Package the Electron app for release: ASAR assembly with the signed native helpers unpacked, platform packaging, and signing and notarization hooks. Proctor's own esbuild output is the input; Forge has no bundler plugin.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/@electron-forge/cli",
+      "license": "MIT",
+      "lifecycleScripts": "none"
     }
   ]
 }

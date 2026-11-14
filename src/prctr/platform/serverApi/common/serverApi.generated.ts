@@ -1869,6 +1869,135 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exam-attempts/{exam_attempt_id}/screen-clip-requests": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List the screen clip requests the candidate's Desktop has not taken
+         * @description Lists, newest first, the screen clip requests waiting for the candidate's Desktop, after validating the Session-bound Attempt credential and open Connection. Requests queued while the Attempt was suspended appear once the candidate resumes. Each item carries the range to cut; never who asked or why.
+         */
+        readonly get: operations["listCandidateScreenClipRequests"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exam-attempts/{exam_attempt_id}/screen-clip-requests/{screen_clip_id}/take": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Take one screen clip request
+         * @description Records that the candidate's Desktop took a request and is recording what remains of its range. The request then belongs to the Participation that took it. Taking it again through the same Participation returns it unchanged.
+         */
+        readonly post: operations["takeCandidateScreenClipRequest"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exam-attempts/{exam_attempt_id}/screen-clip-requests/{screen_clip_id}/upload": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * Read where a screen clip upload stands
+         * @description Returns the clip and the numbers of the chunks that arrived, so Desktop resumes an interrupted upload with the rest.
+         */
+        readonly get: operations["getCandidateScreenClipUpload"];
+        readonly put?: never;
+        /**
+         * Declare the screen clip about to be uploaded
+         * @description Declares a taken clip's media type, exact size and the SHA-256 of every chunk in order. Every chunk is chunk_bytes long except the last, which holds the rest. The clip's content digest is the SHA-256 of that manifest. A clip that would take the Attempt's clips past 6 GiB is refused. Declaring the same clip again returns it unchanged. Once the Participation that took the clip has closed, as at submission, Desktop continues the upload without the Attempt credential and Connection headers until that Participation's upload deadline; a clip not complete by then fails with upload_deadline.
+         */
+        readonly post: operations["beginCandidateScreenClipUpload"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exam-attempts/{exam_attempt_id}/screen-clip-requests/{screen_clip_id}/upload/chunks/{chunk}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+                /** @description The chunk's number, from 1. */
+                readonly chunk: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /**
+         * Upload one chunk of a screen clip
+         * @description Streams one chunk as the raw request body, with its exact Content-Length. The bytes are checked against the hash the clip declared for that chunk and kept only if they match. Sending a stored chunk again changes nothing, so a chunk whose response was lost can be sent again.
+         */
+        readonly put: operations["uploadCandidateScreenClipChunk"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exam-attempts/{exam_attempt_id}/screen-clip-requests/{screen_clip_id}/upload/complete": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Finish a screen clip upload
+         * @description Makes a clip whose every chunk arrived ready to play. The body carries the clip's content digest and the installation key's ES256 signature over the exact bytes of that digest (its 64 lowercase hexadecimal characters), raw r and s in unpadded base64url. The signature must verify with the key of the Desktop registration uploading the clip; it is stored with the clip so a reviewer can check the clip later from the clip and its record alone. Completing it again returns it unchanged.
+         */
+        readonly post: operations["completeCandidateScreenClipUpload"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exam-attempts/{exam_attempt_id}/security-batches": {
         readonly parameters: {
             readonly query?: never;
@@ -1883,7 +2012,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Append minimized native security evidence
-         * @description Atomically accepts one closed batch under its original verified release, matrix, policy, source instances, and Participation generation. Live delivery requires exact Connection continuity; closed streams use current owning registered-key authentication until the fixed upload deadline. Exact retries preserve the submitted prior acknowledgement and recover the original receipt. Out-of-order records wait behind recoverable holes; terminal gaps preserve unresolved openers. Native conditions do not automatically create Flags, warnings or suspension. Lifetime quotas include pending bytes, envelopes, receipts and bounded metadata. Repair has reserved headroom. Native append is limited across Sessions and transports to two requests per second with burst eight; replay consumes allowance. A 429 response supplies Retry-After.
+         * @description Atomically accepts one closed batch under its original verified release, matrix, policy, source instances, and Participation generation. Live delivery requires exact Connection continuity; closed streams use current owning registered-key authentication until the fixed upload deadline. Exact retries preserve the submitted prior acknowledgement and recover the original receipt. Out-of-order records wait behind recoverable holes; terminal gaps preserve unresolved openers. The server evaluates the policy's rules on the facts in stream order; an enforce rule that stops being met raises its native Flag and, for a flag_and_suspend family, suspends the Attempt. Observe rules, unknown status and gaps never flag. Lifetime quotas include pending bytes, envelopes, receipts and bounded metadata. Repair has reserved headroom. Native append is limited across Sessions and transports to two requests per second with burst eight; replay consumes allowance. A 429 response supplies Retry-After.
          */
         readonly post: operations["appendNativeDelivery"];
         readonly delete?: never;
@@ -2215,6 +2344,29 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exam-sittings/{exam_sitting_id}/security-policy": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * Read the policy for the readiness overview
+         * @description Resolves the Sitting's current native policy, under the same eligibility checks as preparing a preflight, for the overview a candidate's Desktop shows before Start: the capabilities it activates, the rules it checks, the recorder switch and the disclosure. It creates no preflight, records nothing and grants nothing, so the overview may hold it for as long as it is open. At Start, compare readiness_digest with the one the prepared preflight returns; if they differ, refresh the overview.
+         */
+        readonly get: operations["getSecurityPolicyOverview"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exam-sittings/{exam_sitting_id}/security-preflights": {
         readonly parameters: {
             readonly query?: never;
@@ -2229,7 +2381,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Prepare a secure Desktop admission challenge
-         * @description Requires an eligible registered Desktop Session and an exact admitted build, registry, source manifest and configuration manifest. Stores one pending 120-second challenge per Session and Sitting; a successor supersedes it. Does not create an Attempt, Workspace or Participation. Ready rejoin returns frozen configuration; active and suspended Attempts cannot obtain a replacement preflight. Unavailable Institution catalogs or enforced native coverage fail closed.
+         * @description Requires an eligible registered Desktop Session and an exact admitted build, capability registry and configuration manifest. Stores one pending 120-second challenge per Session and Sitting; a successor supersedes it. Does not create an Attempt, Workspace or Participation. Ready rejoin returns frozen configuration; active and suspended Attempts cannot obtain a replacement preflight. Unavailable Institution catalogs, or a family enforced where the release does not certify enforcement on the candidate's platform, fail closed.
          */
         readonly post: operations["prepareSecurityPreflight"];
         readonly delete?: never;
@@ -2989,6 +3141,66 @@ export interface paths {
          * @description Closes only the identified active suspension episode and moves the Attempt to ready. It preserves integrity evidence and creates no continuity credential, Participation, Session binding, or Connection; the candidate must rejoin through full admission validation.
          */
         readonly post: operations["reallowExamAttempt"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/screen-clips": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List an Attempt's screen clips
+         * @description Lists, newest first, every clip requested for the Attempt, manager and incident alike, with its state: requested, recording the future part of its range, uploading, ready or failed. Managers' reasons are never returned.
+         */
+        readonly get: operations["listExamAttemptScreenClips"];
+        readonly put?: never;
+        /**
+         * Request a range of a candidate's recorded screen
+         * @description An Exam Manager's request for part of the screen Desktop records on the candidate's device, for an Exam whose native policy turns the screen recorder on. The range is either from the start of the session or an explicit start and end of at most six hours; it may end up to ten minutes after the request, and Desktop waits for that part before cutting the clip. A request made while the Attempt is suspended waits until the candidate resumes. The manager's reason is required, audited as an attempt, and stored with the request; it is never returned. An Attempt takes at most ten manager requests. Requests stop once the Attempt has ended.
+         */
+        readonly post: operations["requestExamAttemptScreenClip"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/screen-clips/{screen_clip_id}/content": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * Play a ready screen clip
+         * @description Streams a ready clip to one of the Sitting's Exam Managers, or once the Attempt is submitted to someone allowed to review its Submission, whole or by one byte range so a player can seek. Each playback, a request from the clip's first byte, is audited. Multiple ranges, or a range past the clip's end, are refused.
+         */
+        readonly get: operations["playExamAttemptScreenClip"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -4246,6 +4458,49 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/plugins": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List the plugins compiled into the server
+         * @description Lists every plugin compiled into the server, ordered by name, with its state on the serving node, whether it should run, its saved settings and the JSON Schema an administration UI draws its settings form from. A Session with plugin.manage is required; Personal Access Tokens cannot read it. Plugin secrets never appear: they stay in the configuration file. A plugin nobody configured shows its default and revision 0.
+         */
+        readonly get: operations["listPlugins"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/plugins/{plugin_id}/settings": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The plugin's ID, for example display-topology. */
+                readonly plugin_id: components["parameters"]["PluginID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /**
+         * Save a plugin's settings
+         * @description Turns one plugin on or off and replaces its settings document, under an optimistic revision fence. Requires a strong recent interactive system-administrator Session, an Idempotency-Key, and durable audit; the audit records the plugin and whether it is enabled, never setting values. Use expected_revision 0 for a plugin nobody has configured. The plugin checks the settings before they are saved and may refuse them with plugin.invalid. A required plugin cannot be turned off. A saved change applies on every node within about five seconds, without a restart, and plugin_settings_changed tells administrators' clients to refetch. A no-op keeps the revision.
+         */
+        readonly put: operations["replacePluginSettings"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/programme-levels/{programme_level_id}": {
         readonly parameters: {
             readonly query?: never;
@@ -4606,7 +4861,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Report minimized privileged preflight results
-         * @description Rechecks the same registered Session, candidate, build, Sitting and policy before storing the bounded report and its canonical digest. Enforced and baseline requirements must be ready; truthful degraded observe-only coverage can remain eligible. A blocked report creates no Attempt or misconduct Flag. Retry preserves the original receipt time; Connect must consume a current eligible report within 30 seconds.
+         * @description Rechecks the same registered Session, candidate, build, Sitting and policy before storing the bounded report and its canonical digest. The server evaluates every readiness rule on the reported facts; each enforced and baseline rule must be met, and an unknown status blocks. Observed rules never block. A blocked report creates no Attempt or misconduct Flag. Retry preserves the original receipt time; Connect must consume a current eligible report within 30 seconds.
          */
         readonly post: operations["reportSecurityPreflight"];
         readonly delete?: never;
@@ -4813,8 +5068,8 @@ export interface paths {
             readonly cookie?: never;
         };
         /**
-         * Inspect minimized native condition transitions for a Submission
-         * @description Requires the same current Submission integrity-view authorization as detailed evidence. Returns selected catalog-validated occurrence transitions without creating a Flag or declaring a violation. Includes original receipt and interpretation times, immutable stream/policy provenance and unresolved-opener state. Operational health, gaps and resets are excluded. Pages contain at most 100 records. Integrity retirement removes this material independently of native operational retention. No-store; cursors are purpose-specific opaque keysets.
+         * Inspect the native rule status changes of a Submission
+         * @description Requires the same current Submission integrity-view authorization as detailed evidence. Returns every change of a native rule's status as the server evaluated it on the facts Desktop reported, with the delivery position that caused it (batch 0 is the state reported at Start), original receipt and interpretation times, and immutable stream and policy provenance. An occurrence opens when a rule becomes not met and closes when it is met again; an enforce occurrence that opens also raises its capability's native Flag. The facts themselves are not returned. Pages contain at most 100 records. Integrity retirement removes this material independently of native operational retention. No-store; cursors are purpose-specific opaque keysets.
          */
         readonly get: operations["listNativeConditions"];
         readonly put?: never;
@@ -4935,6 +5190,26 @@ export interface paths {
          * @description Returns a request-specific, fail-closed compatibility result for one declared Proctor Desktop build. The declarations are consistency metadata rather than binary attestation. Every well-formed request returns 200, including unsupported builds and temporary unavailability; malformed selectors return Problem Details. The response deliberately omits Installation identity, authentication policy, providers, build provenance, and update destinations.
          */
         readonly get: operations["pingSystem"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/plugins": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List the plugins active on this server
+         * @description Lists the optional features compiled into the server that are active on the serving node, ordered by name, so a client can show only what this server supports. A plugin that is turned off, failed to activate, or has since failed is not listed. The response carries no plugin settings or diagnostics.
+         */
+        readonly get: operations["listActiveSystemPlugins"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -6266,6 +6541,7 @@ export interface components {
             readonly pending_invitations_is_lower_bound?: boolean;
         };
         readonly AdmittedSecurity: {
+            /** @description The native delivery stream this admission opened. Desktop sends it as the security control's stream_id and as the native delivery watermark's source_id. */
             readonly delivery_stream_id: string;
             /** Format: int64 */
             readonly generation: number;
@@ -6381,7 +6657,7 @@ export interface components {
          * @description Stable name of an audited action. The catalogue is closed and may grow; clients own the labels and should present an unknown value generically.
          * @enum {string}
          */
-        readonly AuditAction: "academic.progression.manage" | "academic_audit.view" | "academic_period.manage" | "academic_period.view" | "academic_unit.manage" | "academic_unit.members.manage" | "academic_unit.members.view" | "academic_unit.view" | "access_policy.manage" | "access_policy.view" | "audit.view" | "authentication.administrator_mfa_reset" | "authentication.administrator_recovery" | "authentication.desktop_authorization" | "authentication.desktop_session_issue" | "authentication.email_change.undo" | "authentication.email_verification.complete" | "authentication.email_verification.request" | "authentication.external_login" | "authentication.external_provision" | "authentication.login" | "authentication.password_reset.complete" | "authentication.password_reset.request" | "authentication.public_registration" | "authentication.reauthenticate" | "class.manage" | "class.members.manage" | "class.members.view" | "class.view" | "desktop_compatibility_policy.manage" | "desktop_registration.rename" | "desktop_registration.revoke" | "exam.attempt.browser_activity.view" | "exam.create" | "exam.create.override" | "exam.manage" | "exam.manage.override" | "exam.publish" | "exam.publish.override" | "exam.records.complete" | "exam.records.complete.override" | "exam.records.export" | "exam.records.export.override" | "exam.records.hold" | "exam.records.hold.override" | "exam.sitting.create" | "exam.sitting.create.override" | "exam.sitting.manage" | "exam.sitting.manage.override" | "exam.sitting.participate" | "exam.sitting.view" | "exam.sitting.view.override" | "exam.view" | "exam.view.override" | "external_identity.manage" | "installation.bootstrap" | "institution.manage" | "invitation.accept" | "invitation.create" | "invitation.manage" | "invitation.view" | "job.manage" | "job.view" | "mail.manage" | "mail.rekey" | "mail.view" | "mfa.activate" | "mfa.challenge" | "mfa.disable" | "mfa.recovery_codes.regenerate" | "mfa.rekey" | "mfa.setup" | "onboarding_batch.manage" | "onboarding_batch.view" | "personal_access_token.create" | "personal_access_token.disable" | "personal_access_token.enable" | "personal_access_token.revoke" | "programme.manage" | "programme.view" | "programme_level.manage" | "programme_level.view" | "retention_cleanup.manage" | "retention_hold.release" | "retention_policy.manage" | "retention_policy.view" | "role.manage" | "role.system_admin.reconcile" | "role.view" | "role_binding.manage" | "role_binding.view" | "session.manage" | "session.view" | "submission.release" | "submission.release.override" | "submission.review" | "submission.review.override" | "submission.view" | "submission.view.override" | "user.manage" | "user.mfa.reset" | "user.profile_picture.manage" | "user.search" | "user.settings.replace" | "user.view";
+        readonly AuditAction: "academic.progression.manage" | "academic_audit.view" | "academic_period.manage" | "academic_period.view" | "academic_unit.manage" | "academic_unit.members.manage" | "academic_unit.members.view" | "academic_unit.view" | "access_policy.manage" | "access_policy.view" | "audit.view" | "authentication.administrator_mfa_reset" | "authentication.administrator_recovery" | "authentication.desktop_authorization" | "authentication.desktop_session_issue" | "authentication.email_change.undo" | "authentication.email_verification.complete" | "authentication.email_verification.request" | "authentication.external_login" | "authentication.external_provision" | "authentication.login" | "authentication.password_reset.complete" | "authentication.password_reset.request" | "authentication.public_registration" | "authentication.reauthenticate" | "class.manage" | "class.members.manage" | "class.members.view" | "class.view" | "desktop_compatibility_policy.manage" | "desktop_registration.rename" | "desktop_registration.revoke" | "exam.attempt.browser_activity.view" | "exam.create" | "exam.create.override" | "exam.manage" | "exam.manage.override" | "exam.publish" | "exam.publish.override" | "exam.records.complete" | "exam.records.complete.override" | "exam.records.export" | "exam.records.export.override" | "exam.records.hold" | "exam.records.hold.override" | "exam.sitting.create" | "exam.sitting.create.override" | "exam.sitting.manage" | "exam.sitting.manage.override" | "exam.sitting.participate" | "exam.sitting.view" | "exam.sitting.view.override" | "exam.view" | "exam.view.override" | "external_identity.manage" | "installation.bootstrap" | "institution.manage" | "invitation.accept" | "invitation.create" | "invitation.manage" | "invitation.view" | "job.manage" | "job.view" | "mail.manage" | "mail.rekey" | "mail.view" | "mfa.activate" | "mfa.challenge" | "mfa.disable" | "mfa.recovery_codes.regenerate" | "mfa.rekey" | "mfa.setup" | "onboarding_batch.manage" | "onboarding_batch.view" | "personal_access_token.create" | "personal_access_token.disable" | "personal_access_token.enable" | "personal_access_token.revoke" | "plugin.manage" | "programme.manage" | "programme.view" | "programme_level.manage" | "programme_level.view" | "retention_cleanup.manage" | "retention_hold.release" | "retention_policy.manage" | "retention_policy.view" | "role.manage" | "role.system_admin.reconcile" | "role.view" | "role_binding.manage" | "role_binding.view" | "session.manage" | "session.view" | "submission.release" | "submission.release.override" | "submission.review" | "submission.review.override" | "submission.view" | "submission.view.override" | "user.manage" | "user.mfa.reset" | "user.profile_picture.manage" | "user.search" | "user.settings.replace" | "user.view";
         /** @description Safe durable audit fact visible to the authorized caller. */
         readonly AuditEventResponse: {
             /** @description Stable permission-style name of the attempted action. */
@@ -6460,6 +6736,14 @@ export interface components {
             readonly refresh_token: string;
             /** @enum {string} */
             readonly token_type: "Bearer" | "DPoP";
+        };
+        readonly BeginCandidateScreenClipUploadRequest: {
+            /** @description The lowercase hexadecimal SHA-256 of every chunk, in order. */
+            readonly chunk_sha256: readonly string[];
+            /** @enum {string} */
+            readonly media_type: "video/mp4" | "video/webm";
+            /** Format: int64 */
+            readonly size_bytes: number;
         };
         readonly BeginProviderConnectionRequest: {
             readonly return_to?: string;
@@ -6908,7 +7192,7 @@ export interface components {
             /** @enum {string} */
             readonly state: "ready" | "active" | "suspended" | "submitted";
             /** @enum {string|null} */
-            readonly suspension_reason_code: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended" | null;
+            readonly suspension_reason_code: "secure_connectivity_lost" | "focus_policy_review_required" | "native_policy_review_required" | "manager_suspended" | null;
         };
         readonly CandidateExamActivityItemResponse: {
             readonly academic_unit: components["schemas"]["CandidateExamActivityRelationResponse"];
@@ -7197,6 +7481,12 @@ export interface components {
             readonly revision: number;
             /** Format: date-time */
             readonly updated_at: string;
+        };
+        readonly CompleteCandidateScreenClipUploadRequest: {
+            /** @description The clip's content digest, as the upload status reports it. */
+            readonly content_digest: string;
+            /** @description The installation key's ES256 signature over the content digest, raw r and s in unpadded base64url. */
+            readonly signature: string;
         };
         readonly CompleteExamRecordsRequest: {
             /** Format: int64 */
@@ -7788,24 +8078,36 @@ export interface components {
         };
         /** @description Frozen native semantics for a Participation. issued_at and active_from use millisecond UTC precision, with issued_at <= active_from <= activation time. There is no policy expiry; the renewable Participation lease is the sole live authority. The digest excludes only digest; scope rebinding preserves the separately computed content digest. */
         readonly EffectiveExamSecurityPolicy: {
+            /** @description The capabilities Desktop runs for this policy, with the sub-categories each selects. */
+            readonly activations: readonly components["schemas"]["NativeActivation"][];
             /** Format: date-time */
             readonly active_from: string;
             readonly application_release_id: string;
             /** @description Exactly one family in this order: process_application, interactive_session, clipboard, printing, removable_storage, virtualization, network_configuration, camera, microphone, external_capture. */
             readonly capabilities: readonly [
                 {
-                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
+                    /** @description The only catalog applications the candidate may run, sorted and unique: IDs from the Desktop release's application catalog, each one it marks allowable. Empty adds no allowlist. When the family is on, the catalog's never-allowable applications are always blocked. */
                     readonly allowed_application_ids: readonly string[];
                     /** @constant */
                     readonly id: "process_application";
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                 } & unknown,
                 {
                     /** @constant */
                     readonly id: "interactive_session";
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                 },
                 {
                     /** @constant */
@@ -7813,6 +8115,11 @@ export interface components {
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
                     readonly observe_os_clipboard_changes: boolean;
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                     /** @enum {string} */
                     readonly strategy: "disabled" | "private_attempt";
                 } & (unknown & unknown & unknown),
@@ -7825,36 +8132,48 @@ export interface components {
                     readonly mode: "disabled" | "observe" | "enforce";
                     /** @enum {string} */
                     readonly monitored_spooler: "not_required" | "required";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                 } & (unknown & unknown & unknown),
                 {
-                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
-                    readonly allowed_storage_function_class_ids: readonly string[];
                     readonly enabled_sub_capabilities: readonly ("removable_block_storage" | "portable_mtp")[];
                     /** @constant */
                     readonly id: "removable_storage";
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                 } & (unknown & unknown & unknown),
                 {
                     /** @constant */
                     readonly id: "virtualization";
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                     /** @enum {string} */
                     readonly rule: "not_applied" | "block_recognized_guest" | "require_certified_physical_environment";
                 } & (unknown & unknown & unknown),
                 {
-                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
-                    readonly allowed_adapter_class_ids: readonly string[];
-                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
-                    readonly allowed_managed_profile_ids: readonly string[];
-                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
-                    readonly allowed_tunnel_class_ids: readonly string[];
-                    readonly enabled_sub_capabilities: readonly ("system_proxy_state" | "os_managed_vpn_state" | "tunnel_interface_state" | "route_change" | "network_source_health")[];
+                    readonly enabled_sub_capabilities: readonly ("system_proxy_state" | "os_managed_vpn_state" | "tunnel_interface_state")[];
                     /** @constant */
                     readonly id: "network_configuration";
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                 } & (unknown & unknown & unknown),
                 {
                     /** @enum {string} */
@@ -7863,6 +8182,11 @@ export interface components {
                     readonly id: "camera";
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                     readonly require_ready: boolean;
                 } & (unknown & unknown),
                 {
@@ -7872,6 +8196,11 @@ export interface components {
                     readonly id: "microphone";
                     /** @enum {string} */
                     readonly mode: "disabled" | "observe" | "enforce";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                     readonly require_ready: boolean;
                 } & (unknown & unknown),
                 {
@@ -7879,6 +8208,11 @@ export interface components {
                     readonly id: "external_capture";
                     /** @enum {string} */
                     readonly mode: "disabled";
+                    /**
+                     * @description What an enforce occurrence of this family leads to; flag unless mode is enforce.
+                     * @enum {string}
+                     */
+                    readonly outcome: "flag" | "flag_and_suspend";
                 }
             ];
             /** @constant */
@@ -7897,11 +8231,13 @@ export interface components {
             readonly ordinal: number;
             readonly policy_id: string;
             /** @constant */
-            readonly registry_digest: "sha256:79faa1141236b073dff2ff802ce67abce3082417a7a4fa2954615e4226acd1e0";
+            readonly registry_digest: "sha256:e4c05771fa6f34c08c0f01aa98e33f88973baacf832c67d760457f2b4f9d734d";
             readonly resolved_exception_refs: readonly string[];
             /** @constant */
             readonly retention_class_id: "native_minimized";
             readonly revision: string;
+            /** @description The compiled native rules: the release's baseline, unchanged, then the rules compiled from the Exam's family selections. Desktop evaluates them on the device; the server evaluates them again on the same facts. */
+            readonly rules: readonly components["schemas"]["NativeRule"][];
             readonly scope: {
                 readonly admission_scope_id: string;
                 /** @constant */
@@ -7911,6 +8247,7 @@ export interface components {
                 /** @constant */
                 readonly kind: "attempt";
             };
+            readonly screen_recording: components["schemas"]["NativeScreenRecordingPolicy"];
             readonly sitting_id: string;
             readonly target_tuple: string;
             /** @constant */
@@ -7963,7 +8300,7 @@ export interface components {
          * @description Stable public problem code. The catalogue is closed and may grow; clients own the labels and should present an unknown value generically.
          * @enum {string}
          */
-        readonly ErrorCode: "academic_administration_preview.authorization_lost" | "academic_administration_preview.conflict" | "academic_administration_preview.expired" | "academic_administration_preview.target_conflict" | "academic_administration_preview.too_many_users" | "academic_period.conflict" | "academic_period.invalid" | "academic_unit.conflict" | "academic_unit.invalid" | "academic_unit_member.conflict" | "academic_unit_member.invalid" | "access_policy.blocked" | "access_policy.invalid" | "access_policy.revision_conflict" | "access_policy.unavailable" | "administration.unavailable" | "administrator_recovery.invalid" | "administrator_recovery.unavailable" | "affiliation.conflict" | "affiliation.invalid" | "affiliation.student_has_active_enrollment" | "audit.internal" | "audit.query.invalid" | "audit.unavailable" | "authentication.account_recovery.unavailable" | "authentication.account_token.invalid" | "authentication.client_type.invalid" | "authentication.credential_ambiguous" | "authentication.credentials_invalid" | "authentication.csrf.invalid" | "authentication.desktop_authorization.account_session_locked" | "authentication.desktop_authorization.disabled" | "authentication.desktop_authorization.incompatible" | "authentication.desktop_authorization.invalid" | "authentication.desktop_authorization.rejected" | "authentication.desktop_authorization.unavailable" | "authentication.desktop_reauthentication.denied" | "authentication.desktop_reauthentication.invalid" | "authentication.dpop.invalid" | "authentication.dpop.replayed" | "authentication.dpop.unavailable" | "authentication.dpop.use_nonce" | "authentication.email_change_undo.conflict" | "authentication.external.account_conflict" | "authentication.external.account_not_linked" | "authentication.external.invalid" | "authentication.external.provider_not_found" | "authentication.external.rejected" | "authentication.external.request.invalid" | "authentication.external.unavailable" | "authentication.internal" | "authentication.method.conflict" | "authentication.method.disabled" | "authentication.method.last_usable" | "authentication.method.not_found" | "authentication.method.provider_conflict" | "authentication.method.unavailable" | "authentication.mfa.code_invalid" | "authentication.mfa.conflict" | "authentication.mfa.disabled" | "authentication.mfa.enrollment_required" | "authentication.mfa.not_found" | "authentication.mfa.rekey.conflict" | "authentication.mfa.rekey.invalid" | "authentication.mfa.required" | "authentication.mfa.reset_invalid" | "authentication.mfa.unavailable" | "authentication.password.common_invalid" | "authentication.password.identity_invalid" | "authentication.password.invalid" | "authentication.password.pattern_invalid" | "authentication.password.reused" | "authentication.rate_limit_unavailable" | "authentication.rate_limited" | "authentication.reauthentication_method_required" | "authentication.reauthentication_required" | "authentication.registration.invalid" | "authentication.registration.invitation_required" | "authentication.registration.unavailable" | "authentication.required" | "authentication.session.invalid" | "authentication.session_required" | "authentication.sessions.maximum_reached" | "authentication.strong_required" | "authentication.token_invalid" | "authentication.user.conflict" | "authentication.user.invalid" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "class.conflict" | "class.enrollment_conflict" | "class.invalid" | "class_member.invalid" | "class_member.student_affiliation_required" | "desktop_compatibility_policy.invalid" | "desktop_compatibility_policy.revision_conflict" | "desktop_compatibility_policy.unavailable" | "desktop_registration.invalid" | "desktop_registration.revoked" | "desktop_registration.unavailable" | "exam.archived" | "exam.attempt.already_connected" | "exam.attempt.browser_activity_conflict" | "exam.attempt.configuration_frozen" | "exam.attempt.configuration_required" | "exam.attempt.configuration_stale" | "exam.attempt.configuration_unsupported" | "exam.attempt.conflict" | "exam.attempt.connection_closed" | "exam.attempt.connection_lost" | "exam.attempt.continuity_invalid" | "exam.attempt.correction_conflict" | "exam.attempt.desktop_incompatible" | "exam.attempt.focus_loss_conflict" | "exam.attempt.invalid" | "exam.attempt.management_authority_conflict" | "exam.attempt.not_found" | "exam.attempt.registered_desktop_required" | "exam.attempt.renewal_conflict" | "exam.attempt.revision_conflict" | "exam.attempt.sitting_not_open" | "exam.attempt.state_conflict" | "exam.attempt.suspension_conflict" | "exam.attempt.unavailable" | "exam.attempt.workspace.content_conflict" | "exam.attempt.workspace.cursor_conflict" | "exam.attempt.workspace.directory_not_empty" | "exam.attempt.workspace.entry_conflict" | "exam.attempt.workspace.entry_limit" | "exam.attempt.workspace.object_conflict" | "exam.attempt.workspace.path_conflict" | "exam.attempt.workspace.size_limit" | "exam.browser.source_budget_exhausted" | "exam.conflict" | "exam.delivery.append_rate_limited" | "exam.delivery.batch_conflict" | "exam.delivery.control_rate_limited" | "exam.delivery.declaration_conflict" | "exam.delivery.detail_budget_exhausted" | "exam.delivery.metadata_capacity" | "exam.delivery.pending_capacity" | "exam.delivery.replay_window_exceeded" | "exam.delivery.sequence_limit" | "exam.delivery.summary_rate_limited" | "exam.delivery.upload_expired" | "exam.draft.no_changes" | "exam.draft.revision_conflict" | "exam.export.claim_lost" | "exam.export.conflict" | "exam.export.expired" | "exam.export.limit" | "exam.export.not_found" | "exam.export.not_ready" | "exam.export.policy_unconfigured" | "exam.export.scope_changed" | "exam.export.source_retired" | "exam.export.unavailable" | "exam.integrity_review.incomplete" | "exam.integrity_review.invalid" | "exam.integrity_review.not_found" | "exam.integrity_review.revision_conflict" | "exam.integrity_review.state_conflict" | "exam.integrity_review.too_large" | "exam.integrity_review.unavailable" | "exam.invalid" | "exam.manager.candidate_conflict" | "exam.manager.exists" | "exam.manager.ineligible" | "exam.manager.not_found" | "exam.manager.owner_protected" | "exam.not_found" | "exam.owner.no_changes" | "exam.resource.conflict" | "exam.resource.content_invalid" | "exam.resource.invalid" | "exam.resource.limit" | "exam.resource.no_changes" | "exam.resource.not_found" | "exam.resource.order_invalid" | "exam.resource.revision_conflict" | "exam.resource.unavailable" | "exam.resource.upload_invalid" | "exam.revision.capacity_exceeded" | "exam.revision.no_changes" | "exam.revision_conflict" | "exam.security.attempt_not_ready" | "exam.security.catalog_missing" | "exam.security.configuration_unsupported" | "exam.security.control_conflict" | "exam.security.policy_changed" | "exam.security.posture_blocked" | "exam.security.preflight_consumed" | "exam.security.preflight_expired" | "exam.security.preflight_rate_limited" | "exam.security.preflight_report_changed" | "exam.security.preflight_required" | "exam.security.preflight_superseded" | "exam.security.resume_required" | "exam.security.session_changed" | "exam.security.unsupported_capability" | "exam.sitting.class_ineligible" | "exam.sitting.conflict" | "exam.sitting.correction.conflict" | "exam.sitting.correction.content_invalid" | "exam.sitting.correction.invalid" | "exam.sitting.correction.limit" | "exam.sitting.correction.manifest_conflict" | "exam.sitting.correction.no_changes" | "exam.sitting.correction.not_found" | "exam.sitting.correction.stage_conflict" | "exam.sitting.correction.unavailable" | "exam.sitting.deadline_reached" | "exam.sitting.extension_not_later" | "exam.sitting.invalid" | "exam.sitting.no_changes" | "exam.sitting.not_found" | "exam.sitting.revision_conflict" | "exam.sitting.schedule_not_future" | "exam.sitting.schedule_outside_period" | "exam.sitting.state_conflict" | "exam.sitting.unavailable" | "exam.starter_workspace.conflict" | "exam.starter_workspace.content_conflict" | "exam.starter_workspace.directory_not_empty" | "exam.starter_workspace.entry_kind" | "exam.starter_workspace.entry_limit" | "exam.starter_workspace.invalid" | "exam.starter_workspace.move_conflict" | "exam.starter_workspace.no_changes" | "exam.starter_workspace.not_found" | "exam.starter_workspace.object_conflict" | "exam.starter_workspace.parent_not_found" | "exam.starter_workspace.path_conflict" | "exam.starter_workspace.total_size_limit" | "exam.starter_workspace.unavailable" | "exam.starter_workspace.upload_expired" | "exam.unavailable" | "health.not_live" | "health.not_ready" | "idempotency.conflict" | "idempotency.in_progress" | "idempotency.key_invalid" | "idempotency.key_required" | "idempotency.not_supported" | "installation.already_initialized" | "installation.bootstrap_denied" | "installation.unavailable" | "institution.conflict" | "institution.invalid" | "invitation.class_period_conflict" | "invitation.conflict" | "invitation.invalid" | "invitation.mail_unavailable" | "invitation.query.invalid" | "invitation.role_not_delegable" | "invitation.unavailable" | "invitation.user_invalid" | "job.cancel.unsupported" | "job.conflict" | "job.query.invalid" | "job.retry.unsupported" | "job.unavailable" | "mail.conflict" | "mail.query.invalid" | "mail.recipient_ineligible" | "mail.recipient_unverified" | "mail.rekey.conflict" | "mail.rekey.invalid" | "mail.test.rate_limited" | "mail.unavailable" | "mfa.required_by_policy" | "onboarding_batch.duplicate" | "onboarding_import.conflict" | "onboarding_import.file_invalid" | "onboarding_import.unavailable" | "personal_access_token.invalid" | "personal_access_token.maximum_reached" | "personal_access_token.unavailable" | "profile_picture.invalid" | "profile_picture.unavailable" | "programme.conflict" | "programme.invalid" | "programme_level.conflict" | "programme_level.invalid" | "request.invalid" | "request.too_large" | "resource.not_found" | "retention.conflict" | "retention.invalid" | "retention.unavailable" | "retention_policy.invalid" | "retention_policy.revision_conflict" | "retention_policy.unavailable" | "role.built_in.protected" | "role.conflict" | "role.invalid" | "role.permission.invalid" | "role_binding.conflict" | "role_binding.invalid" | "role_binding.last_system_admin" | "role_binding.system_admin_scope_invalid" | "route.method_not_allowed" | "route.not_found" | "search.query.invalid" | "server.internal" | "service.busy" | "session.desktop_named_by_registration" | "session.id.invalid" | "session.invalid" | "session.not_found" | "student_progression.conflict" | "student_progression.effective_date_conflict" | "student_progression.lineage_conflict" | "student_progression.roster_too_large" | "student_progression.target_conflict" | "student_progression.unavailable" | "user.conflict" | "user.invalid" | "user.last_system_admin" | "user_settings.format_unsupported" | "user_settings.invalid" | "user_settings.revision_conflict" | "user_settings.unavailable" | "websocket.action.unknown" | "websocket.internal" | "websocket.origin.invalid" | "websocket.rate_limited" | "websocket.request.invalid" | "websocket.subscription.invalid" | "websocket.subscription.limit" | "websocket.unavailable";
+        readonly ErrorCode: "academic_administration_preview.authorization_lost" | "academic_administration_preview.conflict" | "academic_administration_preview.expired" | "academic_administration_preview.target_conflict" | "academic_administration_preview.too_many_users" | "academic_period.conflict" | "academic_period.invalid" | "academic_unit.conflict" | "academic_unit.invalid" | "academic_unit_member.conflict" | "academic_unit_member.invalid" | "access_policy.blocked" | "access_policy.invalid" | "access_policy.revision_conflict" | "access_policy.unavailable" | "administration.unavailable" | "administrator_recovery.invalid" | "administrator_recovery.unavailable" | "affiliation.conflict" | "affiliation.invalid" | "affiliation.student_has_active_enrollment" | "audit.internal" | "audit.query.invalid" | "audit.unavailable" | "authentication.account_recovery.unavailable" | "authentication.account_token.invalid" | "authentication.client_type.invalid" | "authentication.credential_ambiguous" | "authentication.credentials_invalid" | "authentication.csrf.invalid" | "authentication.desktop_authorization.account_session_locked" | "authentication.desktop_authorization.disabled" | "authentication.desktop_authorization.incompatible" | "authentication.desktop_authorization.invalid" | "authentication.desktop_authorization.rejected" | "authentication.desktop_authorization.unavailable" | "authentication.desktop_reauthentication.denied" | "authentication.desktop_reauthentication.invalid" | "authentication.dpop.invalid" | "authentication.dpop.replayed" | "authentication.dpop.unavailable" | "authentication.dpop.use_nonce" | "authentication.email_change_undo.conflict" | "authentication.external.account_conflict" | "authentication.external.account_not_linked" | "authentication.external.invalid" | "authentication.external.provider_not_found" | "authentication.external.rejected" | "authentication.external.request.invalid" | "authentication.external.unavailable" | "authentication.internal" | "authentication.method.conflict" | "authentication.method.disabled" | "authentication.method.last_usable" | "authentication.method.not_found" | "authentication.method.provider_conflict" | "authentication.method.unavailable" | "authentication.mfa.code_invalid" | "authentication.mfa.conflict" | "authentication.mfa.disabled" | "authentication.mfa.enrollment_required" | "authentication.mfa.not_found" | "authentication.mfa.rekey.conflict" | "authentication.mfa.rekey.invalid" | "authentication.mfa.required" | "authentication.mfa.reset_invalid" | "authentication.mfa.unavailable" | "authentication.password.common_invalid" | "authentication.password.identity_invalid" | "authentication.password.invalid" | "authentication.password.pattern_invalid" | "authentication.password.reused" | "authentication.rate_limit_unavailable" | "authentication.rate_limited" | "authentication.reauthentication_method_required" | "authentication.reauthentication_required" | "authentication.registration.invalid" | "authentication.registration.invitation_required" | "authentication.registration.unavailable" | "authentication.required" | "authentication.session.invalid" | "authentication.session_required" | "authentication.sessions.maximum_reached" | "authentication.strong_required" | "authentication.token_invalid" | "authentication.user.conflict" | "authentication.user.invalid" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "class.conflict" | "class.enrollment_conflict" | "class.invalid" | "class_member.invalid" | "class_member.student_affiliation_required" | "desktop_compatibility_policy.invalid" | "desktop_compatibility_policy.revision_conflict" | "desktop_compatibility_policy.unavailable" | "desktop_registration.invalid" | "desktop_registration.revoked" | "desktop_registration.unavailable" | "exam.archived" | "exam.attempt.already_connected" | "exam.attempt.browser_activity_conflict" | "exam.attempt.configuration_frozen" | "exam.attempt.configuration_required" | "exam.attempt.configuration_stale" | "exam.attempt.configuration_unsupported" | "exam.attempt.conflict" | "exam.attempt.connection_closed" | "exam.attempt.connection_lost" | "exam.attempt.continuity_invalid" | "exam.attempt.correction_conflict" | "exam.attempt.desktop_incompatible" | "exam.attempt.focus_loss_conflict" | "exam.attempt.invalid" | "exam.attempt.management_authority_conflict" | "exam.attempt.not_found" | "exam.attempt.registered_desktop_required" | "exam.attempt.renewal_conflict" | "exam.attempt.revision_conflict" | "exam.attempt.screen_clip_incomplete" | "exam.attempt.screen_clip_limit_reached" | "exam.attempt.screen_clip_too_large" | "exam.attempt.screen_recording_off" | "exam.attempt.sitting_not_open" | "exam.attempt.state_conflict" | "exam.attempt.suspension_conflict" | "exam.attempt.unavailable" | "exam.attempt.workspace.content_conflict" | "exam.attempt.workspace.cursor_conflict" | "exam.attempt.workspace.directory_not_empty" | "exam.attempt.workspace.entry_conflict" | "exam.attempt.workspace.entry_limit" | "exam.attempt.workspace.object_conflict" | "exam.attempt.workspace.path_conflict" | "exam.attempt.workspace.size_limit" | "exam.browser.source_budget_exhausted" | "exam.conflict" | "exam.delivery.append_rate_limited" | "exam.delivery.batch_conflict" | "exam.delivery.control_rate_limited" | "exam.delivery.declaration_conflict" | "exam.delivery.detail_budget_exhausted" | "exam.delivery.metadata_capacity" | "exam.delivery.pending_capacity" | "exam.delivery.replay_window_exceeded" | "exam.delivery.sequence_limit" | "exam.delivery.summary_rate_limited" | "exam.delivery.upload_expired" | "exam.draft.no_changes" | "exam.draft.revision_conflict" | "exam.export.claim_lost" | "exam.export.conflict" | "exam.export.expired" | "exam.export.limit" | "exam.export.not_found" | "exam.export.not_ready" | "exam.export.policy_unconfigured" | "exam.export.scope_changed" | "exam.export.source_retired" | "exam.export.unavailable" | "exam.integrity_review.incomplete" | "exam.integrity_review.invalid" | "exam.integrity_review.not_found" | "exam.integrity_review.revision_conflict" | "exam.integrity_review.state_conflict" | "exam.integrity_review.too_large" | "exam.integrity_review.unavailable" | "exam.invalid" | "exam.manager.candidate_conflict" | "exam.manager.exists" | "exam.manager.ineligible" | "exam.manager.not_found" | "exam.manager.owner_protected" | "exam.not_found" | "exam.owner.no_changes" | "exam.resource.conflict" | "exam.resource.content_invalid" | "exam.resource.invalid" | "exam.resource.limit" | "exam.resource.no_changes" | "exam.resource.not_found" | "exam.resource.order_invalid" | "exam.resource.revision_conflict" | "exam.resource.unavailable" | "exam.resource.upload_invalid" | "exam.revision.capacity_exceeded" | "exam.revision.no_changes" | "exam.revision_conflict" | "exam.security.attempt_not_ready" | "exam.security.catalog_missing" | "exam.security.configuration_unsupported" | "exam.security.control_conflict" | "exam.security.interaction_blocked" | "exam.security.policy_changed" | "exam.security.preflight_consumed" | "exam.security.preflight_expired" | "exam.security.preflight_rate_limited" | "exam.security.preflight_report_changed" | "exam.security.preflight_required" | "exam.security.preflight_superseded" | "exam.security.readiness_unmet" | "exam.security.resume_required" | "exam.security.session_changed" | "exam.security.unsupported_capability" | "exam.sitting.class_ineligible" | "exam.sitting.conflict" | "exam.sitting.correction.conflict" | "exam.sitting.correction.content_invalid" | "exam.sitting.correction.invalid" | "exam.sitting.correction.limit" | "exam.sitting.correction.manifest_conflict" | "exam.sitting.correction.no_changes" | "exam.sitting.correction.not_found" | "exam.sitting.correction.stage_conflict" | "exam.sitting.correction.unavailable" | "exam.sitting.deadline_reached" | "exam.sitting.extension_not_later" | "exam.sitting.invalid" | "exam.sitting.no_changes" | "exam.sitting.not_found" | "exam.sitting.revision_conflict" | "exam.sitting.schedule_not_future" | "exam.sitting.schedule_outside_period" | "exam.sitting.state_conflict" | "exam.sitting.unavailable" | "exam.starter_workspace.conflict" | "exam.starter_workspace.content_conflict" | "exam.starter_workspace.directory_not_empty" | "exam.starter_workspace.entry_kind" | "exam.starter_workspace.entry_limit" | "exam.starter_workspace.invalid" | "exam.starter_workspace.move_conflict" | "exam.starter_workspace.no_changes" | "exam.starter_workspace.not_found" | "exam.starter_workspace.object_conflict" | "exam.starter_workspace.parent_not_found" | "exam.starter_workspace.path_conflict" | "exam.starter_workspace.total_size_limit" | "exam.starter_workspace.unavailable" | "exam.starter_workspace.upload_expired" | "exam.unavailable" | "health.not_live" | "health.not_ready" | "idempotency.conflict" | "idempotency.in_progress" | "idempotency.key_invalid" | "idempotency.key_required" | "idempotency.not_supported" | "installation.already_initialized" | "installation.bootstrap_denied" | "installation.unavailable" | "institution.conflict" | "institution.invalid" | "invitation.class_period_conflict" | "invitation.conflict" | "invitation.invalid" | "invitation.mail_unavailable" | "invitation.query.invalid" | "invitation.role_not_delegable" | "invitation.unavailable" | "invitation.user_invalid" | "job.cancel.unsupported" | "job.conflict" | "job.query.invalid" | "job.retry.unsupported" | "job.unavailable" | "mail.conflict" | "mail.query.invalid" | "mail.recipient_ineligible" | "mail.recipient_unverified" | "mail.rekey.conflict" | "mail.rekey.invalid" | "mail.test.rate_limited" | "mail.unavailable" | "mfa.required_by_policy" | "onboarding_batch.duplicate" | "onboarding_import.conflict" | "onboarding_import.file_invalid" | "onboarding_import.unavailable" | "personal_access_token.invalid" | "personal_access_token.maximum_reached" | "personal_access_token.unavailable" | "plugin.invalid" | "plugin.not_found" | "plugin.required" | "plugin.revision_conflict" | "plugin.unavailable" | "profile_picture.invalid" | "profile_picture.unavailable" | "programme.conflict" | "programme.invalid" | "programme_level.conflict" | "programme_level.invalid" | "request.invalid" | "request.too_large" | "resource.not_found" | "retention.conflict" | "retention.invalid" | "retention.unavailable" | "retention_policy.invalid" | "retention_policy.revision_conflict" | "retention_policy.unavailable" | "role.built_in.protected" | "role.conflict" | "role.invalid" | "role.permission.invalid" | "role_binding.conflict" | "role_binding.invalid" | "role_binding.last_system_admin" | "role_binding.system_admin_scope_invalid" | "route.method_not_allowed" | "route.not_found" | "search.query.invalid" | "server.internal" | "service.busy" | "session.desktop_named_by_registration" | "session.id.invalid" | "session.invalid" | "session.not_found" | "student_progression.conflict" | "student_progression.effective_date_conflict" | "student_progression.lineage_conflict" | "student_progression.roster_too_large" | "student_progression.target_conflict" | "student_progression.unavailable" | "user.conflict" | "user.invalid" | "user.last_system_admin" | "user_settings.format_unsupported" | "user_settings.invalid" | "user_settings.revision_conflict" | "user_settings.unavailable" | "websocket.action.unknown" | "websocket.internal" | "websocket.origin.invalid" | "websocket.rate_limited" | "websocket.request.invalid" | "websocket.subscription.invalid" | "websocket.subscription.limit" | "websocket.unavailable";
         readonly ExamAttemptConnectionResponse: {
             readonly close_reason?: components["schemas"]["AttemptConnectionCloseReason"];
             /** Format: date-time */
@@ -8019,7 +8356,7 @@ export interface components {
             /** Format: int64 */
             readonly attempt_revision: number;
             /** @enum {string} */
-            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
+            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "native_policy_review_required" | "manager_suspended";
             readonly exam_attempt_id: components["schemas"]["ID"];
             readonly exam_sitting_id: components["schemas"]["ID"];
             readonly reallowed_by_user_id: components["schemas"]["ID"];
@@ -8052,7 +8389,7 @@ export interface components {
         /** @description One suspension episode. A policy episode links its Integrity Flag in integrity_flag_id; a manual episode (an Exam Manager's kick) links no Flag and names its manager in suspended_by_user_id. */
         readonly ExamAttemptSuspensionResponse: {
             /** @enum {string} */
-            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
+            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "native_policy_review_required" | "manager_suspended";
             /** Format: date-time */
             readonly ended_at?: string;
             /** Format: int64 */
@@ -8218,8 +8555,8 @@ export interface components {
             /** Format: date-time */
             readonly observed_at: string;
             readonly participation_id: components["schemas"]["ID"];
-            /** @enum {string} */
-            readonly policy_kind: "connection_loss" | "focus_loss" | "browser_navigation";
+            /** @description The policy that raised the flag: a core policy (connection_loss, focus_loss or browser_navigation) or a capability's "<plugin-id>.<kind>". Treat an unknown kind as opaque. */
+            readonly policy_kind: string;
             /** Format: date-time */
             readonly recorded_at: string;
             /** Format: int64 */
@@ -8249,8 +8586,8 @@ export interface components {
             /** Format: int64 */
             readonly generation: number;
             readonly id: components["schemas"]["ID"];
-            /** @enum {string} */
-            readonly policy_kind: "connection_loss" | "focus_loss" | "browser_navigation";
+            /** @description The policy that raised the flag: a core policy (connection_loss, focus_loss or browser_navigation) or a capability's "<plugin-id>.<kind>". Treat an unknown kind as opaque. */
+            readonly policy_kind: string;
             /** @enum {string} */
             readonly state: "open" | "closed";
             /**
@@ -8912,10 +9249,10 @@ export interface components {
         /** @description Minimal successful health-check projection. */
         readonly HealthResponse: {
             /**
-             * @description The literal successful health state.
+             * @description The successful health state. Readiness answers `degraded` when an enabled plugin has failed: the node still serves, without that plugin. The server log and the `proctor_plugin_state` metric name the plugin.
              * @enum {string}
              */
-            readonly status: "ok";
+            readonly status: "ok" | "degraded";
         };
         readonly ID: string;
         /** @description Initial admission and sign-in policy created during bootstrap. */
@@ -9271,7 +9608,7 @@ export interface components {
          * @description Stable type of a background Job. The catalogue is closed and may grow; clients own the labels and should present an unknown value generically.
          * @enum {string}
          */
-        readonly JobType: "academic_administration_preview.resolve" | "audit.attempt_sweep" | "command_outcome.cleanup" | "exam_export.build" | "exam_export.cleanup" | "exam_sitting.lifecycle" | "exam_sitting.lifecycle_recovery" | "exam_sitting.sealing" | "file.purge_expired_content" | "invitation.maintenance" | "job.cleanup" | "mail.cleanup" | "mail.deliver" | "mail.deliver_credential" | "mail.expand_sitting" | "mail.rekey" | "mfa.rekey" | "onboarding_import.execute" | "onboarding_import.parse" | "profile_picture.generate_default" | "profile_picture.reconcile_defaults" | "retention.expire" | "retention.notices" | "retention.purge" | "retention.reconcile" | "session.purge_retired" | "student_progression.preview";
+        readonly JobType: "academic_administration_preview.resolve" | "audit.attempt_sweep" | "command_outcome.cleanup" | "domain_event.dispatch" | "exam_export.build" | "exam_export.cleanup" | "exam_sitting.lifecycle" | "exam_sitting.lifecycle_recovery" | "exam_sitting.sealing" | "file.purge_expired_content" | "invitation.maintenance" | "job.cleanup" | "mail.cleanup" | "mail.deliver" | "mail.deliver_credential" | "mail.expand_sitting" | "mail.rekey" | "mfa.rekey" | "onboarding_import.execute" | "onboarding_import.parse" | "profile_picture.generate_default" | "profile_picture.reconcile_defaults" | "retention.expire" | "retention.notices" | "retention.purge" | "retention.reconcile" | "session.purge_retired" | "student_progression.preview";
         readonly LoginRequest: {
             /**
              * @description The client family for the Session being created.
@@ -9678,13 +10015,10 @@ export interface components {
             readonly expected_revision: number;
             readonly path: components["schemas"]["StarterWorkspacePath"];
         };
-        readonly NativeBaselineReport: {
-            /** @enum {string} */
-            readonly constrained_window: "verified" | "unavailable";
-            /** @enum {string} */
-            readonly content_protection: "verified" | "unavailable";
-            /** @enum {string} */
-            readonly single_physical_display: "verified" | "unavailable";
+        readonly NativeActivation: {
+            readonly capability: string;
+            /** @description The sub-categories the capability runs; empty means every registered one. */
+            readonly categories: readonly string[];
         };
         readonly NativeBatchReceipt: {
             /** Format: int64 */
@@ -9693,6 +10027,78 @@ export interface components {
             readonly received_at: string;
             readonly request_digest: string;
             readonly stream_id: string;
+        };
+        /** @description One activated capability's full minimized state as Desktop observed it, with its envelope. Desktop sends a fact whenever the state or the envelope changes; the server checks it against the capability's published schemas and evaluates the policy's rules on it again. A fact no newer than the latest of its source instance changes nothing. */
+        readonly NativeCapabilityFact: {
+            readonly capability: string;
+            /** @enum {string} */
+            readonly certainty: "complete" | "partial" | "unknown";
+            /** @enum {string} */
+            readonly health: "unsupported" | "healthy" | "degraded" | "failed" | "stopped";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            readonly kind: "capability_fact";
+            /**
+             * Format: date-time
+             * @description The device time of the observation, in whole milliseconds.
+             */
+            readonly observed_at: string;
+            /** @enum {string} */
+            readonly permission: "not_determined" | "granted" | "denied" | "restricted" | "unavailable";
+            /** Format: int64 */
+            readonly sequence: number;
+            readonly source_instance_id: string;
+            /** @description The full state, valid against its published state schema. State and summary are at most 16 KiB together. */
+            readonly state: Record<string, never>;
+            /** @description The counts derived from the state, valid against its published summary schema. */
+            readonly summary: Record<string, never>;
+        };
+        readonly NativeCapabilityReadiness: {
+            readonly capability: string;
+            /** @enum {string} */
+            readonly certainty: "complete" | "partial" | "unknown";
+            /** @enum {string} */
+            readonly health: "unsupported" | "healthy" | "degraded" | "failed" | "stopped";
+            /** @enum {string} */
+            readonly permission: "not_determined" | "granted" | "denied" | "restricted" | "unavailable";
+            /**
+             * Format: int64
+             * @description The sequence the capability's event stream continues from.
+             */
+            readonly sequence: number;
+            readonly source_instance_id: string;
+            /** @description The capability's minimized full state, valid against its published state schema, at most 16 KiB. It never holds what must not leave the device. A field named "<capability>.<name>" is read from state.<name>. */
+            readonly state: Record<string, never>;
+            /** @description The counts Desktop derives from the state, valid against its published summary schema, at most 16 KiB. A field named "<capability>.summary.<name>" is read from summary.<name>. */
+            readonly summary: Record<string, never>;
+        };
+        readonly NativeCatalogApplications: {
+            /** @description Catalog application IDs in ASCII order. */
+            readonly catalog_app_ids: readonly string[];
+        };
+        /** @description Exactly one of a comparison of a registered field with a typed value, a combination of conditions, or an application condition matched on the device. Nesting is at most three deep. */
+        readonly NativeCondition: {
+            readonly Compare: {
+                readonly field: string;
+                /** @enum {string} */
+                readonly op: "eq" | "ne" | "lt" | "le" | "gt" | "ge" | "in" | "not_in";
+                /** @description A whole number, one of an enumerated field's values, a boolean, or a list of them for in and not_in. */
+                readonly value: unknown;
+            };
+        } | {
+            readonly All: components["schemas"]["NativeConditionList"];
+        } | {
+            readonly Any: components["schemas"]["NativeConditionList"];
+        } | {
+            readonly Not: {
+                readonly condition: components["schemas"]["NativeCondition"];
+            };
+        } | {
+            readonly AppsAbsent: components["schemas"]["NativeCatalogApplications"];
+        } | {
+            readonly AppsOnly: components["schemas"]["NativeCatalogApplications"];
         };
         readonly NativeConditionEvidence: {
             readonly application_release_id: string;
@@ -9705,7 +10111,6 @@ export interface components {
             /** Format: date-time */
             readonly interpreted_at: string;
             readonly matrix_id: string;
-            readonly occurrence: components["schemas"]["NativeOccurrence"];
             readonly participation_id: string;
             readonly policy_digest: string;
             readonly policy_revision_id: string;
@@ -9714,66 +10119,98 @@ export interface components {
             readonly record_index: number;
             readonly security_session_id: string;
             readonly stream_id: string;
-            readonly unresolved_opener: boolean;
+            readonly transition: components["schemas"]["NativeRuleTransition"];
         };
         readonly NativeConditionInventory: {
             readonly digest: string;
             /** Format: int64 */
             readonly records: number;
         };
+        readonly NativeConditionList: {
+            readonly conditions: readonly components["schemas"]["NativeCondition"][];
+        };
         readonly NativeConditionListResponse: {
             readonly items: readonly components["schemas"]["NativeConditionEvidence"][];
             readonly next_cursor?: string;
         };
-        readonly NativeCoverageClaim: {
-            /** @enum {string} */
-            readonly claim: "enforce" | "observe" | "unavailable";
-            readonly coverage_key: string;
-            readonly source_schema_digest: string;
-            /** @enum {string} */
-            readonly state: "ready" | "degraded" | "unavailable";
-        };
-        readonly NativeCoverageTransition: {
+        /** @description Where the exam begins on the stream: Desktop sends it once, when the candidate window mounts after admission. Before it the server applies the policy's readiness rules; from it, the participation rules, on the latest facts. Send the mounted candidate window's fact before it, in the same or an earlier batch; otherwise the window rule is evaluated on the window Desktop reported at Start and fails. */
+        readonly NativeParticipationConfirmed: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
-            readonly kind: "coverage_transition";
+            readonly kind: "participation_confirmed";
             /** Format: date-time */
-            readonly occurred_at: string;
-            /** @enum {string} */
-            readonly reason: "initial" | "health_changed" | "permission_changed" | "reconciled" | "stopped";
-            readonly source: components["schemas"]["NativeSourceCoverage"];
+            readonly observed_at: string;
         };
-        readonly NativeOccurrence: {
-            readonly capability_id: string;
+        readonly NativeRecord: components["schemas"]["NativeCapabilityFact"] | components["schemas"]["NativeParticipationConfirmed"] | components["schemas"]["NativeRuleStatusReport"] | components["schemas"]["NativeSourceReset"] | components["schemas"]["NativeSourceGap"];
+        /** @description One requirement, in the rule grammar Desktop publishes. */
+        readonly NativeRule: {
+            readonly capability: string;
             /** @enum {string} */
-            readonly certainty: "complete" | "partial" | "unknown";
-            readonly condition_id: string;
-            readonly detector_id: string;
-            /** Format: int64 */
-            readonly detector_version: number;
-            /** Format: date-time */
-            readonly first_observed_at: string;
-            /** Format: int64 */
-            readonly gap_count: number;
+            readonly mode: "enforce" | "observe";
+            /** @enum {string} */
+            readonly phase: "readiness" | "participation" | "both";
+            /** @description A reason registered for the capability; Desktop owns its localized text. */
+            readonly reason: string;
+            readonly requirement: components["schemas"]["NativeCondition"];
+            readonly rule_id: string;
+        };
+        readonly NativeRuleReport: {
+            readonly rule_id: string;
+            /** @enum {string} */
+            readonly status: "met" | "not_met" | "unknown";
+            /**
+             * @description Why the rule is unknown; present only when status is unknown.
+             * @enum {string}
+             */
+            readonly unknown_cause?: "unavailable" | "gap" | "unhealthy" | "permission" | "partial" | "checking";
+        };
+        /** @description Desktop's own status for one participation rule and whether it is containing the candidate window because of it. The server's status is authoritative; a disagreement is counted, never applied. */
+        readonly NativeRuleStatusReport: {
+            readonly contained: boolean;
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
-            readonly kind: "occurrence";
+            readonly kind: "rule_status";
             /** Format: date-time */
-            readonly last_confirmed_at: string;
+            readonly observed_at: string;
+            readonly rule_id: string;
             /** @enum {string} */
-            readonly mode: "observe" | "enforce";
-            readonly occurrence_id: string;
-            /** Format: int64 */
-            readonly repeat_count: number;
-            readonly source_ranges: readonly components["schemas"]["NativeSourceRange"][];
-            /** @enum {string} */
-            readonly status: "opened" | "repeated" | "recovered";
+            readonly status: "met" | "not_met" | "unknown";
+            /**
+             * @description Why the rule is unknown; present only when status is unknown.
+             * @enum {string}
+             */
+            readonly unknown_cause?: "unavailable" | "gap" | "unhealthy" | "permission" | "partial" | "checking";
         };
-        readonly NativeRecord: components["schemas"]["NativeOccurrence"] | components["schemas"]["NativeCoverageTransition"] | components["schemas"]["NativeSourceReset"] | components["schemas"]["NativeSourceGap"];
+        readonly NativeRuleTransition: {
+            /**
+             * Format: date-time
+             * @description The device time of the change; it never moves backwards within a Participation.
+             */
+            readonly at: string;
+            readonly capability: string;
+            /** @enum {string} */
+            readonly event?: "opened" | "closed";
+            readonly from?: components["schemas"]["NativeRuleReport"];
+            /** @enum {string} */
+            readonly mode: "enforce" | "observe";
+            /**
+             * Format: int64
+             * @description The rule's occurrence this change opened or closed, counted from 1 per Participation.
+             */
+            readonly occurrence?: number;
+            /** @description The reason ID Desktop's registry publishes for the rule; Desktop owns its wording. */
+            readonly reason: string;
+            readonly rule_id: string;
+            readonly to: components["schemas"]["NativeRuleReport"];
+        };
+        /** @description Whether Desktop records the candidate's screen on the device for the whole session, uploading only the ranges the server requests. Off by default; the candidate is told before the Attempt starts. When on, the policy activates the screen_recording capability with the readiness rule screen_recording.free_space: Start is refused unless the recorder is permitted and the device has at least 3072 MiB free. */
+        readonly NativeScreenRecordingPolicy: {
+            readonly enabled: boolean;
+        };
         readonly NativeSecurityAcknowledgement: {
             /** Format: int64 */
             readonly highest_contiguous_batch_sequence: number;
@@ -9850,7 +10287,8 @@ export interface components {
                 }
             ];
             /** @constant */
-            readonly registry_digest: "sha256:79faa1141236b073dff2ff802ce67abce3082417a7a4fa2954615e4226acd1e0";
+            readonly registry_digest: "sha256:e4c05771fa6f34c08c0f01aa98e33f88973baacf832c67d760457f2b4f9d734d";
+            readonly screen_recording: components["schemas"]["NativeScreenRecordingPolicy"];
         };
         readonly NativeSecurityStreamStatus: {
             /** Format: int64 */
@@ -9889,37 +10327,43 @@ export interface components {
             /** Format: int64 */
             readonly terminal_missing_through_sequence: number;
         };
-        /** @description Content-free native condition count and currently live source health. Contains no detector, occurrence or source-instance identities and makes no misconduct finding. */
+        /** @description The candidate's live native standing: how many rule status changes are kept, whether the live Participation's native delivery is open, each enforce rule's status as the server evaluates it, whether Desktop is containing the candidate window, and the Attempt's screen clips by state. It contains no facts, source-instance or application identities, and an application outside the catalog is never named. A rule that is not met is not a misconduct finding; its Flag is reviewed like any other. */
         readonly NativeSecuritySummary: {
+            /** @description Whether Desktop reports it is containing the candidate window right now. */
+            readonly contained: boolean;
+            /** @description Whether the live Participation's native delivery is open, so rule statuses are current. */
             readonly live_coverage_available: boolean;
             /** Format: int64 */
             readonly retained_condition_records: number;
-            readonly sources: readonly {
-                readonly complete: boolean;
+            /** @description The live Participation's enforce rules, by rule ID; empty when nothing is live. */
+            readonly rules: readonly {
+                readonly capability: string;
+                /** Format: int64 */
+                readonly occurrences: number;
+                /**
+                 * Format: int64
+                 * @description The occurrence open now, counted from 1 in this Participation; absent when none is open.
+                 */
+                readonly open_occurrence?: number;
+                /** @description The registry's reason ID for the rule, such as display.single_display_required. */
+                readonly reason: string;
+                readonly rule_id: string;
                 /** @enum {string} */
-                readonly health: "starting" | "healthy" | "degraded" | "failed" | "recovering" | "stopped";
+                readonly status: "met" | "not_met" | "unknown";
                 /** @enum {string} */
-                readonly permission: "denied" | "granted" | "not_determined" | "restricted" | "unavailable";
-                readonly source_id: string;
+                readonly unknown_cause?: "unavailable" | "gap" | "unhealthy" | "permission" | "partial" | "checking";
             }[];
-        };
-        readonly NativeSourceCoverage: {
-            readonly adapter_version: string;
-            readonly complete: boolean;
-            /** Format: int64 */
-            readonly gap_count: number;
-            /** @enum {string} */
-            readonly health: "starting" | "healthy" | "degraded" | "failed" | "recovering" | "stopped";
-            /** @enum {string} */
-            readonly permission: "denied" | "granted" | "not_determined" | "restricted" | "unavailable";
-            /** Format: int64 */
-            readonly sequence: number;
-            /** @enum {string} */
-            readonly source_id: "display-topology" | "candidate-window" | "capture-session" | "process-application" | "interactive-session" | "clipboard" | "print-spooler" | "removable-storage" | "virtualization" | "network-configuration" | "media-device";
-            readonly source_instance_id: string;
-            readonly source_schema_digest: string;
+            readonly screen_clips: {
+                readonly failed: number;
+                readonly ready: number;
+                readonly recording: number;
+                readonly requested: number;
+                readonly uploading: number;
+            };
         };
         readonly NativeSourceGap: {
+            /** @description The activated capability whose source this names. */
+            readonly capability: string;
             /** Format: int64 */
             readonly first_missing_sequence: number;
             /**
@@ -9933,20 +10377,11 @@ export interface components {
             readonly occurred_at: string;
             /** @enum {string} */
             readonly reason: "overflow" | "source_loss" | "corruption";
-            /** @enum {string} */
-            readonly source_id: "display-topology" | "candidate-window" | "capture-session" | "process-application" | "interactive-session" | "clipboard" | "print-spooler" | "removable-storage" | "virtualization" | "network-configuration" | "media-device";
-            readonly source_instance_id: string;
-        };
-        readonly NativeSourceRange: {
-            /** Format: int64 */
-            readonly first_sequence: number;
-            /** Format: int64 */
-            readonly last_sequence: number;
-            /** @enum {string} */
-            readonly source_id: "display-topology" | "candidate-window" | "capture-session" | "process-application" | "interactive-session" | "clipboard" | "print-spooler" | "removable-storage" | "virtualization" | "network-configuration" | "media-device";
             readonly source_instance_id: string;
         };
         readonly NativeSourceReset: {
+            /** @description The activated capability whose source this names. */
+            readonly capability: string;
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
@@ -9961,8 +10396,6 @@ export interface components {
             /** @enum {string} */
             readonly reason: "restart" | "resume" | "permission_changed";
             readonly reset_id: string;
-            /** @enum {string} */
-            readonly source_id: "display-topology" | "candidate-window" | "capture-session" | "process-application" | "interactive-session" | "clipboard" | "print-spooler" | "removable-storage" | "virtualization" | "network-configuration" | "media-device";
         };
         /** @description Opaque continuation for the next page, omitted on the last page. Clients return it unchanged as cursor. */
         readonly NextCursor: string;
@@ -10121,11 +10554,51 @@ export interface components {
          * @enum {string}
          */
         readonly PersonalAccessTokenScope: "academic.progression.manage" | "academic_audit.view" | "academic_period.manage" | "academic_period.view" | "academic_unit.manage" | "academic_unit.members.manage" | "academic_unit.members.view" | "academic_unit.view" | "audit.view" | "class.manage" | "class.members.manage" | "class.members.view" | "class.view" | "exam.attempt.browser_activity.view" | "exam.create" | "exam.create.override" | "exam.manage" | "exam.manage.override" | "exam.publish" | "exam.publish.override" | "exam.sitting.create" | "exam.sitting.create.override" | "exam.sitting.manage" | "exam.sitting.manage.override" | "exam.sitting.view" | "exam.sitting.view.override" | "exam.view" | "exam.view.override" | "institution.manage" | "invitation.create" | "invitation.manage" | "invitation.view" | "job.manage" | "job.view" | "mail.manage" | "mail.view" | "onboarding_batch.manage" | "onboarding_batch.view" | "programme.manage" | "programme.view" | "programme_level.manage" | "programme_level.view" | "session.manage" | "session.view" | "submission.release" | "submission.release.override" | "submission.review" | "submission.review.override" | "submission.view" | "submission.view.override" | "user.manage" | "user.profile_picture.manage" | "user.view";
+        /** @description One page of the collection in its stable order. */
+        readonly PluginListResponse: {
+            readonly items: readonly components["schemas"]["PluginResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description One compiled-in plugin as an administrator sees it. */
+        readonly PluginResponse: {
+            /** @description Whether the plugin should run, from its saved settings or its default. */
+            readonly enabled: boolean;
+            /** @description Whether the plugin runs when nobody has configured it. */
+            readonly enabled_by_default: boolean;
+            readonly id: string;
+            readonly name: string;
+            /** @description A required plugin always runs. */
+            readonly required: boolean;
+            /**
+             * Format: int64
+             * @description The saved settings revision, 0 when nothing is saved.
+             */
+            readonly revision: number;
+            /** @description The saved settings document as JSON text, or "{}" when nothing is saved. */
+            readonly settings: string;
+            /** @description The JSON Schema of the plugin's settings as JSON text, absent when the plugin has none. */
+            readonly settings_schema?: string;
+            /**
+             * @description The plugin's state on the serving node.
+             * @enum {string}
+             */
+            readonly state: "disabled" | "active" | "failed";
+        };
+        readonly PluginSettingsRequest: {
+            /** @description Whether the plugin should run. A required plugin cannot be turned off. */
+            readonly enabled: boolean;
+            /**
+             * Format: int64
+             * @description The settings revision the editor read, 0 when nothing is saved. A stale revision cannot overwrite newer settings.
+             */
+            readonly expected_revision: number;
+            /** @description The plugin's settings document as JSON text, a JSON object of at most 64 KiB, as its settings_schema describes. */
+            readonly settings: string;
+        };
         readonly PrepareSecurityPreflightRequest: {
             readonly attempt_id?: string;
             readonly configuration_manifest_fingerprint: string;
             readonly native_registry_digest: string;
-            readonly source_manifest_digest: string;
         };
         readonly ProblemDetails: {
             readonly code: string | components["schemas"]["ErrorCode"];
@@ -10289,6 +10762,8 @@ export interface components {
              */
             readonly expected_revision: number;
         };
+        /** @description Identifies what the readiness overview shows and Desktop enforces: the activations and rules, family selections, recorder switch, and the registry, matrix and catalogs they rest on. Unlike the policy content digest it leaves out the policy's own identity, so the overview and the preflight prepared at Start carry the same value exactly when nothing that matters changed. It is the SHA-256 of the canonical JSON object {activations, rules, capabilities, screen_recording, focus_loss_mode, connection_loss_mode, registry_digest, capability_matrix_digest, catalog_bindings}, taken from the policy and its resolution. */
+        readonly ReadinessDigest: string;
         readonly ReallowExamAttemptRequest: {
             /** Format: int64 */
             readonly expected_revision: number;
@@ -10391,6 +10866,22 @@ export interface components {
             readonly suggested_locale?: string;
             readonly suggested_timezone?: string;
             readonly suggested_username?: string;
+        };
+        readonly RequestExamAttemptScreenClipRequest: {
+            /**
+             * Format: date-time
+             * @description The range's end, at most ten minutes after the request.
+             */
+            readonly end: string;
+            /** @description True for a range from the moment the candidate window opened; start is then omitted. */
+            readonly from_session_start: boolean;
+            /** @description The manager's private reason. It is stored with the request and never returned. */
+            readonly reason: string;
+            /**
+             * Format: date-time
+             * @description The range's start, required unless from_session_start is true, and omitted then.
+             */
+            readonly start?: string;
         };
         readonly ResetUserMFARequest: {
             /**
@@ -10797,6 +11288,80 @@ export interface components {
             /** Format: date-time */
             readonly scheduled_start_at: string;
         };
+        readonly ScreenClipChunkResponse: {
+            readonly chunk: number;
+        };
+        /** @description One page of the collection in its stable order. */
+        readonly ScreenClipListResponse: {
+            readonly items: readonly components["schemas"]["ScreenClipResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        readonly ScreenClipRange: {
+            /** Format: date-time */
+            readonly end: string;
+            readonly from_session_start: boolean;
+            /** Format: date-time */
+            readonly start?: string;
+        };
+        readonly ScreenClipResponse: {
+            readonly exam_attempt_id: components["schemas"]["ID"];
+            /**
+             * @description Why the clip failed; present only when state is failed.
+             * @enum {string}
+             */
+            readonly failure?: "attempt_ended" | "not_recorded" | "upload_deadline" | "rejected";
+            readonly id: components["schemas"]["ID"];
+            readonly range: components["schemas"]["ScreenClipRange"];
+            /** Format: date-time */
+            readonly requested_at: string;
+            /** Format: int64 */
+            readonly revision: number;
+            /** @enum {string} */
+            readonly source: "manager" | "incident";
+            /** @enum {string} */
+            readonly state: "requested" | "recording" | "uploading" | "ready" | "failed";
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        readonly ScreenClipUploadResponse: {
+            /**
+             * Format: int64
+             * @description The size of every chunk but the last.
+             */
+            readonly chunk_bytes: number;
+            readonly chunk_count: number;
+            readonly clip: components["schemas"]["ScreenClipResponse"];
+            /** @description The SHA-256 of the clip's manifest: "proctor-screen-clip-v1", the media type, size, chunk size and every chunk hash in order, each followed by a line feed. */
+            readonly content_digest: string;
+            /** @description The numbers, from 1, of the chunks that arrived, in order. */
+            readonly received_chunks: readonly number[];
+        };
+        /** @description Localized recorder notice, not consent or playback authority. Zero days means no configured automatic expiry; holds still apply. */
+        readonly ScreenRecordingDisclosure: {
+            /**
+             * @description Who may play an uploaded clip.
+             * @constant
+             */
+            readonly audience: "exam_managers_of_the_sitting";
+            /** @description Uploaded clips are integrity evidence and follow its retention period. */
+            readonly clip_retention_days: number;
+            /**
+             * @description Desktop records the whole session on the device and deletes it at submission.
+             * @constant
+             */
+            readonly local_recording: "whole_session_deleted_at_submission";
+            /** @constant */
+            readonly notice_id: "screen_recording";
+            /** @constant */
+            readonly retention_anchor: "eligible_closed_sitting_records_completion";
+            /** Format: int64 */
+            readonly retention_policy_revision: number;
+            /**
+             * @description Only ranges the Sitting's Exam Managers ask for, or the minute either side of a Flag, leave the device.
+             * @constant
+             */
+            readonly uploads: "requested_and_flagged_ranges_only";
+        };
         /** @description An unarchived Class within the caller's class.view scope. */
         readonly SearchClassItem: {
             readonly display_name: string;
@@ -10847,38 +11412,49 @@ export interface components {
             readonly catalog_id: string;
             readonly digest: string;
             /** @enum {string} */
-            readonly kind: "application" | "storage_function" | "managed_network_profile" | "network_adapter_class" | "tunnel_class" | "detector";
+            readonly kind: "application";
             readonly revision: string;
         };
-        readonly SecurityCoverageResult: {
-            /** @enum {string} */
-            readonly coverage_result: "accepted" | "stale_control" | "reset_required" | "reset_conflict";
+        /** @description How the server processed Desktop's latest security control: the lease renewal and its delivery watermarks. A renewal never changes whether the candidate may interact; only closing native delivery does. */
+        readonly SecurityControlResult: {
             readonly delivery_watermark_rejections: readonly components["schemas"]["DeliveryWatermarkRejection"][];
             readonly processed_control_digest: string | null;
             /** Format: int64 */
             readonly processed_control_sequence: number;
             readonly security_interaction_allowed: boolean;
-            readonly source_reset_receipts: readonly components["schemas"]["SourceResetReceipt"][];
         };
-        readonly SecurityPolicyRecovery: {
-            readonly current_coverage: readonly components["schemas"]["NativeCoverageClaim"][];
-            readonly current_sources: readonly components["schemas"]["NativeSourceCoverage"][];
-            readonly frozen_attempt_configuration: components["schemas"]["FrozenAttemptConfiguration"];
-            readonly security: components["schemas"]["AdmittedSecurity"];
-            readonly security_coverage: components["schemas"]["SecurityCoverageResult"];
+        readonly SecurityPolicyOverviewResponse: {
+            readonly browser_activity_disclosure: components["schemas"]["BrowserActivityDisclosure"];
+            /** @description SHA-256 of the exact signed bytes of the release's certification document. */
+            readonly capability_matrix_digest: string;
+            readonly catalog_bindings: readonly components["schemas"]["SecurityCatalogBinding"][];
+            readonly policy: components["schemas"]["EffectiveExamSecurityPolicy"];
+            readonly readiness_digest: components["schemas"]["ReadinessDigest"];
+            /** @description The recorder notice to show before Start; null when the Exam does not record the screen. */
+            readonly screen_recording_disclosure: components["schemas"]["ScreenRecordingDisclosure"] | null;
             /** Format: date-time */
             readonly server_time: string;
-            readonly source_reset_receipts: readonly components["schemas"]["SourceResetReceipt"][];
+        };
+        readonly SecurityPolicyRecovery: {
+            readonly frozen_attempt_configuration: components["schemas"]["FrozenAttemptConfiguration"];
+            readonly security: components["schemas"]["AdmittedSecurity"];
+            readonly security_control: components["schemas"]["SecurityControlResult"];
+            /** Format: date-time */
+            readonly server_time: string;
         };
         /** @description Privileged registered-Desktop response bounded to 128 KiB. Catalog bindings are unique and sorted by kind then catalog_id. First admission returns null configuration; Ready rejoin returns the original immutable configuration. */
         readonly SecurityPolicyResponse: {
             readonly browser_activity_disclosure: components["schemas"]["BrowserActivityDisclosure"];
+            /** @description SHA-256 of the exact signed bytes of the release's certification document. */
             readonly capability_matrix_digest: string;
             readonly catalog_bindings: readonly components["schemas"]["SecurityCatalogBinding"][];
             readonly frozen_attempt_configuration: components["schemas"]["FrozenAttemptConfiguration"] | null;
             readonly policy: components["schemas"]["EffectiveExamSecurityPolicy"];
             readonly policy_content_digest: string;
             readonly preflight_challenge: components["schemas"]["SecurityPreflightChallenge"];
+            readonly readiness_digest: components["schemas"]["ReadinessDigest"];
+            /** @description The recorder notice to show before Start; null when the Exam does not record the screen. */
+            readonly screen_recording_disclosure: components["schemas"]["ScreenRecordingDisclosure"] | null;
             /** Format: date-time */
             readonly server_time: string;
         };
@@ -10890,22 +11466,18 @@ export interface components {
             readonly issued_at: string;
             readonly preflight_id: string;
         };
-        /** @description Minimized assertions, at most 64 KiB. Source order and categories must match the resolved policy; coverage keys are sorted and exact. No inventories, media, clipboard bytes, OS errors or arbitrary details are accepted. The server computes the report digest. Client reported_at is provenance; server time controls challenge expiry and admission freshness. */
+        /** @description What Desktop observed at Start, at most 128 KiB: one fresh fact for each activated capability and its own status for each readiness rule. No inventories, media, clipboard bytes, OS errors or arbitrary details are accepted. The server evaluates the readiness rules on these facts and its result decides admission. The server computes the report digest. Client reported_at is provenance; server time controls challenge expiry and admission freshness. */
         readonly SecurityPreflightReport: {
-            readonly baseline: components["schemas"]["NativeBaselineReport"];
-            readonly capability_matrix_digest: string;
+            /** @description One fresh fact for every activated capability at Start, in the policy's activation order. */
+            readonly capabilities: readonly components["schemas"]["NativeCapabilityReadiness"][];
             readonly challenge: string;
-            readonly coverage: readonly components["schemas"]["NativeCoverageClaim"][];
             readonly policy_content_digest: string;
             readonly policy_digest: string;
-            /** @enum {string} */
-            readonly posture: "compliant" | "degraded" | "contained" | "failed";
             /** Format: date-time */
             readonly reported_at: string;
+            /** @description Desktop's own status for every readiness rule. */
+            readonly rules: readonly components["schemas"]["NativeRuleReport"][];
             readonly security_session_id: string;
-            readonly selected_source_categories: readonly ("os-clipboard-change" | "removable-block-storage" | "portable-mtp" | "system-proxy-state" | "os-managed-vpn-state" | "tunnel-interface-state" | "route-change" | "network-source-health" | "camera" | "microphone")[];
-            readonly source_manifest_digest: string;
-            readonly sources: readonly components["schemas"]["NativeSourceCoverage"][];
         };
         readonly SecurityPreflightResult: {
             /** @enum {string} */
@@ -10913,8 +11485,10 @@ export interface components {
             /** Format: date-time */
             readonly expires_at: string;
             readonly preflight_id: string;
-            readonly reason_codes: readonly ("policy_changed" | "unsupported_capability" | "source_unavailable" | "permission_required" | "baseline_unavailable" | "preflight_expired" | "preflight_superseded" | "posture_blocked" | "configuration_unsupported" | "session_changed")[];
+            readonly reason_codes: readonly ("preflight_expired" | "native_rule_unmet")[];
             readonly report_digest: string;
+            /** @description The server's own status for every readiness rule, evaluated on the reported state. Where it differs from Desktop's, the server's decides admission. */
+            readonly rules: readonly components["schemas"]["NativeRuleReport"][];
             /** Format: date-time */
             readonly server_time: string;
         };
@@ -11144,13 +11718,9 @@ export interface components {
         };
         readonly SittingCandidateSuspensionResponse: {
             /** @enum {string} */
-            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
+            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "native_policy_review_required" | "manager_suspended";
             readonly id: components["schemas"]["ID"];
             readonly reallow_available: boolean;
-        };
-        readonly SourceResetReceipt: {
-            readonly reset_digest: string;
-            readonly reset_id: string;
         };
         /** @description An already-canonical, case-sensitive POSIX-relative path: at most 16 segments and 255 UTF-8 bytes per segment. Empty, absolute, dot, dot-dot, repeated/trailing separators, backslashes, NUL/control characters, and the reserved .proctor root are rejected. */
         readonly StarterWorkspacePath: string;
@@ -11295,6 +11865,18 @@ export interface components {
              * @description Authoritative serving-node time in RFC 3339 format.
              */
             readonly server_time: string;
+        };
+        /** @description One active plugin. */
+        readonly SystemPlugin: {
+            /** @description Stable plugin identifier, also its key in the Plugins configuration section. */
+            readonly id: string;
+            /** @description Short human-readable plugin name. */
+            readonly name: string;
+        };
+        /** @description One page of the active plugins, ordered by name. */
+        readonly SystemPluginsResponse: {
+            readonly items: readonly components["schemas"]["SystemPlugin"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
         };
         /** @description Existing Review identity and exact revision for a terminal transition. */
         readonly TerminalExamIntegrityReviewRequest: {
@@ -12133,6 +12715,16 @@ export interface components {
                 readonly "application/json": components["schemas"]["CandidateExamWorkspaceListResponse"];
             };
         };
+        /** @description The request the candidate's Desktop took */
+        readonly CandidateScreenClipOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["ScreenClipResponse"];
+            };
+        };
         /** @description Bounded ordered acknowledged Workspace changes or an explicit full-refresh signal */
         readonly CandidateWorkspaceJournalOK: {
             headers: {
@@ -12525,6 +13117,16 @@ export interface components {
             };
             content: {
                 readonly "application/json": components["schemas"]["ExamAttemptReallowResponse"];
+            };
+        };
+        /** @description The saved request, without the manager's reason; 201 when created, 200 when replayed */
+        readonly ExamAttemptScreenClipOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["ScreenClipResponse"];
             };
         };
         /** @description Exam Attempt suspended by a manager without exposing the private manager reason */
@@ -13703,6 +14305,38 @@ export interface components {
                 readonly "application/json": components["schemas"]["PersonalAccessTokenResponse"];
             };
         };
+        /** @description One page of the compiled-in plugins. */
+        readonly PluginListOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["PluginListResponse"];
+            };
+        };
+        /** @description The plugin with its saved settings. */
+        readonly PluginOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "enabled": true,
+                 *       "enabled_by_default": true,
+                 *       "id": "oidc",
+                 *       "name": "OpenID Connect",
+                 *       "required": false,
+                 *       "revision": 2,
+                 *       "settings": "{}",
+                 *       "state": "active"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["PluginResponse"];
+            };
+        };
         /** @description Normalized private profile-picture rendition */
         readonly ProfilePictureOK: {
             headers: {
@@ -14085,6 +14719,72 @@ export interface components {
                 readonly "application/json": components["schemas"]["RoleResponse"];
             };
         };
+        /** @description The chunk is stored */
+        readonly ScreenClipChunkOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "chunk": 1
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ScreenClipChunkResponse"];
+            };
+        };
+        /** @description The whole clip */
+        readonly ScreenClipContent: {
+            headers: {
+                readonly "Accept-Ranges"?: "bytes";
+                readonly "Cache-Control"?: "private, no-store";
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "video/mp4": Uint8Array;
+                readonly "video/webm": Uint8Array;
+            };
+        };
+        /** @description One byte range of the clip */
+        readonly ScreenClipPartialContent: {
+            headers: {
+                readonly "Accept-Ranges"?: "bytes";
+                readonly "Cache-Control"?: "private, no-store";
+                /** @description The range served, as bytes first-last/size. */
+                readonly "Content-Range"?: string;
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "video/mp4": Uint8Array;
+                readonly "video/webm": Uint8Array;
+            };
+        };
+        /** @description The requests waiting for the candidate's Desktop */
+        readonly ScreenClipRequestListOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "items": []
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ScreenClipListResponse"];
+            };
+        };
+        /** @description Where the clip's upload stands */
+        readonly ScreenClipUploadOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["ScreenClipUploadResponse"];
+            };
+        };
         /** @description Matches of each requested type within the caller's list visibility. */
         readonly SearchOK: {
             headers: {
@@ -14416,6 +15116,34 @@ export interface components {
                 readonly "application/json": components["schemas"]["SystemPingResponse"];
             };
         };
+        /** @description The active plugins */
+        readonly SystemPluginsOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "items": [
+                 *         {
+                 *           "id": "cas",
+                 *           "name": "CAS"
+                 *         },
+                 *         {
+                 *           "id": "oidc",
+                 *           "name": "OpenID Connect"
+                 *         },
+                 *         {
+                 *           "id": "export.zip",
+                 *           "name": "Zip export"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["SystemPluginsResponse"];
+            };
+        };
         /** @description Rate limited */
         readonly TooManyRequests: {
             headers: {
@@ -14580,6 +15308,8 @@ export interface components {
         readonly PageLimit: number;
         /** @description The Personal Access Token record identifier; this is not the token secret. */
         readonly PersonalAccessTokenID: components["schemas"]["ID"];
+        /** @description The plugin's ID, for example display-topology. */
+        readonly PluginID: string;
         /** @description The Programme identifier. */
         readonly ProgrammeID: components["schemas"]["ID"];
         /** @description The Programme Level identifier. */
@@ -14596,6 +15326,8 @@ export interface components {
         readonly RoleBindingID: components["schemas"]["ID"];
         /** @description The Role identifier. */
         readonly RoleID: components["schemas"]["ID"];
+        /** @description The screen clip identifier. */
+        readonly ScreenClipID: components["schemas"]["ID"];
         /** @description Server-issued canonical preflight transaction ID returned by preparation. */
         readonly SecurityPreflightID: string;
         /** @description The interactive Session identifier. */
@@ -14683,6 +15415,22 @@ export interface components {
                  *     }
                  */
                 readonly "application/json": components["schemas"]["ArchiveExamRequest"];
+            };
+        };
+        /** @description The clip's media type, exact size and the SHA-256 of every chunk in order. */
+        readonly BeginCandidateScreenClipUpload: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "chunk_sha256": [
+                 *         "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+                 *         "fcde2b2edba56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9"
+                 *       ],
+                 *       "media_type": "video/mp4",
+                 *       "size_bytes": 8388618
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["BeginCandidateScreenClipUploadRequest"];
             };
         };
         /** @description Supplies the one-time Invitation claim plus the validated post-authentication destination and optional device presentation. */
@@ -14875,6 +15623,18 @@ export interface components {
                 readonly "application/json": components["schemas"]["StudentProgressionCommitRequest"];
             };
         };
+        /** @description The clip's content digest and the installation key's signature over it. */
+        readonly CompleteCandidateScreenClipUpload: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "content_digest": "7d1a54127b222502f5b79b5fb0803061152a44f92b37e23c6527baf665d4da9a",
+                 *       "signature": "IcHJ1bNctXFVhTF0-ay6LIFS44MN3zPJw36YbQsF8C0haUjE4cuDhg0o1daUkq3Rf_VIJ_Me5s6cnjdzIYeWdQ"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["CompleteCandidateScreenClipUploadRequest"];
+            };
+        };
         /** @description Supplies the one-time email-verification token delivered through the configured mail channel. */
         readonly CompleteEmailVerification: {
             readonly content: {
@@ -14952,61 +15712,70 @@ export interface components {
                  *           {
                  *             "allowed_application_ids": [],
                  *             "id": "process_application",
-                 *             "mode": "disabled"
+                 *             "mode": "disabled",
+                 *             "outcome": "flag"
                  *           },
                  *           {
                  *             "id": "interactive_session",
-                 *             "mode": "disabled"
+                 *             "mode": "disabled",
+                 *             "outcome": "flag"
                  *           },
                  *           {
                  *             "id": "clipboard",
                  *             "mode": "disabled",
                  *             "observe_os_clipboard_changes": false,
+                 *             "outcome": "flag",
                  *             "strategy": "disabled"
                  *           },
                  *           {
                  *             "candidate_print_commands": "not_applied",
                  *             "id": "printing",
                  *             "mode": "disabled",
-                 *             "monitored_spooler": "not_required"
+                 *             "monitored_spooler": "not_required",
+                 *             "outcome": "flag"
                  *           },
                  *           {
-                 *             "allowed_storage_function_class_ids": [],
                  *             "enabled_sub_capabilities": [],
                  *             "id": "removable_storage",
-                 *             "mode": "disabled"
+                 *             "mode": "disabled",
+                 *             "outcome": "flag"
                  *           },
                  *           {
                  *             "id": "virtualization",
                  *             "mode": "disabled",
+                 *             "outcome": "flag",
                  *             "rule": "not_applied"
                  *           },
                  *           {
-                 *             "allowed_adapter_class_ids": [],
-                 *             "allowed_managed_profile_ids": [],
-                 *             "allowed_tunnel_class_ids": [],
                  *             "enabled_sub_capabilities": [],
                  *             "id": "network_configuration",
-                 *             "mode": "disabled"
+                 *             "mode": "disabled",
+                 *             "outcome": "flag"
                  *           },
                  *           {
                  *             "concurrent_use_check": "not_required",
                  *             "id": "camera",
                  *             "mode": "disabled",
+                 *             "outcome": "flag",
                  *             "require_ready": false
                  *           },
                  *           {
                  *             "concurrent_use_check": "not_required",
                  *             "id": "microphone",
                  *             "mode": "disabled",
+                 *             "outcome": "flag",
                  *             "require_ready": false
                  *           },
                  *           {
                  *             "id": "external_capture",
-                 *             "mode": "disabled"
+                 *             "mode": "disabled",
+                 *             "outcome": "flag"
                  *           }
                  *         ],
-                 *         "registry_digest": "sha256:79faa1141236b073dff2ff802ce67abce3082417a7a4fa2954615e4226acd1e0"
+                 *         "registry_digest": "sha256:e4c05771fa6f34c08c0f01aa98e33f88973baacf832c67d760457f2b4f9d734d",
+                 *         "screen_recording": {
+                 *           "enabled": true
+                 *         }
                  *       }
                  *     }
                  */
@@ -15660,8 +16429,7 @@ export interface components {
                 /**
                  * @example {
                  *       "configuration_manifest_fingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                 *       "native_registry_digest": "sha256:79faa1141236b073dff2ff802ce67abce3082417a7a4fa2954615e4226acd1e0",
-                 *       "source_manifest_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                 *       "native_registry_digest": "sha256:e4c05771fa6f34c08c0f01aa98e33f88973baacf832c67d760457f2b4f9d734d"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["PrepareSecurityPreflightRequest"];
@@ -15845,6 +16613,19 @@ export interface components {
                 readonly "application/json": components["schemas"]["ReplaceInvitationRequest"];
             };
         };
+        /** @description Whether the plugin runs and its complete settings document. Every member is required. */
+        readonly ReplacePluginSettings: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "enabled": true,
+                 *       "expected_revision": 0,
+                 *       "settings": "{\"mode\":\"observe\"}"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["PluginSettingsRequest"];
+            };
+        };
         /** @description Complete configuration replacement. Every period is required, including zero values. Automatic deletion cannot be enabled. */
         readonly ReplaceRetentionPolicy: {
             readonly content: {
@@ -15874,6 +16655,20 @@ export interface components {
                  *     }
                  */
                 readonly "application/json": components["schemas"]["UserSettingsReplaceRequest"];
+            };
+        };
+        /** @description The range to cut, either from the start of the session or from an explicit start, and the manager's private reason. */
+        readonly RequestExamAttemptScreenClip: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "end": "2026-11-12T10:00:00Z",
+                 *       "from_session_start": false,
+                 *       "reason": "The candidate seemed to read from a second screen.",
+                 *       "start": "2026-11-12T09:58:00Z"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["RequestExamAttemptScreenClipRequest"];
             };
         };
         /** @description Supplies the account email address to which an eligible password-reset message should be sent. */
@@ -15994,22 +16789,13 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "baseline": {
-                 *         "constrained_window": "unavailable",
-                 *         "content_protection": "unavailable",
-                 *         "single_physical_display": "unavailable"
-                 *       },
-                 *       "capability_matrix_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                 *       "capabilities": [],
                  *       "challenge": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                 *       "coverage": [],
                  *       "policy_content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                  *       "policy_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                 *       "posture": "failed",
                  *       "reported_at": "2026-09-08T08:00:00.000Z",
-                 *       "security_session_id": "synthetic-security-session",
-                 *       "selected_source_categories": [],
-                 *       "source_manifest_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                 *       "sources": []
+                 *       "rules": [],
+                 *       "security_session_id": "synthetic-security-session"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["SecurityPreflightReport"];
@@ -18569,6 +19355,190 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listCandidateScreenClipRequests: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header: {
+                /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. */
+                readonly "X-Proctor-Attempt-Credential": components["parameters"]["CandidateAttemptCredential"];
+                /** @description The durable open Attempt Connection bound to the current authenticated Session. */
+                readonly "X-Proctor-Attempt-Connection-ID": components["parameters"]["CandidateAttemptConnectionID"];
+            };
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ScreenClipRequestListOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly takeCandidateScreenClipRequest: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. */
+                readonly "X-Proctor-Attempt-Credential": components["parameters"]["CandidateAttemptCredential"];
+                /** @description The durable open Attempt Connection bound to the current authenticated Session. */
+                readonly "X-Proctor-Attempt-Connection-ID": components["parameters"]["CandidateAttemptConnectionID"];
+            };
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["CandidateScreenClipOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly getCandidateScreenClipUpload: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: {
+                /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Credential"?: components["parameters"]["NativeDeliveryCredential"];
+                /** @description The durable open Attempt Connection bound to the current authenticated Session. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Connection-ID"?: components["parameters"]["NativeDeliveryConnectionID"];
+            };
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ScreenClipUploadOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly beginCandidateScreenClipUpload: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: {
+                /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Credential"?: components["parameters"]["NativeDeliveryCredential"];
+                /** @description The durable open Attempt Connection bound to the current authenticated Session. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Connection-ID"?: components["parameters"]["NativeDeliveryConnectionID"];
+            };
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["BeginCandidateScreenClipUpload"];
+        readonly responses: {
+            readonly 200: components["responses"]["ScreenClipUploadOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly uploadCandidateScreenClipChunk: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: {
+                /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Credential"?: components["parameters"]["NativeDeliveryCredential"];
+                /** @description The durable open Attempt Connection bound to the current authenticated Session. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Connection-ID"?: components["parameters"]["NativeDeliveryConnectionID"];
+            };
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+                /** @description The chunk's number, from 1. */
+                readonly chunk: number;
+            };
+            readonly cookie?: never;
+        };
+        /** @description The chunk's raw bytes, exactly the size the declared upload gives that chunk: 8 MiB (8388608 bytes) for every chunk but the last. */
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/octet-stream": Uint8Array;
+            };
+        };
+        readonly responses: {
+            readonly 200: components["responses"]["ScreenClipChunkOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly completeCandidateScreenClipUpload: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: {
+                /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Credential"?: components["parameters"]["NativeDeliveryCredential"];
+                /** @description The durable open Attempt Connection bound to the current authenticated Session. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
+                readonly "X-Proctor-Attempt-Connection-ID"?: components["parameters"]["NativeDeliveryConnectionID"];
+            };
+            readonly path: {
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["CompleteCandidateScreenClipUpload"];
+        readonly responses: {
+            readonly 200: components["responses"]["CandidateScreenClipOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly appendNativeDelivery: {
         readonly parameters: {
             readonly query?: never;
@@ -19066,6 +20036,37 @@ export interface operations {
         };
         readonly responses: {
             readonly 200: components["responses"]["CandidateWorkspaceMutationOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly getSecurityPolicyOverview: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description The policy the readiness overview checks the machine against */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["SecurityPolicyOverviewResponse"];
+                };
+            };
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
@@ -20202,6 +21203,113 @@ export interface operations {
         readonly requestBody: components["requestBodies"]["ReallowExamAttempt"];
         readonly responses: {
             readonly 200: components["responses"]["ExamAttemptReallowed"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listExamAttemptScreenClips: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description The Attempt's screen clips */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": []
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["ScreenClipListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly requestExamAttemptScreenClip: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required opaque client key. Identical semantic commands replay the committed outcome for at least 24 hours; reuse with different input is a conflict. */
+                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
+            };
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["RequestExamAttemptScreenClip"];
+        readonly responses: {
+            readonly 200: components["responses"]["ExamAttemptScreenClipOK"];
+            readonly 201: components["responses"]["ExamAttemptScreenClipOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly playExamAttemptScreenClip: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: {
+                /** @description One byte range, such as bytes=0-1048575, bytes=1048576- or bytes=-4096. */
+                readonly Range?: string;
+            };
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The screen clip identifier. */
+                readonly screen_clip_id: components["parameters"]["ScreenClipID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ScreenClipContent"];
+            readonly 206: components["responses"]["ScreenClipPartialContent"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
@@ -21751,6 +22859,54 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listPlugins: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["PluginListOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly replacePluginSettings: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required opaque client key. Identical semantic commands replay the committed outcome for at least 24 hours; reuse with different input is a conflict. */
+                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
+            };
+            readonly path: {
+                /** @description The plugin's ID, for example display-topology. */
+                readonly plugin_id: components["parameters"]["PluginID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["ReplacePluginSettings"];
+        readonly responses: {
+            readonly 200: components["responses"]["PluginOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly getProgrammeLevel: {
         readonly parameters: {
             readonly query?: never;
@@ -22760,6 +23916,27 @@ export interface operations {
             readonly 200: components["responses"]["SystemPingOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listActiveSystemPlugins: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["SystemPluginsOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };

@@ -251,21 +251,32 @@ server's stable safe outcome.
 
 ## Privileged exam-security module
 
-`ExamSecurityCoordinator` is one Attempt-scoped privileged module used by the
-CandidateWindow composition root. It owns:
+`ExamSecurityCoordinator` is one Attempt-scoped privileged module in Electron
+main, used by the CandidateWindow composition root. It owns:
 
 - policy authenticity, freshness, scope, and rollback checks;
-- secure preflight and continuous local posture;
-- passive native-source supervision and normalization;
+- the readiness overview session, secure preflight and continuous local posture;
+- supervision of the [native agent](./native-capabilities.md), whose rule
+  statuses drive posture; it never evaluates rules or reads raw inventories;
 - closed containment effects through separate enforcement adapters;
 - connectivity evaluation and Participation lease continuity;
 - Browser Activity/integrity delivery reconciliation;
 - coordination with Attempt Workspace protection and recovery.
 
+The coordinator is implemented as `ExamParticipationService`
+(`workbench/services/examSecurity/electron-main/`), composed per Session by
+`code/electron-main/examParticipationComposition.ts`. It holds the Session's
+realtime command channel and the native agent, runs Start as prepare →
+bind → report → recheck → Connect within 30 seconds, renews every
+`renewal_interval_seconds` with a `security_control` that carries the native
+delivery watermark, and delivers native records through the encrypted
+`NativeDeliveryService` spool. When the CandidateWindow mounts it delivers the
+mounted window's fact before `participation_confirmed`.
+
 Its renderer interface exposes only an immutable
 `CandidateSecurityProjection` and closed intents such as retry checks, begin a
 permitted join, acknowledge an explicit correction, or contact approved
-support. Raw native streams, policy internals, detector thresholds, evidence,
+support. Raw native facts, policy internals, rule definitions, evidence,
 credentials, server authorization objects, and privileged handles stay behind
 the module.
 
@@ -303,6 +314,15 @@ policy changes resolve at fresh admission; selective live strengthening is
 outside the initial contract. Instruction/resource/browser corrections retain
 their separate immutable correction path.
 
+Before joining, AuthenticatedWindow shows a **readiness overview** for the
+sitting. It reads the sitting's compiled security policy without creating a
+preflight, runs a native readiness session and lists every rule live, met or
+not, with correction steps and the permission prompts the exam needs. Start is
+the binding check: the preflight challenge, one fresh complete state of every
+activated capability, and the rule statuses form the report. The server
+evaluates the same rules and admits or blocks; the native session continues into
+CandidateWindow without a gap.
+
 The [secure-participation contract](../contracts/secure-participation.md) owns
 the bounded preflight challenge/report and atomic Connect. Preparation creates
 no Attempt or Session lock. Connect consumes eligible preflight, reserves owner
@@ -311,7 +331,7 @@ atomically. First-join scope rebinding preserves policy content digest. Ready
 rejoin requires new preflight; within-lease transport resume requires continuous
 privileged ownership. Registered-key proof authenticates the installation
 credential and matrix validation restricts claims; neither attests physical OS
-state, official-binary integrity, or utility-process continuity.
+state, official-binary integrity, or native-agent continuity.
 
 ## Secure Exam Posture and containment
 
@@ -419,28 +439,28 @@ Keep the transformation explicit:
 
 ```text
 Native Observation
-    → Security Signal
-    → Detector Finding
+    → Rule Status              (Desktop for containment; the server authoritatively)
+    → Native Occurrence        (server)
     → Integrity Evidence
     → Integrity Flag
     → Review Outcome
     → Consequence
 ```
 
-Every transition preserves source/schema/policy version, uncertainty, and known
-gaps. Local findings may drive reversible containment but do not declare guilt
-or authoritative Attempt state. Integrity review is not grading.
+Every transition preserves source/schema/policy identity, uncertainty, and known
+gaps. Local rule statuses may drive reversible containment but do not declare
+guilt or authoritative Attempt state. Integrity review is not grading.
 
-Sources use source-instance identity, monotonic sequence/time, bounded classified
-payload, and explicit gaps/resets; the privileged delivery layer adds wall-clock
-context. Raw native facts remain ephemeral; only minimized occurrences,
-health/gap transitions,
-recovery records, and preflight capability reports enter delivery. The main-
-process delivery service binds canonical batches to Institution, User Session,
-Attempt, policy digest, application release, capability matrix, source
-generations, batch sequence, prior acknowledgement, and idempotency key, then
-authenticates them with the registered installation credential. Helpers and the
-utility never receive that credential.
+Capabilities use source-instance identity, monotonic sequence/time, bounded
+classified payload, and explicit gaps/resets; Electron main adds wall-clock
+context. Raw inventories never leave the native agent; only minimized facts in
+their published shapes, rule statuses, health/gap/reset records, local
+containment records, and the preflight report enter delivery. The main-process
+delivery service binds canonical batches to Institution, User Session, Attempt,
+policy digest, application release, capability matrix, source generations,
+batch sequence, prior acknowledgement, and idempotency key, then authenticates
+them with the registered installation credential. The native agent and the
+privileged components never receive that credential.
 
 The [protected-delivery contract](../contracts/protected-delivery.md) separates
 actual content receipts, settled positions and authoritative closure. Active
@@ -481,9 +501,9 @@ browser projections for its one active Attempt.
 
 Concrete credential, DPoP, server transport, protected storage, native source,
 and enforcement adapters are chosen in privileged composition roots. The exam-
-security coordinator runs in the dedicated utility process. Electron main owns
-its launcher, permission broker, CandidateWindow enforcer, window transitions,
-and fail-closed projection bridge. Preload exposes fixed capability-specific
+security coordinator runs in Electron main with the native agent's launcher and
+supervisor, the permission broker, the CandidateWindow enforcer, window
+transitions, and the fail-closed projection bridge. Preload exposes fixed capability-specific
 channels and validates scope, revision, intent family, and bounds.
 
 ## Verification
@@ -509,7 +529,7 @@ Use real coordinators behind in-memory ports and packaged-process tests. Cover:
   and sensitive-data absence.
 
 Cross-process tests verify sandboxing, IPC validation, fixed preloads, key and
-credential custody, close veto, window transitions, security-utility loss, and
+credential custody, close veto, window transitions, native-agent loss, and
 capability revocation before presentation. Native platform claims follow
 [native-capability architecture](./native-capabilities.md); browser
 claims follow their focused architecture topic.

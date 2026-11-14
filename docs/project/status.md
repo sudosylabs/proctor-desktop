@@ -50,14 +50,25 @@
   environments are too costly, so Desktop removed its remote terminal. A Run
   action with an output panel and no interactive terminal is planned before the
   first release; its backend is undecided. The AI agent is deferred.
-- Native architecture uses passive sources, a dedicated exam-security utility
-  process, main-process enforcement, one physical display, constrained
-  CandidateWindow, and packaged Windows/macOS conformance. Its accepted first-
-  release families also cover bounded process/application and interactive-
-  session state, clipboard, printing, removable storage, virtualization,
-  network configuration, and camera/microphone endpoint state. Each sub-
-  capability declares enforce, observe, or unavailable; global external screen-
-  capture detection is unavailable on the initial targets.
+- Native capabilities are being rewritten around one on-demand native agent:
+  passive adapters, server-compiled rules evaluated in the agent, Electron main
+  containment, a readiness overview before the exam, matches-only application
+  privacy, and a screen evidence recorder. Every capability and the recorder
+  are implemented on Windows and macOS and tested on both, with Linux reporting
+  unsupported where it must. Process and interactive session read unprivileged,
+  polling each second: a field the OS reports is complete, and one it cannot see
+  unprivileged (macOS screen sharing; the identity of another session's Windows
+  processes) is left out of the rule fields, so a rule on it is unknown. A privileged helper for full coverage (a
+  Windows service and a macOS Endpoint Security daemon) was built and removed on
+  2026-11-14 to ship without Apple's entitlement or candidate admin rights; it
+  stays in git history for a later optional upgrade. Electron main's exam
+  participation (readiness, preflight,
+  Connect, renewal with security control, native delivery, the CandidateWindow
+  seam, suspension, Focus Loss and submission) is implemented and tested against
+  fakes, with a composition factory; the readiness overview, the CandidateWindow
+  page and the production entry that would call it are not built yet. The superseded utility-process
+  implementation has been removed. The native parts of `docs/contracts/` follow
+  the server's published API.
 - One Proctor design system, selective VS Code source admission, one pinned npm/
   NodeNext/esbuild/Forge graph, and invariant-to-assurance mapping govern future
   implementation.
@@ -182,20 +193,21 @@ Exam security now includes effective-policy and native-selection validation,
 reconciliation, minimized evidence, authoritative projection derivation, action
 gates, correction acknowledgement, and a fail-closed Candidate contribution.
 The renderer subscribes before its initial projection and revision-fences that
-snapshot. Electron IPC and composition seams exist, but authoritative server
-participation, enforcement adapters, protected evidence delivery, and complete
-CandidateWindow startup composition are not yet wired into a production entrypoint.
+snapshot. Electron main's `ExamParticipationService` now owns server
+participation (preflight, Connect, renewal, suspension, submission) and protected
+native delivery, and implements the projection the CandidateWindow bridge serves;
+its composition, the CandidateWindow startup and the readiness overview UI are
+not yet wired into a production entrypoint.
 
-The native Rust/Node-API/Electron utility foundation remains substantial: the
-generated eleven-source manifest, bounded schemas, source-session supervision,
-sequence/gap accounting, helper transport and identity verification, Windows/
-macOS/Linux observation adapters, permission broker, CandidateWindow enforcer,
-private clipboard, print gate, capability-family registry, and signed-matrix
-verifier are implemented and tested. Several platform claims deliberately remain
-partial or unavailable, including the absent signed Windows ETW/WTS service,
-entitled macOS Endpoint Security helper, bounded Linux/macOS printing coverage,
-and global external screen-capture observation. No capability matrix is generated
-or signed yet, so this is not packaged secure-target conformance.
+The native layer is one Rust agent under `native/`, spawned by Electron main over
+a private pipe: a deterministic engine with published rule vectors, every
+capability read without privileged components, an interruption watcher, and the
+screen recorder. Electron main's agent service launches, supervises, restarts the
+agent once and contains. Several platform claims deliberately remain partial or
+unavailable, including macOS screen sharing, other sessions' Windows processes,
+bounded Linux/macOS printing coverage, and global external screen-capture
+observation. No capability matrix is generated or signed yet, so this is not
+packaged secure-target conformance.
 
 The executable toolchain has one pinned npm graph, strict NodeNext compiler
 projects for every runtime, esbuild harnesses, generators, policy/schema/source/
@@ -255,25 +267,6 @@ Missing observe-only coverage is explicit and degraded, while absent mandatory o
 enforce coverage blocks admission. Frozen configuration retains original build
 provenance across compatible patched builds and accepts only packaged catalog IDs.
 
-Production process/application and interactive-session helpers remain source-incomplete.
-The macOS source now includes an ES notification feed, kernel-bound peer code
-verification, bounded audit inventory and generation-aware reconciliation. A bounded
-worker verifies executable identity against exact kernel audit tokens and secured
-signing metadata; missing fields remain unavailable. Startup requires natural event
-boundaries around inventory and rejects gaps, suppressed notifications or an unproved
-deadline. The fixed macOS service/worker entrypoints, authenticated socket bootstrap,
-observed-exit acknowledgement, shared Node source owner and explicit main-process
-registration are implemented. Unsigned service staging records hashes and actual
-permissions; it does not establish installation, exact utility-role authorization,
-profile/signature validity or packaged support. The ordinary stdio entrypoint remains
-unavailable for privileged sources, and complete macOS interactive-session coverage
-remains unavailable. Windows has an ETW event feed, bounded process inventory/reducer,
-exact-lifetime account-scope enrichment, a service-owned WTS session source and an
-authenticated-context helper bridge. Live client
-executable verification, complete process bootstrap, service transport activation and
-target verification are still outstanding. Source tests do not
-establish entitlement, signing or packaged support.
-
 Initial resolver exclusions are Institution inheritance, accommodations and
 exception authoring/revocation, plus selective live native-policy strengthening.
 Nonempty Institution allowlists remain unavailable until their catalog owner
@@ -300,12 +293,11 @@ compatibility-gated state until their adapters match the verified server contrac
 5. **Candidate identity/security** — admission, Attempt Configuration,
    CandidateWindow lifecycle, active Session/Participation projection, pause,
    suspension handoff, ready join, close/departure, correction, and submission.
-6. **Native capabilities** — replace partial process/session observations with
-   the signed privileged helper implementations, close per-platform full-
-   coverage gaps, then add coordinator integration, production effect wiring,
-   packaged target conformance, and capability-matrix generation/signing over
-   the implemented schemas, registry, supervision, eleven-source utility
-   bridge, helper protocol, private clipboard, print gate, and matrix verifier.
+6. **Native capabilities** — production effect wiring, packaged target
+   conformance, and capability-matrix generation/signing over the implemented
+   schemas, registry, capabilities, private clipboard and print gate. Full
+   process/session coverage through a privileged helper is a later optional
+   upgrade (kept in git history), not a release requirement.
 7. **Integrated browser** — frozen policy validation/enforcement, Candidate item,
    minimized activity, protected spool, ordered delivery, and privacy/access
    verification.

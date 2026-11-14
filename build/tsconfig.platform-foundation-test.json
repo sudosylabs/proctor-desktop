@@ -14,6 +14,7 @@
     "../test/platform/protectedStorage/node/**",
     "../test/platform/windows/node/**",
     "../test/workbench/services/examSecurity/node/**",
+    "../test/workbench/services/screenClips/node/**",
     "../test/platform/settings/node/**",
     "../test/platform/native/node/**"
   ],
@@ -43,7 +44,6 @@
     "../test/workbench/contrib/account/common/**/*.ts",
     "../test/workbench/contrib/administration/common/**/*.ts",
     "../test/workbench/services/examSecurity/**/*.test.ts",
-    "../src/prctr/workbench/services/examSecurity/electron-utility/**/*.ts",
     "../test/workbench/services/notification/common/**/*.ts"
   ]
 }

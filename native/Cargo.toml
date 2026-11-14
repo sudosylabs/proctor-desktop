@@ -1,23 +1,13 @@
 [workspace]
 members = [
   "crates/desktop-key-custody",
-  "crates/native-protocol",
-  "crates/native-source-runtime",
-  "crates/native-helper-protocol",
-  "crates/native-security-helper",
-  "crates/display-topology",
-  "crates/candidate-window-state",
-  "crates/capture-session-state",
-  "crates/process-application-state",
-  "crates/interactive-session-state",
-  "crates/clipboard-state",
-  "crates/print-spooler-state",
-  "crates/removable-storage-state",
-  "crates/virtualization-state",
-  "crates/network-configuration-state",
-  "crates/media-device-state",
-  "crates/native-source-supervisor",
-  "crates/native-node-bridge",
+  "crates/prctr-protocol",
+  "crates/prctr-core",
+  "crates/prctr-xtask",
+  "crates/prctr-agent",
+  "crates/prctr-os",
+  "crates/prctr-capabilities",
+  "crates/prctr-recorder",
 ]
 resolver = "2"
 

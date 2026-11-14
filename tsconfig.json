@@ -15,9 +15,8 @@
     { "path": "./build/tsconfig.browser.json" },
     { "path": "./build/tsconfig.electron-browser.json" },
     { "path": "./build/tsconfig.electron-main.json" },
-    { "path": "./build/tsconfig.electron-utility.json" },
     { "path": "./build/tsconfig.electron-test.json" },
-    { "path": "./build/tsconfig.security-utility-test.json" },
+    { "path": "./build/tsconfig.native-agent-test.json" },
     { "path": "./build/tsconfig.resource-preview-test.json" }
   ]
 }

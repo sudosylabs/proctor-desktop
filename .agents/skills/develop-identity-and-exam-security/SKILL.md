@@ -32,8 +32,10 @@ Use that accepted contract when existing adapters or fixtures still differ.
 
 Put readiness/auth/key/credential/Session lifecycle in the privileged
 `DesktopIdentityCoordinator`. Put Attempt-scoped policy, posture, containment,
-continuity, activity/integrity delivery, and Workspace orchestration in the
-privileged `ExamSecurityCoordinator`. Keep Electron-main-only window effects,
+continuity, activity/integrity delivery, native-agent supervision and Workspace
+orchestration in the privileged `ExamSecurityCoordinator` in Electron main; it
+consumes the native agent's rule statuses and never evaluates rules itself. Keep
+Electron-main-only window effects,
 OS storage, system browser, loopback listener, permission prompts, and native
 effects behind focused adapters. Renderers receive immutable projections and
 closed intents.
@@ -141,15 +143,16 @@ process loss, Force Quit, and stale generation are testable.
 
 ## 8. Preserve integrity meaning and privacy
 
-Keep `Native Observation` → `Security Signal` → `Detector Finding` →
+Keep `Native Observation` → `Rule Status` → `Native Occurrence` (server) →
 `Integrity Evidence` → `Integrity Flag` → `Review Outcome` → `Consequence`
-distinct. Preserve versions, uncertainty, gaps, source sequences, and delivery
+distinct. Desktop rule statuses drive only reversible containment; the server's
+evaluation is authoritative. Preserve versions, uncertainty, gaps, source sequences, and delivery
 watermarks. Keep Browser Activity and Workspace Recovery in separate protected
 spools. Project only authorized minimized state and keep content/evidence/
 credentials out of ordinary audit, diagnostics, renderer state, and logs.
 
 Let main canonicalize and authenticate minimized batches with the registered
-installation credential; helpers and the utility never receive it. Separate
+installation credential; the native agent and helpers never receive it. Separate
 content receipts from settlement and final declarations from server closure.
 Honor Attempt-wide detail/metadata budgets and reserved lifecycle capacity. Bind batch
 sequence, prior acknowledgement, idempotency key, policy digest, release,

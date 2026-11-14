@@ -119,7 +119,7 @@ export interface IServerEvents {
 export type ServerCommandAction =
 	| 'exam_attempt.connect'
 	| 'exam_attempt.renew'
-	| 'exam_attempt.security_update'
+	| 'exam_attempt.security.update'
 	| 'exam_attempt.focus_loss'
 	| 'exam_attempt.browser_activity.start'
 	| 'exam_attempt.browser_activity.append';

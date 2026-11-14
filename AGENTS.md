@@ -14,9 +14,9 @@ Most durable data is remote. An Attempt Workspace is not a local folder. Code
 execution is absent for now because the server no longer provides execution
 hosts or terminals; a Run capability is planned before the first release, and
 no local shell or process is ever exposed to a renderer. Native
-observation packages report bounded mechanical facts behind privileged process
-boundaries; the exam-security coordinator applies policy and separate adapters
-own enforcement.
+capabilities report bounded mechanical facts inside one native agent that
+evaluates server-compiled rules; Electron main applies containment and the
+server decides flags and consequences.
 
 The accepted workspace separates authoritative server state, the desktop
 working overlay, and protected local recovery. Read
@@ -38,17 +38,18 @@ only bounded state and intents to renderers. Read
 before changing authentication, admission, secure-exam posture, containment,
 participation continuity, re-entry, or integrity-information handling.
 
-The accepted native-capability architecture uses passive observation sources, a
-dedicated exam-security utility process, separate main-process enforcement, a
-strict single-display candidate window, and packaged Windows/macOS verification.
-Read
+The accepted native-capability architecture uses one on-demand unprivileged
+native agent spawned by Electron main, Rust protocol types as the wire
+authority, a strict single-display candidate window, privileged Windows/macOS
+components for full coverage, and real-OS proof of every fact. Read
 [`docs/architecture/native-capabilities.md`](docs/architecture/native-capabilities.md)
-before changing native observation, permissions, candidate-window enforcement,
-security-utility supervision, native IPC, or platform capability tests. Read
+before changing the native agent, its protocol, readiness, containment,
+permissions, candidate-window enforcement, privileged components, the screen
+evidence recorder, or platform capability tests. Read
 [`docs/architecture/native-capability-families.md`](docs/architecture/native-capability-families.md)
-before changing process/application or interactive-session policy, clipboard,
-printing, removable storage, virtualization, network configuration, camera,
-microphone, platform coverage, correction, or minimized native evidence.
+before changing what a capability reports, its platform coverage, or its privacy
+limits, and [`docs/architecture/native-rules.md`](docs/architecture/native-rules.md)
+before changing rules, their evaluation, or the baseline.
 
 The accepted user-settings architecture uses one server-authoritative virtual
 `settings.json`, a static Proctor registry, an Account/Settings destination in
@@ -198,9 +199,9 @@ Use these repository skills when their trigger matches:
   Sessions, Attempt admission/state, secure posture, containment, participation,
   re-entry, or integrity information.
 - [`develop-native-capabilities`](.agents/skills/develop-native-capabilities/SKILL.md)
-  when changing native observations, source sessions, permissions,
-  candidate-window enforcement, security-utility supervision, native IPC, or
-  Windows/macOS capability verification.
+  when changing native capabilities, rules, the native agent or its protocol,
+  permissions, candidate-window enforcement, privileged components, the screen
+  recorder, or Windows/macOS capability verification.
 - [`develop-user-settings`](.agents/skills/develop-user-settings/SKILL.md) when
   changing registered preferences, JSONC settings, effective configuration,
   Account/Settings editing, Attempt Configuration, constraints,

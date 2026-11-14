@@ -1,0 +1,82 @@
+//! The contract between the agent and one capability. A source observes the OS and answers "the
+//! full state now"; everything generic (sequencing, gaps, rules) stays in the engine.
+
+use std::fmt;
+
+use prctr_protocol::facts::{InterruptionKind, Permission};
+
+use prctr_protocol::rules::Rule;
+use prctr_protocol::scalars::Identifier;
+
+use crate::observation::Observation;
+use crate::registry::CapabilityDescriptor;
+
+/// What a running source reports between queries. Implementations must not block: the sink only
+/// enqueues.
+#[derive(Clone, Debug)]
+pub enum SourceEvent {
+    /// Something changed; the agent will call [`Source::current`] and feed the result to the engine.
+    Changed,
+    /// The source lost this many OS events.
+    Lost(u64),
+    /// The OS interrupted every capability (sleep, screen lock, user switch). The agent ends every
+    /// stream and re-reads every source. In production the agent's interruption watcher reports
+    /// these itself; only the scripted test capability sends this, so agent tests can drive the
+    /// same handling.
+    Interrupted(InterruptionKind),
+}
+
+/// Receives a source's events. Cheap to clone; safe to call from any thread.
+pub type Sink = std::sync::Arc<dyn Fn(SourceEvent) + Send + Sync>;
+
+/// A source could not do what it was asked. The agent needs only that fact: it reports the
+/// capability as failed or refuses the request, and never forwards OS detail to Electron main.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SourceError;
+
+impl fmt::Display for SourceError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("the capability source refused the request")
+    }
+}
+
+impl std::error::Error for SourceError {}
+
+/// One capability on one platform.
+pub trait Source: Send {
+    fn descriptor(&self) -> CapabilityDescriptor;
+
+    /// Receives the policy's rules on this capability before [`Source::start`], for a source that
+    /// matches application conditions on the device. The policy may still be refused afterwards.
+    fn configure_rules(&mut self, _rules: &[Rule]) {}
+
+    /// Starts observing the activation's selected `categories` (empty for capabilities without
+    /// sub-categories; an unselected category is never queried), then returns the first complete state. Observation is registered before the
+    /// state is read, so no change can fall between them.
+    ///
+    /// # Errors
+    /// When the OS observation cannot be set up.
+    fn start(&mut self, categories: &[Identifier], sink: Sink) -> Result<Observation, SourceError>;
+
+    /// The complete state now. Valid whether or not the source is started.
+    fn current(&mut self) -> Observation;
+
+    /// Stops observing; idempotent.
+    fn stop(&mut self);
+
+    /// A fact only Electron main can see (for example the candidate window's focus).
+    ///
+    /// # Errors
+    /// When this capability accepts no host events, or the event is not valid for it.
+    fn host_event(&mut self, _event: &serde_json::Value) -> Result<(), SourceError> {
+        Err(SourceError)
+    }
+
+    /// Shows the OS permission prompt, after explicit candidate action.
+    ///
+    /// # Errors
+    /// When this capability has no prompt.
+    fn request_permission(&mut self) -> Result<Permission, SourceError> {
+        Err(SourceError)
+    }
+}

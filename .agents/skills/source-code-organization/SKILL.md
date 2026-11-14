@@ -87,11 +87,11 @@ Place the stable identity contract and renderer projection client in
 narrowest accepted environment folder and select them from `code` composition
 roots.
 
-Give language-neutral observation protocols `platform` common ownership, the
-privileged coordinator `workbench` service ownership in `electron-utility`, and
-candidate-window and permission effects focused `platform` service ownership in
-`electron-main`. Launch the coordinator from a `code` Electron-main composition
-root. Keep platform-native implementation packages capability-first and outside
+Give the native agent's generated protocol `platform/native/common` ownership,
+its connection `platform/native/node`, and its service, candidate-window and
+permission effects `platform/native/electron-main` ownership. Compose them from a
+`code` Electron-main composition root; observation runs in the native agent,
+never in an Electron process. Keep platform-native implementation packages capability-first and outside
 renderer dependency closure; use
 [`develop-toolchain`](../develop-toolchain/SKILL.md) for their Rust workspace,
 schemas, target artifacts, and package layout.

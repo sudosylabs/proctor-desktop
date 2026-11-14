@@ -4,7 +4,7 @@ import { nodeTarget, repositoryRoot, resetBuildOutput, selectFiles } from './pat
 import { testSuites } from './testSuites.ts';
 
 export async function buildNodeTests(
-	suite: 'base' | 'platform' | 'editor' | 'security-utility',
+	suite: 'base' | 'platform' | 'editor' | 'native-agent',
 	outputName: string,
 	tsconfig: string,
 	external: string[] = []

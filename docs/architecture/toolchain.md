@@ -117,24 +117,29 @@ admitted behavior with smaller implementations.
 
 ## Native and private protocol artifacts
 
-Language-neutral JSON Schema files are authoritative for native observation and
-enforcement DTOs, including the fixed privileged-helper handshake, source
-configuration, and normalized event envelope. One generator registry produces
-TypeScript and Rust types plus runtime validators. Generated types improve
-callers but never replace validation. Generated Rust deserializers reject
-unknown object fields rather than accepting an extension at a security
-boundary.
+Rust protocol types in `prctr-protocol` are authoritative for every native wire
+shape: Electron main ↔ native agent messages, agent ↔ privileged-component
+messages, capability facts, rules and rule statuses. `prctr-xtask` exports their
+JSON Schema, the capability registry (capabilities, typed rule fields, reasons,
+baseline rules) and the rule conformance vectors as committed files; Rust tests
+fail when those files drift from the types. A registered generator turns the
+committed schema into TypeScript types and runtime validators, and
+`generated.parity` checks that step. Generated types improve callers but never
+replace validation. Rust deserializers reject unknown fields rather than
+accepting an extension at a security boundary.
 
-Electron MessagePorts carry only schema-valid JSON-compatible structured-clone
-values. Node-API bindings expose the same bounded DTO shapes. A separately
-signed helper uses size-prefixed UTF-8 JSON frames on a private inherited
-channel and rejects excessive frames before parsing. Each capability manifest
-declares bounds, compatibility fixtures, target tuple, build toolchain, source
-revision, artifact hash, and signature.
+Electron main and the native agent exchange length-prefixed UTF-8 JSON frames
+on a private inherited pipe and reject excessive frames before parsing. The
+agent and the privileged components use the same framing and protocol crate.
+Each capability's release entry declares bounds, fixtures, target tuple, build
+toolchain, source revision, artifact hash, and signature.
 
-Observation Node-API modules belong only to passive sources in the security
-utility process. The separate identity key-custody adapter is the narrow
-Electron-main exception defined by the
+The native agent is a standalone binary, not a Node-API module; no observation
+code loads into an Electron process. Its screen recorder uses the OS H.264
+encoders (VideoToolbox, Media Foundation), never ffmpeg, and RustCrypto's
+`chacha20poly1305`; every key and nonce comes from the OS random source through
+`prctr-os`, so no userspace random-number crate is admitted. The separate
+identity key-custody adapter is the one Electron-main Node-API module, defined by the
 [identity architecture](./identity-and-exam-security.md#desktop-authorization-and-installation-proof):
 it exposes a public key, bounded digest signing and deletion, with no private-key
 export or observation/policy behavior. Required privilege, entitlement, native stability, or a
@@ -272,14 +277,14 @@ byte-identical signed installers. A release records:
 
 Production source maps and native symbols are stored privately by build
 identity and never shipped. Renderer symbolication follows privacy filtering.
-Security-utility/native symbols and crash dumps are more restricted evidence;
+Native-agent symbols and crash dumps are more restricted evidence;
 dumps require explicit support authorization and are never uploaded
 automatically.
 
 GitHub Actions owns initial CI. Linux may run inexpensive source checks but
 cannot establish supported-platform behavior. Current Windows and macOS jobs
-run native-source verification and the real Electron security-utility bridge;
-that development-runtime evidence establishes no packaged platform claim.
+run the native agent's Rust tests, including real-OS checks, and its end-to-end
+suite; that development-runtime evidence establishes no packaged platform claim.
 Windows x64 and macOS arm64/x64 jobs will own package and native claims once the
 packaged target gates exist. Unsigned verified payloads enter protected signing
 jobs whose credentials are unavailable to pull requests and ordinary builds.
@@ -308,10 +313,11 @@ never coincide.
 
 The foundation currently exposes `check`, focused repository checks,
 `check:types`, `generate`, `inspect`, the checker test suite, and a typed
-`test:native` entrypoint. `build:security-utility` compiles the native Node-API
-addon and exact Electron-main/utility test bundles. `test:security-utility`
-proves the process-neutral private protocol, while `test:electron` runs the
-real Electron/Node-API lifecycle. `build:browser-harness` bundles a sandboxed
+`test:native` entrypoint. `test:native-agent` builds the native agent with its
+test-only scripted capability and drives the real binary through Electron main's
+connection and service: handshake, framing, readiness → participation, containment,
+gaps, crash, hang, the single restart, and orderly close. It is part of
+`test:unit`. `build:browser-harness` bundles a sandboxed
 plain-DOM fixture against Electron's exact Chromium major, and `test:browser`
 verifies DOM execution, locale/direction control, and absence of ambient Node.js
 through that real renderer. `test:base` compiles and executes the localization

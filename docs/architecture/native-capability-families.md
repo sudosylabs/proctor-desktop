@@ -1,364 +1,476 @@
-# Native capability family contracts
+# Native capability contracts
 
 ## Scope and claim language
 
-This document owns the accepted first-release policy, privacy, correction, and
-platform-coverage contract for Proctor Desktop native capability families. The
-[native capability architecture](./native-capabilities.md) owns source sessions,
-process boundaries, coordination, failure, evidence transport, and release
-verification.
+This document owns what each native capability reports, its platform coverage, permission and
+privacy limits. The [native capability architecture](./native-capabilities.md) owns the process
+model, lifecycle and protocol; [native rules](./native-rules.md) owns how rules read these facts.
 
-Architecture acceptance is not an implementation or support claim. A capability
-is supported only when the exact packaged application, helper, adapter, schema,
-operating-system version, and architecture tuple appears in the signed release
-capability matrix. Windows x64 and macOS arm64/x64 are the initial certification
-targets. Linux keeps the common interfaces and practical adapters, but broader
-security claims require a pinned and certified distribution, kernel, session,
-display, media, and networking tuple.
+Architecture acceptance is not an implementation or support claim. A capability is supported only
+when the exact packaged application, agent and OS/architecture tuple appears
+in the signed release capability matrix. Windows x64 and macOS arm64/x64 are the initial
+certification targets; on them every capability is implemented to the **strongest coverage the OS
+offers** through public, unprivileged APIs. Linux keeps the same interfaces and may
+report a capability as unsupported.
 
-Every capability-matrix entry states one of:
+Every capability states one coverage claim per target:
 
-- `enforce` — the certified adapter can establish the declared mechanical
-  condition strongly enough for policy containment;
-- `observe` — the adapter can report a useful bounded fact but cannot establish
-  an enforcement boundary;
-- `unavailable` — the platform or packaged adapter cannot make that claim.
+- `enforce`: the adapter establishes the fact strongly enough for an enforce rule;
+- `observe`: the adapter reports a useful bounded fact but cannot support enforcement;
+- `unavailable`: the platform or adapter cannot make the claim.
 
-Coverage belongs to a sub-capability, source schema digest, and target tuple. One
-enforceable part never makes its whole family enforceable. Missing enforce
-coverage blocks admission. Missing observe coverage produces an explicit
-degraded result and never silently changes policy.
+One enforceable field never makes a whole capability enforceable.
 
-## Policy modes and registry
+## Policy modes
 
-Every family uses an explicit server-frozen mode:
+Managers choose per-family options on the server; the server compiles them into activations and
+rules ([native rules](./native-rules.md)). A family is:
 
-- `disabled` opens no source, requests no permission, collects no fact, and
-  presents no capability UI;
-- `observe` opens the disclosed source and may create minimized review material,
-  but a condition never causes containment;
-- `enforce` requires healthy complete coverage and contains a confirmed
-  prohibited condition.
+- `disabled`: no capability opened, no permission requested, no fact collected, no UI;
+- `observe`: facts collected and disclosed; rules are reported but never contain;
+- `enforce`: rules contain while not met or unknown. The family's server outcome is `flag` or
+  `flag_and_suspend`.
 
-The Desktop contains a deterministically generated capability registry. Its
-checked JSON authority and bounded family-policy schema are the single source
-of truth. Each entry declares a
-stable identifier, permitted modes, bounded configuration and
-fact shapes, permission/effect requirements, privacy class, and per-platform
-coverage keys. New authoring templates start these broader families as
-`disabled`; there is no hidden inheritance or Desktop-selected default.
-The family modes must exactly match the referenced configuration schema.
-External capture therefore advertises only `disabled`, rather than inheriting a
-generic mode set from other families.
+Policies select only registered identifiers and bounded values. They never supply code, commands,
+paths, patterns, hashes outside the catalog, platform API names or timing.
 
-The effective policy may select only packaged identifiers and bounded values.
-It cannot supply code, commands, paths, arbitrary regular expressions,
-unregistered hashes, platform API identifiers, effect sequences, or low-level
-OS timing. Unknown, contradictory, oversized, prohibited, or unsupported
-requirements fail before permission prompts and source startup. Observe mode
-cannot select an enforcement-only effect: private clipboard and candidate
-print-command denial remain inactive while their observation-only siblings may
-collect bounded facts. The server resolves the
-[accepted security-policy contract](../contracts/security-policy.md); Desktop
-has no local bypass or policy-precedence engine. Initial resolution includes
-published selections, mandatory baseline, verified artifacts/catalogs and
-existing admission fences. Institution inheritance, accommodations and exception
-authoring/revocation are excluded; exception references are empty.
+## Shared envelope
 
-Ordinary live policy mutation is absent. A changed policy requires suspension
-and a fresh join. Emergency blocking uses authorized Attempt suspension.
-Selective live strengthening is outside the initial contract. Policy has no
-independent expiry; current Participation and Sitting authority govern use.
+Every capability's facts carry, in addition to the fields below:
 
-## Common mechanical envelope
+- permission: `not_determined`, `granted`, `denied`, `restricted`, `unavailable`;
+- health: `unsupported`, `healthy`, `degraded`, `failed`, `stopped`;
+- coverage and certainty: `complete`, `partial`, `unknown`;
+- per-capability sequence, source instance, gaps and resets.
 
-Every source separates:
+Each capability also publishes a **summary**: fields derived only from its state, sent with every
+fact, so the agent's rules and the server compare the same values. The server checks that each
+summary matches its state.
 
-- certified coverage and permission state;
-- source and adapter health;
-- certainty and known gaps;
-- current bounded mechanical state;
-- ordered meaningful transitions and resets;
-- source generation and lifecycle.
+---
 
-Preflight returns one complete initial snapshot. Continuous operation reports
-policy-relevant transitions, occurrence start/recovery, health, gaps, and an
-aggregated coverage heartbeat rather than recurring normal inventories.
-Notifications are wakeups: startup, resume, helper restart, session or namespace
-change, permission change, and detected event loss require a bounded complete
-reconciliation under a new or fenced generation.
+## Display topology
 
-Overflow never truncates an inventory and calls it complete. It reports an
-exact gap or failure. Unknown, stale, incomplete, or unverifiable enforced
-coverage contains; the same condition degrades observation. Uncertainty and
-source failure are operational facts, not evidence of misconduct.
+**Purpose.** The baseline requires exactly one physical, active display with no mirrored, virtual,
+wireless, remote or specialized target, known with complete certainty.
 
-## Process and application state
+**State.** `certainty`; `targets` (at most 32), each with an opaque per-session `target_id`,
+`active`, `built_in`, `kind` (physical, virtual, wireless, remote, specialized, unknown),
+`connection` (direct, indirect, unknown), `mirror_of`, `power` (awake, asleep, unknown) and
+`primary`. Resolution, refresh rate and position are not reported.
 
-Application policy evaluates each user-space executable in the candidate's
-interactive exam session. Kernel components and service/system-account
-processes remain outside application allowlist matching while process-source
-health still covers the declared boundary. A child process never inherits its
-parent's permission.
+**Changes.** `topology_changed` with the complete new state and the kinds of change (target added
+or removed, activity, mirroring, kind, power, primary, certainty).
 
-The packaged application catalog contains two authorities:
+**Summary.** `active_physical`, `active_total`, `connected_total`, `mirrored`, `virtual`, `wireless`,
+`remote`, `specialized`, `unknown_kind`. The baseline reads `certainty = complete`,
+`active_physical = 1` and `connected_total = 1`.
 
-- Proctor-maintained OS-essential classifications tied to the Desktop release;
-- Institution-registered bounded application identities selected by stable
-  catalog identifier.
+**Platforms.**
 
-Windows identity uses signer chain, publisher/product metadata, version bounds,
-and an optional exact digest. macOS identity uses code-signing identity, Team
-ID, designated requirement, bundle identity, and version. A certified Linux
-tuple may use package identity and executable digest. Paths and process names
-are never authoritative. Unsigned applications require an exact registered
-digest and are disabled by default.
+- Windows: `QueryDisplayConfig` over all paths plus the target output technology (internal panel,
+  HDMI/DP, Miracast, indirect drivers); two paths sharing a source mean mirroring; monitor
+  specialization marks headsets. Wake-ups from display change, monitor arrival/removal and console
+  display state.
+- macOS: the online display list (which includes mirrored and sleeping displays), built-in, mirror
+  and asleep queries, and the reconfiguration callback.
+  - **Apple silicon:** every physical screen is driven through an `AppleCLCD2` framebuffer that
+    reports a hardware transport. Each display is paired with an unused framebuffer by EDID vendor,
+    product and serial (serial matches first). A paired display is physical and direct. An unpaired
+    one is virtual, which covers Sidecar, AirPlay and software displays; on macOS wireless targets
+    are reported as virtual. A display copying a real monitor's identity cannot pass as a second
+    screen, because each framebuffer pairs once. Checked on an M1 with one HDMI monitor (physical,
+    complete certainty). Sidecar, AirPlay and DisplayLink still need certification rigs.
+  - **Intel:** there are no such framebuffers, so external displays stay unclassified and certainty
+    is partial.
+  - EDID identities are compared in the agent and never sent.
+- Linux: DRM connectors in sysfs; partial where mirroring or virtual drivers cannot be confirmed.
 
-The catalog assigns deterministic execution classes. External shells,
-interpreters, automation hosts, remote-control tools, capture tools, and local
-development servers are initially prohibited classes and cannot become allowed
-merely by registering a signer or digest. No execution path is currently
-permitted; the planned Proctor-owned Run capability must be admitted explicitly
-and cannot rely on a child shell or interpreter.
+**Permission.** None.
 
-A new relevant process immediately enters reversible `checking` while identity
-verification completes. An allowed identity clears without a violation; a
-confirmed disallowed identity opens an occurrence. A process that exits before
-verification is still resolved where possible; otherwise the explicit gap keeps
-enforced participation contained until reconciliation. Proctor asks the
-candidate to close a disallowed application and never kills it automatically.
+**Never leaves the agent.** Monitor names, manufacturer, model, serial, EDID, connector paths, OS
+display IDs.
 
-Full Windows lifecycle coverage requires the signed privileged ETW service
-described in the core architecture. WMI or snapshot-only enumeration is not an
-enforcement substitute. Full macOS exec coverage requires the approved Endpoint
-Security component and Full Disk Access; GUI-only application APIs do not make
-the same claim. Generic Linux process coverage is observe-only or unavailable
-until a pinned tuple closes kernel, namespace, and identity gaps.
+**Decided cases.**
 
-Snapshot process-instance correlation requires PID plus an OS creation/launch
-generation. An entry whose generation cannot be established is omitted from the
-partial snapshot; PID-only fallback and transient application-object addresses
-are forbidden because PID reuse would merge distinct processes.
+- A closed built-in panel with one external monitor does not count, once the adapter confirms the
+  lid is closed; otherwise it counts and the baseline is not met.
+- A sleeping monitor still counts as connected; it is not a violation by itself.
+- A USB DisplayLink monitor is `physical` with `indirect` connection; it is a real second screen.
+- An HDMI dummy plug looks like a physical monitor and is not detectable here (a stated limitation).
 
-Helpers never expose executable paths, command lines, arguments, window titles,
-environment variables, or parent-command data. Routine allowed processes reduce
-to catalog identifiers. Authorized integrity review may retain a bounded
-signer/product/bundle identity or digest for an unknown disallowed executable.
+## Candidate window
 
-## Interactive OS sessions
+**Purpose.** The exam window's own condition. Focus facts also feed the server's Focus Loss
+evaluation.
 
-`single_interactive_session` requires the candidate's local exam session to be
-the only human interactive login session capable of retaining user processes.
-Other active or disconnected human sessions block. System and service accounts
-do not count, and native facts contain no usernames, account identifiers, SIDs,
-terminal addresses, hostnames, or remote IP addresses.
+**State.** `certainty`, `presence`, `focus`, `visibility`, `placement` (maximized, normal,
+minimized, fullscreen), `display_target_id`, `content_protection` (verified, failed, unknown, read
+back from the OS), `occlusion` (none, covered, unknown), `close_attempts` (a count). A field the
+window cannot tell is `unknown` in the state and left out of the rule fields, so only a rule naming
+it is unknown (`unavailable`) and health is degraded.
+`display_target_id` is not implemented yet: it needs the display capability's target identities.
 
-Remote interactive login, Remote Desktop attachment, fast-user switching,
-console ownership transfer, session replacement, lock, or loss of interactive
-console ownership immediately contains participation. The source does not claim
-to detect remote-control mechanisms that create no OS session. Preflight asks
-the candidate to sign out other human sessions; Proctor never logs them off.
+**Host events.** Electron main sends `attach` (the window's native identity: the CoreGraphics
+window number on macOS, the window handle on Windows), `state` (presence, focus, visibility,
+placement), `close_attempted` and `detach`. Any other shape is a protocol error.
 
-Unlock does not restore interaction by itself. Process, session, display,
-device, network, permission, and server-participation checks must reconcile
-first. Sleep creates a continuity interruption; resume starts new source
-generations and verifies the server lease before local recovery.
+**Changes.** The complete new state on every change; a close attempt raises `close_attempts`.
 
-Certified all-session Windows coverage requires the privileged WTS service.
-Exact macOS lock/switch/session coverage requires the approved Endpoint Security
-component and a certified initial snapshot. Linux session enforcement requires
-a pinned logind/system tuple.
+**Baseline.** `baseline.window` applies to participation only (the window does not exist during
+readiness): present, maximized, and content protection verified.
 
-On Windows only `WTSActive` establishes console ownership. A `WTSConnected`
-human session still contributes to the other-human-session inventory but cannot
-claim either candidate or other-human console ownership without active state.
+**Occlusion.** `covered` when other windows cover at least **5% of the exam window for at least 1
+second**. Accessibility tools and Proctor's own overlay never count. The other windows' names or
+owners are never read.
+
+**Platforms.**
+
+- Windows: Electron main's window events; `GetWindowDisplayAffinity` read-back; the z-order above
+  the window for occlusion.
+- macOS: Electron main's window events; `NSWindow.sharingType` read-back; the windows listed above
+  ours (bounds, layer, alpha, with no Screen Recording permission) for occlusion.
+- Linux: window events; content protection and Wayland occlusion are `unknown`.
+
+**Permission.** None.
+
+**Never leaves the agent.** Window titles, other windows' owners, exact coordinates.
+
+## Interactive session
+
+**Purpose.** The candidate's local session must be the only human session, unlocked, and not
+viewed or controlled remotely. It also holds the remote-viewing fact.
+
+**Coverage.** The session is polled every second. Each field the platform reports is complete; a
+field it cannot read is reported `unknown` and left out of the rule fields, so only a rule naming
+that field is unknown. The always-on `baseline.session` rule (console owned by the candidate,
+unlocked, no other human session) uses only fields every target reads, so it holds everywhere;
+remote attachment is not part of it. What each platform reads:
+
+- **macOS:** console and lock from the window-server session; other users from `utmpx`; remote
+  attachment unknown (screen sharing needs privilege).
+- **Windows:** console, lock and remote use (RDP, `SM_REMOTESESSION`) from WTS; other active or
+  disconnected human sessions.
+- **Linux:** logind session files; lock unknown.
+
+A count the platform cannot read is left out, never reported as zero.
+
+**State.** `coverage` (snapshot_only, unavailable), `certainty`, `console_owner`
+(candidate, other_human, none, unknown), `lock` (unlocked, locked, unknown), `remote_attachment`
+(absent, present, unknown: RDP into this session, screen sharing, remote management),
+`other_human_sessions` (count, active or disconnected).
+
+**Changes.** `session_changed` with the complete new state. A lock and a user switch are also
+interruptions of every capability; remote attachment is a fact of this capability only.
+
+**Platforms.**
+
+- Windows: WTS for the current session's console ownership, lock and `SM_REMOTESESSION`, plus a
+  session enumeration for other active or disconnected human sessions.
+- macOS: the window-server session dictionary for console and lock, and `utmpx` for other users.
+  Screen sharing is not observable unprivileged, so remote attachment is `unknown`.
+- Linux: logind sessions; partial.
+
+**Permission.** None; every read is unprivileged.
+
+**Never leaves the agent.** Usernames, account IDs, SIDs, hostnames, remote addresses.
+
+**Decided cases.** A disconnected session of another user counts; SSH counts as another session;
+an idle screen lock is an interruption, not misconduct; remote control without an OS session is
+outside this capability.
+
+## Process and application
+
+**Purpose.** Whether an application the exam's rules name is running in the candidate's session.
+
+**Two layers.** The inventory (instance by process number plus start time, verified identity,
+catalog match) exists **only inside the agent**. The fact that leaves it is the match state:
+`coverage` (snapshot_only, unavailable), `checking` (new processes whose identity is
+still being verified), and per application rule its `rule_id`, `matched` (the condition is violated)
+and, for blocklist rules, the `catalog_app_ids` found. Allowlist matches carry no IDs, names or
+counts. The capability has no rule fields: rules on it are application conditions.
+
+**Changes.** `matches_changed` with the complete match state. A process start or exit that changes
+no rule produces no fact.
+
+**Catalog.** Release-owned and compiled into the agent, so the release's code signature covers it.
+The registry publishes each application's ID and whether an allowlist may name it. Each entry lists
+its identities: a macOS signing identifier with its Team ID (or Apple's anchor for Apple's own code),
+a Windows publisher with the original file name, and a Linux executable name. Code Apple signs, and
+code Microsoft signs as Windows, is part of the OS unless the catalog lists it, so the catalog must
+list every such application a candidate could use (Terminal, Script Editor, Screen Sharing,
+QuickTime, the Windows shells). The catalog in the source is a seed: every identity must be certified
+on real installations before release, and a catalog change is a release change.
+
+**Matching.** A blocklist is violated by any listed application. An allowlist is violated by any
+process that is not Proctor, not part of the OS and not listed, including one whose identity cannot
+be read; an unidentifiable process never matches a blocklist. Proctor is the agent's parent
+(Electron main) and everything it started. A process started by another application is matched on
+its own identity, so an allowed editor that launches a shell is matched on the shell. Paths and
+process names are never identity.
+
+**Platforms.** The agent's session is polled every second; each completed snapshot classifies every
+process it sees, so its matches are complete, and a read that returns nothing is unavailable.
+
+- **macOS:** `proc_listallpids` for the agent's account; identity from the running code's signature
+  (signing identifier, Team ID, and whether it satisfies `anchor apple`), verified once per
+  instance.
+- **Windows:** a Toolhelp snapshot of the agent's session; identity by verifying each image's
+  Authenticode or catalog signature and reading its original file name, cached once per instance.
+  A process whose image cannot be opened (another session, SYSTEM) is unidentified.
+- **Linux:** `/proc` for the agent's account; identity is the executable's file name, a weak stand-in
+  because Linux has no code identity.
+
+**Never leaves the agent.** Names, paths, command lines, arguments, process numbers, signers of
+unmatched applications, display names. The candidate sees an offending application's name on their
+own screen only. Proctor never ends an application.
 
 ## Clipboard
 
-`candidate_private_clipboard` is a Proctor-owned in-memory CandidateWindow
-clipboard. It never reads from or writes to the host clipboard and is erased on
-Attempt departure. Policy may select this private clipboard or disable candidate
-clipboard operations.
+**Purpose.** Whether the host clipboard changed. Observe-only: a change cannot prove what the
+candidate did. The CandidateWindow's private clipboard is an effect, not a fact: it never reads or
+writes the host clipboard and is erased at departure.
 
-`os_clipboard_change` reports only a bounded generation/ownership change. It is
-observe-only, contains no content, cannot prove candidate action, and never
-causes containment by itself. Windows and macOS adapters may use platform change
-notifications or counters; X11/Wayland differences cannot be hidden behind a
-generic enforcement claim.
+**State.** `coverage` (counter_polling, unavailable) and `changes`: host clipboard changes since
+activation. There is no list of entries; content, formats and owner are never read. When the counter
+is unavailable the `clipboard.changes` field is left out, never reported as zero.
+
+**Changes.** The new state on every change; the difference between two facts is the number of changes
+between them.
+
+**Platforms.** Both certified targets keep a counter that rises on every change, polled every 250 ms,
+so no change is missed:
+
+- **Windows:** the clipboard sequence number (complete).
+- **macOS:** the pasteboard change count (complete; macOS has no change notification).
+- **Linux:** unavailable for now (X11 selection notifications are not implemented; Wayland has no
+  generic API).
+
+**Rules.** Observe-only: there is no baseline rule, and an exam rule on `clipboard.changes` never
+contains.
 
 ## Printing
 
-`candidate_print_commands` is a closed enforceable CandidateWindow effect.
-`monitored_spooler_job` means only that a job mechanically attributed to the
-candidate appeared in a certified monitored scheduler. `no_physical_printing`
-is not an available claim because direct, alternate, remote, or socket printing
-can bypass the monitored queue.
+**Purpose.** Whether a job attributed to the candidate appears in the OS print scheduler, and
+whether the CandidateWindow blocked a print command. "No physical printing" is never claimed:
+printing that bypasses the local scheduler is not seen.
 
-A candidate-owned job present before participation blocks preflight without
-creating an integrity occurrence. A new candidate-owned job during participation
-may contain when configured. Attribution crosses the source boundary only as
-`candidate`, `other`, or `unknown`; another account is a session-consistency
-condition and unknown attribution is a gap. Proctor never records printer or
-document names and never cancels a job automatically. The Windows adapter uses
-field-selective spooler notifications for only owner and numeric status, reduces
-the owner to its relative class in place, then clears every transient identity
-buffer before releasing the notification allocation. An allocation outside the
-fixed field or owner-size processing bounds is cleaned behind the shared cleanup
-deadline; unproved completion poisons the native utility for process replacement.
+**State.** `coverage` (monitored_scheduler, snapshot_only, unavailable); the active jobs by owner,
+`candidate_jobs`, `other_jobs` and `unknown_jobs`; `candidate_jobs_since_start`, the candidate jobs
+the scheduler accepted since observation started, finished ones included, so a job that printed
+between two reads is still seen; and `blocked_print_commands`. A query outside an observation is a
+snapshot: partial certainty and no since-start count. An unanswered scheduler is unavailable and has
+no job counts, never zero.
+
+**Changes.** `jobs_changed` when the active counts change; `candidate_print_blocked` when Electron
+main reports a refused print command with the host event `{ "print_blocked": {} }`.
+
+**Summary.** `candidate_jobs` and `unknown_jobs`. A job queued before the exam is active but not new:
+it blocks the overview without counting in `candidate_jobs_since_start`.
+
+**Platforms.**
+
+- **Windows:** spooler change notifications on the local print server for job owner and status
+  only. Each owner is compared with the candidate's account as it arrives and never kept. Discarded
+  notifications are re-read in full and reported as a gap.
+- **macOS and Linux:** one IPP `Get-Jobs` request a second over the local CUPS socket, for job
+  number, state and owner only. Proctor does not link libcups. CUPS keeps finished jobs in its
+  history, so the complete job list is a monitored scheduler; a list cut at 1,000 jobs is partial.
+  Owners hidden by the CUPS privacy policy are `unknown`.
+
+**Never leaves the agent.** Printer names, document names, job numbers, user names. Proctor never
+cancels a job.
 
 ## Removable and portable storage
 
-Policy treats data-bearing functions separately from keyboards, mice,
-accessibility devices, cameras, headsets, power devices, docks, and hubs. A
-composite device exposes separate bounded functions; a hub is not prohibited
-merely because storage could be attached to it.
+**Purpose.** Whether data-bearing storage is attached, mounted or not: USB drives, SD cards,
+external disks, and phones or cameras exposing file or photo transfer. Keyboards, mice, headsets,
+docks and hubs are not storage. Disk images and disks synthesized on another disk (APFS containers)
+are not reported. An empty card reader is not a device until media is inserted.
 
-`removable_block_storage` evaluates attached block media whether mounted or
-unmounted. `portable_mtp` represents bounded portable/MTP classification.
-An enabled policy names a non-empty selection of these registered
-sub-capabilities; disabled policy selects neither, so block-only certification
-cannot be confused with portable/MTP availability. The utility source receives
-the same frozen selection: a portable-only request never enumerates block
-storage, and a block-capable adapter never invents portable/MTP coverage.
-Unmounting does not prove removal. Proctor asks the candidate to remove
-prohibited storage and never automatically ejects or unmounts it.
+**State.** `coverage` (block_and_portable, block_only, unavailable) and `devices` (at most 64,
+ordered by identity), each with an opaque per-session `device_id`, `kind` (block_storage,
+portable_device), `transport` (usb, thunderbolt, sd, other, unknown), `mounted` and `writable` (yes,
+no, unknown). A device that returns keeps its `device_id` for the rest of the agent session. The
+catalog asked for an Attempt-keyed pseudonym; the agent has no Attempt key yet, so identities are
+per agent session until main provides one.
 
-Exceptions select registered device-function classes, not serial numbers or
-candidate-entered identifiers. An Attempt-keyed opaque pseudonym may correlate
-disconnect/reconnect of one device inside that Attempt and cannot correlate it
-across Attempts or Institutions. The same opaque collection context is retained
-across replacement source generations, and a keyed derivation produces the same
-pseudonym after an in-Attempt restart without persisting the raw platform key.
+**Changes.** The new state on every change, reconciled every 2 seconds, with the change kinds
+`device_attached`, `device_removed` and `device_changed`.
 
-Windows is eligible for certified block-storage and bounded portable/MTP
-coverage. macOS is eligible for certified block-media coverage while general
-MTP remains unavailable without a reliable public implementation. Linux
-coverage requires a pinned udev/UDisks/libmtp tuple.
+**Summary.** `block_storage` and `portable_devices` count every device, including those beyond the
+listed 64. A kind the platform cannot read has no count, never zero: `block_only` coverage is partial
+certainty and leaves out the `portable_devices` field.
+
+**Platforms.**
+
+- **Windows:** each `PhysicalDriveN` opened with no data access: the storage bus type (USB, SD, MMC)
+  or the removable-media flag, media presence, and write protection; mounted means a drive-letter
+  volume on that disk. A Thunderbolt disk reports its inner bus (NVMe) and counts only when Windows
+  marks it removable. Phones and cameras: Windows Portable Devices enumerated by the USB bus, so a
+  USB drive that also appears as a portable device through the software bus counts once.
+- **macOS:** IOKit whole `IOMedia` whose provider is a block-storage driver, removable or ejectable or
+  at an external interconnect location; the internal property decides, never transport alone, so a
+  built-in disk on a Thunderbolt bus does not count. Mounted from `getmntinfo`. Phones and cameras:
+  USB interfaces of the still-image class (PTP, usually with MTP), counted once per device. Still to
+  be proved with an iPhone, Android phones and SD cards on certification rigs.
+- **Linux:** `/sys/block` (the removable flag, and USB, Thunderbolt or MMC topology), read-only flags,
+  `/proc/mounts`, and still-image interfaces in `/sys/bus/usb/devices`.
+
+The catalog proposed DiskArbitration and device-interface notifications; polling the same properties
+is simpler and loses nothing, because each read is the complete state.
+
+**Never leaves the agent.** Serials, vendor/model, volume names, mount paths, file contents. Proctor
+never ejects storage.
 
 ## Virtualization
 
-Virtualization classification is three-valued:
+**Purpose.** Whether the exam runs inside a virtual machine. Classification only.
 
-- `recognizedGuest` — positive evidence of a known guest environment;
-- `recognizedPhysicalOrRoot` — positive evidence accepted for one certified
-  physical/root tuple;
-- `unknown` — the adapter cannot establish either stronger statement.
+**State.** `certainty`, `classification` (recognized_guest, recognized_physical_or_root, unknown),
+`hypervisor` (hyperv, vmware, virtualbox, parallels, qemu_kvm, apple_virtualization, xen, other,
+none_detected).
 
-Policy chooses one explicit rule:
+**Changes.** None while running; a fresh state after every interruption.
 
-- `block_recognized_guest` blocks only `recognizedGuest`; a complete result with
-  no recognized guest marker satisfies this narrow rule without claiming the
-  machine is physical;
-- `require_certified_physical_environment` admits only an accepted
-  `recognizedPhysicalOrRoot` result, so `unknown` blocks.
+**Rules.** `block_recognized_guest` blocks only a recognized guest; `require_certified_physical_environment`
+admits only `recognized_physical_or_root`, so unknown blocks.
 
-A Windows hypervisor-present flag is not guest proof because a physical
-Hyper-V/VBS host can be the root partition. macOS has no reliable public generic
-guest-status API. Certified Linux detection can recognize known guests but does
-not prove bare metal from absence alone. Candidate and manager language always
-states the exact recognized condition.
+**Certainty.** A probe that ran is complete certainty; the classification itself says how much the
+evidence proves. That is why a clean machine meets `block_recognized_guest` while
+`require_certified_physical_environment` still needs positive physical evidence.
+
+**Platforms.**
+
+- **Windows:** CPUID: the hypervisor bit, the vendor leaf, and the Hyper-V privilege leaf. A physical
+  host with Hyper-V or VBS is the root partition, not a guest. Without a hypervisor bit the result is
+  unknown, never physical. SMBIOS manufacturer and product are not read yet.
+- **macOS:** the kernel's VMM-present flag and the hardware model. Positive physical evidence is an
+  Apple hardware model (`Mac`, `MacBookPro`, `MacBookAir`, `Macmini`, `iMac`, `MacPro` followed by
+  `<major>,<minor>`) on Apple silicon with no VMM flag; Apple's virtualization framework reports
+  `VirtualMac…`. Still to be proved across Parallels, VMware Fusion and UTM.
+- **Linux:** DMI vendor and product, then CPUID; it recognises guests but never proves physical.
 
 ## Network configuration
 
-Native network policy uses explicit sub-capabilities:
+**Purpose.** Whether traffic goes through a system proxy, an OS-managed VPN or a tunnel.
+Configuration only; Proctor never reads traffic or changes the network.
 
-- `system_proxy_state`;
-- `os_managed_vpn_state`;
-- `tunnel_interface_state`;
-- `route_change`;
-- `network_source_health`.
+**State.** Per selected category: `system_proxy` (none, manual, automatic_config, auto_detect,
+unknown), `managed_vpn` (inactive, active, unknown), `tunnels` (at most 32, opaque per-session ID
+and class: point_to_point, packet_tunnel, virtual_ethernet, managed_vpn, other), `route_generation`.
+A proxy auto-config script is reported as `automatic_config` and never read or run.
 
-An enabled policy selects at least one. The same selection crosses the private
-utility boundary, and adapters skip proxy, tunnel/interface, and route queries
-that were not selected. Generic source lifecycle health remains operational
-metadata; it does not authorize collection of another network category.
+**Categories.** The capability is `network`, with sub-categories `system_proxy`, `managed_vpn`,
+`tunnel_interfaces` and `route_change`. An activation selects at least one, and only selected ones
+are read. An unselected category is absent from the state; a selected one the platform cannot read is
+`unknown` in the state and left out of the rule fields, so only a rule naming it is unknown
+(`unavailable`) and health is degraded.
 
-There is no generic `all_vpn_detection` claim. Windows may certify selected
-adapter, RAS, route, and OS-proxy facts. macOS may certify system proxy and
-interface topology, but its application-scoped Network Extension view is not a
-global VPN inventory. Linux requires a pinned managed-networking tuple.
+**Summary.** Tunnel counts by class: `tunnels_total`, `point_to_point`, `packet_tunnel`,
+`virtual_ethernet`, `managed_vpn_tunnels`.
 
-Allowlists contain registered managed profile identities and adapter/tunnel
-classes. They exclude SSIDs, BSSIDs, IP or MAC addresses, DNS servers, and
-arbitrary remote endpoints. A future campus-network rule requires a separate
-server-attested presence protocol.
+**Changes.** The new state on every change, reconciled every second. A route change alone is never a
+violation; it only raises `route_generation`.
 
-A route transition enters `checking` and reconciles proxy, managed VPN, tunnel,
-adapter, and route state. It is not independently a violation. Routine DHCP
-renewal, IPv6 privacy rotation, and Wi-Fi roaming are not retained. Native
-network sources report configuration; authenticated transport and the
-coordinator own server reachability and Participation lease health. Proctor
-does not disconnect a VPN or mutate host networking automatically.
+**Platforms.**
 
-## Camera and microphone
+- **Windows:** the WinHTTP user proxy settings, RAS connections for OS-managed VPNs, adapters that
+  are up by interface type (tunnel, PPP, virtual), and a fingerprint of the routing table.
+- **macOS:** the SystemConfiguration proxy settings, interfaces from `getifaddrs`, and a fingerprint
+  of the routing table. A `utun` interface counts only with a routable address, because iCloud
+  Private Relay and Continuity create `utun` interfaces with link-local addresses only; this
+  heuristic still needs certification. OS-managed VPN state is unknown for now.
+- **Linux:** `/sys/class/net` (TUN/TAP flags, WireGuard, PPP) and the `/proc` routing tables; proxy
+  and managed VPN are unknown.
 
-`camera_ready` means that at least one recognized endpoint exists, Proctor has
-the required permission, the endpoint is not reported disabled/unavailable,
-and a bounded control path initializes without retaining frames. It does not
-establish image quality, candidate presence, camera direction, identity, gaze,
-or recording.
+**Never leaves the agent.** Addresses, interface names, SSIDs, DNS servers, proxy URLs, VPN server
+names. Only selected categories are queried.
 
-`microphone_ready` similarly means that an authorized enabled capture endpoint
-exists and a bounded control path initializes. Proctor does not retain, analyze,
-transcribe, transmit, or create evidence from audio. Audio quality and speech
-checks require a separately accepted media feature.
+## Screen recording
 
-Additional endpoints are neutral mechanical counts. Exact topology or device
-selection requires a later feature. `camera_other_application_use` and
-`microphone_other_stream_running` may enforce only where the certified OS
-exposes a reliable mechanical fact; they never imply recording intent or
-content. Process scanning is not a substitute.
+**Purpose.** Whether the screen evidence recorder could record, so the overview can show it before
+Start when an exam enables recording. The recorder itself is not a capability: it collects content,
+not facts (see the architecture's "Screen evidence recorder").
 
-Windows is eligible for endpoint readiness and supported microphone stream
-state, but arbitrary concurrent-camera-use detection remains unavailable absent
-a reliable public mechanism. macOS is eligible for endpoint readiness and its
-documented mechanical other-application-use facts. Generic Linux media-use
-enforcement remains unavailable until a managed PipeWire tuple closes direct
-V4L2/ALSA bypasses.
+**State.** `free_space_mib`, the space available to the account on the volume that holds the app's
+data, in MiB; absent when unreadable, which is partial certainty. The permission is the envelope's:
+macOS Screen Recording; granted elsewhere.
 
-Permission requests occur only after candidate disclosure and explicit
-preflight action. Participation never prompts. Endpoint loss, disablement,
-permission revocation, or an enforced concurrent-use condition contains until a
-fresh snapshot and platform-certified stability fence pass.
+**Rules.** `screen_recording.summary.free_space_mib` is a rule field. An exam that enables
+recording compiles a free-space rule; the permission blocks through the envelope. Reasons:
+`screen_recording.not_permitted` and `screen_recording.low_disk_space`.
+
+**Changes.** Reconciled every 5 seconds; a change of permission or of a whole MiB is a new state.
+
+**Permission.** On macOS the request shows the Screen Recording prompt once. macOS applies the
+answer after a relaunch, so the permission reads as denied until then if it was not granted.
+Windows has no prompt and needs none; Linux is unsupported.
+
+## Camera
+
+**Purpose.** Whether a physical camera is present, permitted and ready, and whether another
+application is using it. No frame is ever captured and no device is opened.
+
+**State.** `coverage` (readiness_and_use, readiness_only, unavailable), `physical_devices`,
+`virtual_devices` (software cameras, and any camera that cannot be classified), `ready` (ready,
+not_ready, unknown: a physical camera is connected and not suspended, and the permission is granted)
+and `in_use_by_other_app` (yes, no, unknown). The permission is the envelope's, never a state or rule
+field.
+
+**Changes.** The new state, reconciled every second, with `device_added`, `device_removed`,
+`permission_changed`, `readiness_changed` and `use_changed`.
+
+**Rules.** "Camera ready" is `camera.ready = ready` with a granted permission; a virtual camera never
+satisfies it. `camera.summary.virtual_devices = 0` forbids virtual cameras, and
+`camera.in_use_by_other_app = no` forbids concurrent use. An unknown `ready` or use has no field, so
+a rule on it is unknown, never not met.
+
+**Platforms.**
+
+- **macOS:** AVFoundation's device list with each device's transport type (built-in, USB,
+  Thunderbolt, PCI, FireWire, Bluetooth, wireless and Continuity are physical; virtual and
+  unclassified are not), connected and suspended (a closed lid), `isInUseByAnotherApplication`, and
+  the authorization status. The device-type discovery session is not used, because its macOS 14
+  constants would not load on older systems.
+- **Windows:** Media Foundation's video-capture sources, without activating any. A root- or
+  software-enumerated source is virtual. The permission comes from the camera ConsentStore: the
+  machine, user and desktop-app switches. Other-application use comes from the ConsentStore usage
+  times (a use that started and has not stopped). That store is undocumented, so certification must
+  prove it.
+- **Linux:** V4L2 devices in sysfs, one per device; v4l2loopback devices are virtual. There is no OS
+  consent, so the permission is granted; use is unknown, which makes coverage readiness_only.
+
+**Permission.** Requested on the readiness overview only when a rule requires it. On macOS the
+request shows the OS prompt and returns at once; the answer arrives as `permission_changed`. Windows
+and Linux have no prompt: the request is refused and the overview points to the OS settings. The
+packaged app must declare `NSCameraUsageDescription` and `NSMicrophoneUsageDescription`, or macOS
+terminates the process that asks.
+
+## Microphone
+
+**Purpose.** Like the camera: present, permitted, ready, and whether another application records.
+No audio is ever captured and no device is opened.
+
+**State.** `coverage`, `devices`, `ready` (a microphone is available and the permission is granted)
+and `in_use_by_other_app`. Changes, rules and the permission work as for the camera; a virtual
+microphone counts as a microphone.
+
+**Platforms.**
+
+- **macOS:** Core Audio devices with input streams and whether they are alive. Recording elsewhere is
+  read from Core Audio's process objects, where any process other than the agent that is running
+  input is recording. Process objects exist from macOS 14; earlier systems report use as unknown.
+  The device-wide "running somewhere" flag is not used, because playback through a headset sets it.
+- **Windows:** Core Audio's active capture endpoints, and an active audio session from another
+  process on any of them. The permission comes from the microphone ConsentStore.
+- **Linux:** ALSA capture PCMs in `/proc/asound`; a running capture substream is recording, whatever
+  sound server or direct access opened it.
 
 ## External screen capture
 
-`external_capture_detection` is unavailable on all initial targets. Public
-Windows, macOS, and Linux capture APIs do not expose a reliable global inventory
-of other applications capturing the screen. Process-name matching, permission
-state, UI-indicator scraping, and capturable-source enumeration are not accepted
-substitutes.
-
-CandidateWindow content protection, single-display enforcement, remote-session
-facts, and prohibited-application policy remain independent controls. None is
-described as proof that external capture is absent.
-
-## Correction, occurrence, and evidence rules
-
-Detectors are deterministic versioned state machines, not opaque scores or
-machine-learning heuristics. An occurrence has stable identity, start and last-
-confirmed time, bounded repeat count, recovery time, contributing source ranges,
-certainty, and gaps. Repeated identical callbacks coalesce; recovery closes the
-occurrence and a later recurrence creates a new one.
-
-One CandidateWindow overlay aggregates enforced conditions and orders concrete
-corrections. It may show a safe application or device label only when needed for
-correction. Correction enters `checking` and requires a complete snapshot plus
-a short capability-specific stability fence where certified event ordering can
-flap. The fence is an adapter constant, not a manager-configurable grace period.
-
-Proctor automatically applies only effects it owns: CandidateWindow mutation
-gates, private clipboard behavior, candidate print-command denial, and content
-protection. It does not kill applications, terminate sessions, cancel print
-jobs, eject storage, disconnect VPNs, or mutate unrelated OS resources.
-
-Ordinary observe-only conditions do not interrupt or repeatedly notify the
-candidate. The live manager board shows safe family-level state. Detailed
-minimized identity and occurrence timelines require separately authorized
-integrity review.
-
-Evidence excludes clipboard content, screen or camera frames, audio,
-keystrokes, command lines, arbitrary paths, window/document/printer names,
-usernames, account identifiers, device models and serials, mount paths, SSIDs,
-network addresses, proxy URLs, packets, DNS history, and general system-browser
-history. A source gap or operational failure never becomes misconduct evidence.
+No platform offers a reliable list of other applications capturing the screen. It is
+`unavailable` everywhere and accepted only as disabled. Single display, remote attachment,
+application rules and content protection are related controls; none claims that capture is absent.
+The [screen evidence recorder](./native-capabilities.md#screen-evidence-recorder) is Proctor's own
+recording and is not a capture-detection capability.

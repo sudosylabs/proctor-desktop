@@ -21,8 +21,13 @@ async function run(check: Check, repository: VirtualRepository): Promise<readonl
 	return check.run({ repository, registeredCheckIds: new Set(checks.map((entry) => entry.id)) });
 }
 
-const displayTopologyManifest = 'native/crates/display-topology/Cargo.toml';
-const captureSessionManifest = 'native/crates/capture-session-state/Cargo.toml';
+/** A native manifest with a target-scoped, featured dependency, mutated by the admission fixtures. */
+const fixtureManifest = 'native/crates/prctr-os/Cargo.toml';
+/** Two manifests that declare the same package (`serde`). */
+const sharedManifests = [
+	'native/crates/prctr-core/Cargo.toml',
+	'native/crates/prctr-protocol/Cargo.toml'
+] as const;
 
 function appendCargoDependency(
 	files: Record<string, string | Uint8Array | { symlink: string }>,
@@ -34,25 +39,25 @@ function appendCargoDependency(
 	);
 	const prefix =
 		scoped === declaration ? "[target.'cfg(proctor_checker_fixture)'.dependencies]\n" : '';
-	files[displayTopologyManifest] =
-		`${String(files[displayTopologyManifest])}\n${prefix}${scoped}\n`;
+	files[fixtureManifest] = `${String(files[fixtureManifest])}\n${prefix}${scoped}\n`;
 }
 
 function prependCargoRoot(
 	files: Record<string, string | Uint8Array | { symlink: string }>,
 	declaration: string
 ): void {
-	files[displayTopologyManifest] = `${declaration}\n${String(files[displayTopologyManifest])}`;
+	files[fixtureManifest] = `${declaration}\n${String(files[fixtureManifest])}`;
 }
 
-function replaceDisplayTopologyWithRootDeclaration(
+function replaceFixtureWithRootDeclaration(
 	files: Record<string, string | Uint8Array | { symlink: string }>,
 	declaration: string
 ): void {
-	files[displayTopologyManifest] = `${declaration}
+	const windows = String(files[fixtureManifest]).match(/^windows = .*$/mu)?.[0] ?? '';
+	files[fixtureManifest] = `${declaration}
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows-sys = { version = "=0.61.2", features = ["Win32_Devices_Display", "Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging"] }
+${windows}
 `;
 }
 
@@ -202,7 +207,7 @@ void test('dependency admission rejects an unreviewed exact Cargo dependency', a
 	assert.ok(
 		diagnostics.some(
 			(item) =>
-				item.path === 'native/crates/display-topology/Cargo.toml' &&
+				item.path === fixtureManifest &&
 				/unreviewed-native is not admitted/.test(item.problem)
 		)
 	);
@@ -223,7 +228,7 @@ void test('dependency admission covers every Cargo registry declaration form', a
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
+					item.path === fixtureManifest &&
 					/unreviewed-(?:string|inline|table) is not admitted/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -247,7 +252,7 @@ void test('dependency admission resolves Cargo package aliases and rejects skipp
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
+					item.path === fixtureManifest &&
 					/unreviewed-(?:renamed|table-renamed|quoted|quoted-table)|unsupported/.test(
 						item.problem
 					)
@@ -266,9 +271,7 @@ void test('dependency admission rejects non-exact Cargo versions', async () => {
 	const diagnostics = await run(check, repository);
 	assert.ok(
 		diagnostics.some(
-			(item) =>
-				item.path === 'native/crates/display-topology/Cargo.toml' &&
-				/not-exact is not pinned/.test(item.problem)
+			(item) => item.path === fixtureManifest && /not-exact is not pinned/.test(item.problem)
 		)
 	);
 });
@@ -288,7 +291,7 @@ void test('dependency admission rejects alternate Cargo sources', async () => {
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
+					item.path === fixtureManifest &&
 					/unsupported alternate Cargo source/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -312,7 +315,7 @@ void test('dependency admission rejects quoted Cargo source and path properties'
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
+					item.path === fixtureManifest &&
 					/unsupported alternate Cargo source|not a tracked member/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -328,13 +331,13 @@ void test('dependency admission rejects dotted Cargo dependency declarations', a
 		'target.\'cfg(proctor_checker_dotted)\'.dependencies.unreviewed-target-dotted = "=1.2.3"'
 	]) {
 		const repository = snapshot((files) => {
-			replaceDisplayTopologyWithRootDeclaration(files, declaration);
+			replaceFixtureWithRootDeclaration(files, declaration);
 		});
 		const diagnostics = await run(check, repository);
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
+					item.path === fixtureManifest &&
 					/unreviewed-(?:dotted|target-dotted) is not admitted/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -355,9 +358,7 @@ void test('dependency admission rejects dotted Cargo source overrides', async ()
 		const diagnostics = await run(check, repository);
 		assert.ok(
 			diagnostics.some(
-				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
-					/Cargo override/.test(item.problem)
+				(item) => item.path === fixtureManifest && /Cargo override/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
 		);
@@ -379,7 +380,7 @@ void test('dependency admission rejects quoted Cargo structural keys', async () 
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
+					item.path === fixtureManifest &&
 					/is not admitted as a Cargo dependency|Cargo override/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -388,7 +389,7 @@ void test('dependency admission rejects quoted Cargo structural keys', async () 
 	const assignmentDiagnostics = await run(
 		check,
 		snapshot((files) => {
-			replaceDisplayTopologyWithRootDeclaration(
+			replaceFixtureWithRootDeclaration(
 				files,
 				'"dependencies".unreviewed-quoted-assignment = "=1.2.3"'
 			);
@@ -411,14 +412,14 @@ void test('dependency admission rejects spaced Cargo structural dotted keys', as
 	]) {
 		const repository = snapshot((files) => {
 			if (declaration.startsWith('dependencies'))
-				replaceDisplayTopologyWithRootDeclaration(files, declaration);
+				replaceFixtureWithRootDeclaration(files, declaration);
 			else prependCargoRoot(files, declaration);
 		});
 		const diagnostics = await run(check, repository);
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/display-topology/Cargo.toml' &&
+					item.path === fixtureManifest &&
 					/is not admitted as a Cargo dependency|Cargo override/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -434,7 +435,7 @@ void test('dependency admission rejects external Cargo paths and source override
 			appendCargoDependency(files, 'outside = { path = "../../../../outside" }');
 		},
 		(files: Record<string, string | Uint8Array | { symlink: string }>): void => {
-			const path = 'native/crates/display-topology/Cargo.toml';
+			const path = fixtureManifest;
 			files[path] =
 				`${String(files[path])}\n[patch.crates-io]\nwindows-sys = { path = "../patched" }\n`;
 		},
@@ -497,20 +498,20 @@ void test('dependency admission parses escaped and bracket-bearing TOML keys str
 void test('dependency admission compares normalized Cargo features, defaults, optionality, and target scopes', async () => {
 	const check = checkMap().get('dependencies.admission');
 	assert.ok(check);
+	const windows = 'windows = { version = "=0.62.2", default-features = false, ';
 	for (const mutation of [
 		(manifest: string): string =>
-			manifest.replace('"Win32_Graphics_Gdi"', '"Win32_System_Registry"'),
+			manifest.replace('"Win32_Graphics_Gdi"', '"Win32_System_JobObjects"'),
 		(manifest: string): string =>
-			manifest.replace('features = [', 'default-features = false, features = ['),
-		(manifest: string): string =>
-			manifest.replace('features = [', 'optional = true, features = ['),
+			manifest.replace(windows, 'windows = { version = "=0.62.2", '),
+		(manifest: string): string => manifest.replace(windows, `${windows}optional = true, `),
 		(manifest: string): string =>
 			manifest.replace('[target.\'cfg(target_os = "windows")\'.dependencies]\n', '')
 	]) {
 		const diagnostics = await run(
 			check,
 			snapshot((files) => {
-				files[displayTopologyManifest] = mutation(String(files[displayTopologyManifest]));
+				files[fixtureManifest] = mutation(String(files[fixtureManifest]));
 			})
 		);
 		assert.ok(
@@ -526,7 +527,7 @@ void test('dependency admission normalizes insignificant Cargo target-selector w
 	const diagnostics = await run(
 		check,
 		snapshot((files) => {
-			files[displayTopologyManifest] = String(files[displayTopologyManifest]).replace(
+			files[fixtureManifest] = String(files[fixtureManifest]).replace(
 				'cfg(target_os = "windows")',
 				'cfg( target_os="windows" )'
 			);
@@ -541,7 +542,7 @@ void test('dependency admission distinguishes an unconditional declaration from 
 	const diagnostics = await run(
 		check,
 		snapshot((files) => {
-			files[displayTopologyManifest] = String(files[displayTopologyManifest]).replace(
+			files[fixtureManifest] = String(files[fixtureManifest]).replace(
 				'[target.\'cfg(target_os = "windows")\'.dependencies]',
 				'[target.unconditional.dependencies]'
 			);
@@ -559,9 +560,9 @@ void test('dependency admission rejects an additional unreviewed per-manifest de
 	const diagnostics = await run(
 		check,
 		snapshot((files) => {
-			const path = 'native/crates/candidate-window-state/Cargo.toml';
+			const path = 'native/crates/prctr-capabilities/Cargo.toml';
 			files[path] =
-				`${String(files[path])}\n[target.'cfg(target_os = "macos")'.dependencies]\nwindows-sys = { version = "=0.61.2", features = ["Win32_Foundation"] }\n`;
+				`${String(files[path])}\n[target.'cfg(target_os = "macos")'.dependencies]\nwindows = { version = "=0.62.2", default-features = false, features = ["Win32_Foundation"] }\n`;
 		})
 	);
 	assert.ok(
@@ -573,6 +574,7 @@ void test('dependency admission rejects an additional unreviewed per-manifest de
 void test('dependency admission keeps shared Cargo feature sets bound to their exact manifests', async () => {
 	const check = checkMap().get('dependencies.admission');
 	assert.ok(check);
+	const [first, second] = sharedManifests;
 	const diagnostics = await run(
 		check,
 		snapshot((files) => {
@@ -580,30 +582,32 @@ void test('dependency admission keeps shared Cargo feature sets bound to their e
 			const policy = JSON.parse(String(files[policyPath])) as {
 				dependencies: Array<{
 					ecosystem?: string;
+					package?: string;
 					declarations?: Array<{ manifest: string; features: string[] }>;
 				}>;
 			};
-			const cargo = policy.dependencies.find(
-				(entry) =>
-					entry.ecosystem === 'cargo' &&
-					entry.declarations?.some(
-						(declaration) => declaration.manifest === displayTopologyManifest
-					)
+			const serde = policy.dependencies.find(
+				(entry) => entry.ecosystem === 'cargo' && entry.package === 'serde'
 			);
-			assert.ok(cargo?.declarations);
-			const capture = cargo.declarations.find(
-				(entry) => entry.manifest === captureSessionManifest
+			const one = serde?.declarations?.find((entry) => entry.manifest === first);
+			const two = serde?.declarations?.find((entry) => entry.manifest === second);
+			assert.ok(one && two);
+			// Give the second manifest its own feature set, admitted as such, then swap the two.
+			files[second] = String(files[second]).replace(
+				/^serde = \{ version = "=1\.0\.229", features = \["derive"\] \}$/mu,
+				'serde = { version = "=1.0.229", features = ["derive", "rc"] }'
 			);
-			const display = cargo.declarations.find(
-				(entry) => entry.manifest === displayTopologyManifest
-			);
-			assert.ok(capture && display);
-			[capture.features, display.features] = [display.features, capture.features];
+			two.features = ['derive', 'rc'];
+			[one.features, two.features] = [two.features, one.features];
 			files[policyPath] = `${JSON.stringify(policy, null, 2)}\n`;
 		})
 	);
 	assert.ok(
-		diagnostics.some((item) => /exact per-manifest declaration tuples/.test(item.problem)),
+		diagnostics.some(
+			(item) =>
+				sharedManifests.includes(item.path as (typeof sharedManifests)[number]) &&
+				/exact per-manifest declaration tuples/.test(item.problem)
+		),
 		JSON.stringify(diagnostics)
 	);
 });
@@ -614,21 +618,21 @@ void test('dependency admission rejects workspace-inherited registry declaration
 	const diagnostics = await run(
 		check,
 		snapshot((files) => {
-			const manifest = String(files[displayTopologyManifest]);
-			const declaration = manifest.match(/^windows-sys = .*$/mu)?.[0];
+			const manifest = String(files[fixtureManifest]);
+			const declaration = manifest.match(/^windows = .*$/mu)?.[0];
 			assert.ok(declaration);
 			files['native/Cargo.toml'] =
 				`${String(files['native/Cargo.toml'])}\n[workspace.dependencies]\n${declaration}\n`;
-			files[displayTopologyManifest] = manifest.replace(
+			files[fixtureManifest] = manifest.replace(
 				declaration,
-				'windows-sys = { workspace = true }'
+				'windows = { workspace = true }'
 			);
 		})
 	);
 	assert.ok(
 		diagnostics.some(
 			(item) =>
-				item.path === displayTopologyManifest &&
+				item.path === fixtureManifest &&
 				/workspace dependency inheritance, whose member scope and optionality are not admitted/.test(
 					item.problem
 				)
@@ -641,20 +645,20 @@ void test('dependency admission rejects package features that forward unadmitted
 	const check = checkMap().get('dependencies.admission');
 	assert.ok(check);
 	for (const forwarded of [
-		'windows-sys/Win32_System_Registry',
-		'windows-sys?/Win32_System_Registry'
+		'windows/Win32_System_JobObjects',
+		'windows?/Win32_System_JobObjects'
 	]) {
 		const diagnostics = await run(
 			check,
 			snapshot((files) => {
-				files[displayTopologyManifest] =
-					`${String(files[displayTopologyManifest])}\n[features]\nstealth = ["${forwarded}"]\n`;
+				files[fixtureManifest] =
+					`${String(files[fixtureManifest])}\n[features]\nstealth = ["${forwarded}"]\n`;
 			})
 		);
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === displayTopologyManifest &&
+					item.path === fixtureManifest &&
 					/forwards unadmitted dependency feature/.test(item.problem)
 			),
 			`${forwarded}: ${JSON.stringify(diagnostics)}`
