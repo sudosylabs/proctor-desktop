@@ -159,21 +159,11 @@ mod platform {
     #[cfg(target_os = "windows")]
     use prctr_os::windows as os;
 
-    #[cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))]
     pub fn block() -> Option<Vec<RawStorageDevice>> {
         os::block_devices()
     }
-    #[cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))]
     pub fn portable() -> Option<Vec<RawStorageDevice>> {
         os::portable_devices()
-    }
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    pub fn block() -> Option<Vec<RawStorageDevice>> {
-        None
-    }
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    pub fn portable() -> Option<Vec<RawStorageDevice>> {
-        None
     }
 }
 

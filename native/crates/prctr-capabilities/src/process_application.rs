@@ -222,21 +222,11 @@ mod platform {
     #[cfg(target_os = "windows")]
     use prctr_os::windows as os;
 
-    #[cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))]
     pub fn processes() -> Option<Vec<RawProcess>> {
         os::processes()
     }
-    #[cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))]
     pub fn identity(pid: u32) -> RawIdentity {
         os::identity(pid)
-    }
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    pub fn processes() -> Option<Vec<RawProcess>> {
-        None
-    }
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    pub fn identity(_pid: u32) -> RawIdentity {
-        RawIdentity::Unavailable
     }
 
     /// The process that started the agent: Electron main.

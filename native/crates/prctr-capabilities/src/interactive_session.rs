@@ -267,8 +267,6 @@ fn read() -> RawSession {
     return prctr_os::windows::session();
     #[cfg(target_os = "linux")]
     return prctr_os::linux::session();
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    RawSession::default()
 }
 
 /// The interactive session source: reconciles the session state every [`POLL_INTERVAL`].

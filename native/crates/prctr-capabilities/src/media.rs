@@ -352,11 +352,6 @@ pub fn read(kind: Kind) -> RawMedia {
         Kind::Camera => prctr_os::linux::cameras(),
         Kind::Microphone => prctr_os::linux::microphones(),
     };
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    {
-        let _ = kind;
-        RawMedia::unavailable()
-    }
 }
 
 /// A camera or microphone source.

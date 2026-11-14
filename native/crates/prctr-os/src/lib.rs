@@ -7,6 +7,10 @@
 )]
 #![allow(unsafe_code)]
 
+// The agent is built and tested only for these three; every caller assumes one of them.
+#[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+compile_error!("prctr-os supports macOS, Windows and Linux only");
+
 use std::fmt;
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
@@ -464,11 +468,6 @@ pub fn random_bytes(buffer: &mut [u8]) -> bool {
         // system-preferred generator.
         unsafe { BCryptGenRandom(None, buffer, BCRYPT_USE_SYSTEM_PREFERRED_RNG) }.is_ok()
     }
-    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
-    {
-        let _ = buffer;
-        false
-    }
 }
 
 #[cfg(test)]
@@ -509,11 +508,6 @@ pub fn free_space(path: &std::path::Path) -> Option<u64> {
         // SAFETY: `path` is a valid wide string and `available` a valid out-parameter.
         unsafe { GetDiskFreeSpaceExW(&path, Some(&raw mut available), None, None) }.ok()?;
         Some(available)
-    }
-    #[cfg(not(any(unix, windows)))]
-    {
-        let _ = path;
-        None
     }
 }
 

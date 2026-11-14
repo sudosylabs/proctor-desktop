@@ -307,11 +307,6 @@ fn query() -> Result<RawTopology, OsError> {
     return prctr_os::windows::display_targets();
     #[cfg(target_os = "linux")]
     return prctr_os::linux::connected_displays();
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    Err(OsError {
-        operation: "display query",
-        status: -1,
-    })
 }
 
 /// The display topology source: reconciles the OS topology every [`POLL_INTERVAL`].

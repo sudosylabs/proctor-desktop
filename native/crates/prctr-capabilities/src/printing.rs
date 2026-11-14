@@ -365,30 +365,6 @@ mod platform {
         }
     }
 
-    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
-    mod imp {
-        use super::{RawPrint, Sink, SourceError};
-
-        pub struct Observer;
-
-        impl Observer {
-            pub fn start(_sink: Sink) -> Result<Self, SourceError> {
-                Ok(Self)
-            }
-
-            #[allow(clippy::unused_self)]
-            pub fn current(&self) -> RawPrint {
-                RawPrint::default()
-            }
-
-            pub fn stop(self) {}
-        }
-
-        pub fn snapshot() -> RawPrint {
-            RawPrint::default()
-        }
-    }
-
     pub use imp::{Observer, snapshot};
 }
 

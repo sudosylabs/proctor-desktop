@@ -66,14 +66,11 @@ pub fn sample() -> Sample {
     );
     #[cfg(target_os = "linux")]
     let (suspended_ns, session) = (prctr_os::linux::suspended_ns(), prctr_os::linux::session());
-    #[cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))]
-    return Sample {
+    Sample {
         suspended_ns,
         on_console: session.on_console,
         locked: session.locked,
-    };
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    Sample::default()
+    }
 }
 
 /// A running watcher; dropping it stops the thread.

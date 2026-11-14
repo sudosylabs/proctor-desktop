@@ -183,8 +183,6 @@ fn read() -> RawVirtualization {
     return prctr_os::windows::virtualization();
     #[cfg(target_os = "linux")]
     return prctr_os::linux::virtualization();
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    RawVirtualization::unprobed()
 }
 
 /// The virtualization source. It holds no thread: nothing it reports changes while the system runs.

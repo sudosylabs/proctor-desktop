@@ -271,10 +271,6 @@ mod platform {
     pub fn tunnels() -> Option<Vec<RawTunnel>> {
         prctr_os::linux::tunnels()
     }
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    pub fn tunnels() -> Option<Vec<RawTunnel>> {
-        None
-    }
 
     #[cfg(target_os = "macos")]
     pub fn routes() -> Option<u64> {
@@ -287,10 +283,6 @@ mod platform {
     #[cfg(target_os = "linux")]
     pub fn routes() -> Option<u64> {
         prctr_os::linux::route_fingerprint()
-    }
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
-    pub fn routes() -> Option<u64> {
-        None
     }
 }
 
