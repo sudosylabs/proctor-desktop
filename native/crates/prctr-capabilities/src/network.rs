@@ -4,7 +4,6 @@
 //! Contract: `docs/architecture/native-capability-families.md`, "Network configuration".
 
 use std::collections::BTreeMap;
-use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use prctr_core::{
@@ -452,7 +451,7 @@ const fn vpn_text(vpn: ManagedVpn) -> &'static str {
 /// The network configuration source.
 pub struct NetworkSource {
     selection: Selection,
-    tracking: Arc<Mutex<Tracking>>,
+    tracking: Tracking,
     poller: Option<Poller>,
 }
 
@@ -461,7 +460,7 @@ impl NetworkSource {
     pub fn new() -> Self {
         Self {
             selection: Selection::default(),
-            tracking: Arc::new(Mutex::new(Tracking::default())),
+            tracking: Tracking::default(),
             poller: None,
         }
     }
@@ -495,10 +494,7 @@ impl Source for NetworkSource {
 
     fn current(&mut self) -> Observation {
         let raw = read(self.selection);
-        self.tracking
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .classify(&raw)
+        self.tracking.classify(&raw)
     }
 
     fn stop(&mut self) {

@@ -5,7 +5,7 @@
 //! Contract: `docs/architecture/native-capability-families.md`, "Printing".
 
 use std::collections::BTreeSet;
-use std::sync::{Arc, Mutex, PoisonError};
+use std::sync::Arc;
 
 use prctr_core::{
     CapabilityDescriptor, FieldKind, FieldSpec, FieldValue, Observation, Sink, Source, SourceError,
@@ -394,7 +394,7 @@ mod platform {
 
 /// The printing source.
 pub struct PrintingSource {
-    tracking: Arc<Mutex<Tracking>>,
+    tracking: Tracking,
     observer: Option<platform::Observer>,
     sink: Option<Sink>,
 }
@@ -403,14 +403,10 @@ impl PrintingSource {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            tracking: Arc::new(Mutex::new(Tracking::default())),
+            tracking: Tracking::default(),
             observer: None,
             sink: None,
         }
-    }
-
-    fn tracked(&self) -> std::sync::MutexGuard<'_, Tracking> {
-        self.tracking.lock().unwrap_or_else(PoisonError::into_inner)
     }
 }
 
@@ -431,7 +427,7 @@ impl Source for PrintingSource {
         sink: Sink,
     ) -> Result<Observation, SourceError> {
         self.stop();
-        *self.tracked() = Tracking::default();
+        self.tracking = Tracking::default();
         self.observer = Some(platform::Observer::start(Arc::clone(&sink))?);
         self.sink = Some(sink);
         Ok(self.current())
@@ -442,7 +438,7 @@ impl Source for PrintingSource {
             .observer
             .as_ref()
             .map_or_else(platform::snapshot, platform::Observer::current);
-        self.tracked().classify(&raw)
+        self.tracking.classify(&raw)
     }
 
     fn stop(&mut self) {
@@ -457,7 +453,7 @@ impl Source for PrintingSource {
             serde_json::from_value(event.clone()).map_err(|_| SourceError {
                 reason: "invalid printing host event",
             })?;
-        self.tracked().print_blocked();
+        self.tracking.print_blocked();
         if let Some(sink) = &self.sink {
             sink(SourceEvent::Changed);
         }

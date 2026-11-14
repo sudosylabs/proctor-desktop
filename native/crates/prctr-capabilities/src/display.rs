@@ -2,8 +2,8 @@
 //! Contract: `docs/architecture/native-capability-families.md`, "Display topology".
 
 use std::collections::BTreeMap;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, PoisonError};
 use std::thread::{self, JoinHandle};
 use std::time::Duration;
 
@@ -324,7 +324,7 @@ struct Poller {
 /// The display topology source: reconciles the OS topology every [`POLL_INTERVAL`].
 pub struct DisplaySource {
     query: fn() -> Result<RawTopology, OsError>,
-    ids: Arc<Mutex<TargetIds>>,
+    ids: TargetIds,
     poller: Option<Poller>,
 }
 
@@ -339,7 +339,7 @@ impl DisplaySource {
     pub fn with_query(query: fn() -> Result<RawTopology, OsError>) -> Self {
         Self {
             query,
-            ids: Arc::new(Mutex::new(TargetIds::default())),
+            ids: TargetIds::default(),
             poller: None,
         }
     }
@@ -390,8 +390,7 @@ impl Source for DisplaySource {
 
     fn current(&mut self) -> Observation {
         let raw = (self.query)();
-        let mut ids = self.ids.lock().unwrap_or_else(PoisonError::into_inner);
-        classify(&raw, &mut ids)
+        classify(&raw, &mut self.ids)
     }
 
     fn stop(&mut self) {

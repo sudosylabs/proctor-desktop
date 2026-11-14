@@ -4,7 +4,7 @@
 //! Contract: `docs/architecture/native-capability-families.md`, "Camera" and "Microphone".
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::sync::{Arc, Mutex, PoisonError};
+use std::sync::Arc;
 use std::time::Duration;
 
 use prctr_core::{
@@ -362,7 +362,7 @@ pub fn read(kind: Kind) -> RawMedia {
 /// A camera or microphone source.
 pub struct MediaSource {
     kind: Kind,
-    tracking: Arc<Mutex<Tracking>>,
+    tracking: Tracking,
     poller: Option<Poller>,
     sink: Option<Sink>,
 }
@@ -372,7 +372,7 @@ impl MediaSource {
     pub fn new(kind: Kind) -> Self {
         Self {
             kind,
-            tracking: Arc::new(Mutex::new(Tracking::default())),
+            tracking: Tracking::default(),
             poller: None,
             sink: None,
         }
@@ -407,10 +407,7 @@ impl Source for MediaSource {
 
     fn current(&mut self) -> Observation {
         let raw = read(self.kind);
-        self.tracking
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .classify(self.kind, &raw)
+        self.tracking.classify(self.kind, &raw)
     }
 
     fn stop(&mut self) {

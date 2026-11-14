@@ -4,7 +4,6 @@
 //! Contract: `docs/architecture/native-capability-families.md`, "Removable and portable storage".
 
 use std::collections::BTreeMap;
-use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use prctr_core::{
@@ -297,7 +296,7 @@ impl Tracking {
 
 /// The removable storage source: it re-reads the attached devices every [`POLL_INTERVAL`].
 pub struct RemovableStorageSource {
-    tracking: Arc<Mutex<Tracking>>,
+    tracking: Tracking,
     poller: Option<Poller>,
 }
 
@@ -305,7 +304,7 @@ impl RemovableStorageSource {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            tracking: Arc::new(Mutex::new(Tracking::default())),
+            tracking: Tracking::default(),
             poller: None,
         }
     }
@@ -340,10 +339,7 @@ impl Source for RemovableStorageSource {
 
     fn current(&mut self) -> Observation {
         let raw = read();
-        self.tracking
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .classify(&raw)
+        self.tracking.classify(&raw)
     }
 
     fn stop(&mut self) {

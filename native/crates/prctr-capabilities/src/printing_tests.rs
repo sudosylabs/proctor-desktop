@@ -123,7 +123,7 @@ fn only_the_print_blocked_host_event_is_accepted() {
             .is_err()
     );
     assert!(source.host_event(&json!({ "printed": {} })).is_err());
-    assert_eq!(source.tracked().blocked, 1);
+    assert_eq!(source.tracking.blocked, 1);
 }
 
 #[test]

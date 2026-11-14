@@ -5,8 +5,8 @@
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use prctr_core::{
@@ -136,7 +136,7 @@ fn read(refused: bool) -> RawRecording {
 pub struct ScreenRecordingSource {
     refused: Arc<AtomicBool>,
     poller: Option<Poller>,
-    sink: Arc<Mutex<Option<Sink>>>,
+    sink: Option<Sink>,
 }
 
 impl ScreenRecordingSource {
@@ -145,7 +145,7 @@ impl ScreenRecordingSource {
         Self {
             refused: Arc::new(AtomicBool::new(false)),
             poller: None,
-            sink: Arc::new(Mutex::new(None)),
+            sink: None,
         }
     }
 }
@@ -184,7 +184,7 @@ impl Source for ScreenRecordingSource {
             move || mib(read(refused.load(Ordering::Acquire))),
             Arc::clone(&sink),
         )?);
-        *self.sink.lock().unwrap_or_else(PoisonError::into_inner) = Some(sink);
+        self.sink = Some(sink);
         Ok(self.current())
     }
 
@@ -196,7 +196,7 @@ impl Source for ScreenRecordingSource {
         if let Some(poller) = self.poller.take() {
             poller.stop();
         }
-        *self.sink.lock().unwrap_or_else(PoisonError::into_inner) = None;
+        self.sink = None;
     }
 
     /// Shows the macOS Screen Recording prompt once. macOS applies the answer after a relaunch, so
@@ -209,12 +209,7 @@ impl Source for ScreenRecordingSource {
         }
         let allowed = prctr_os::request_screen_capture();
         self.refused.store(!allowed, Ordering::Release);
-        if let Some(sink) = self
-            .sink
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .as_ref()
-        {
+        if let Some(sink) = &self.sink {
             sink(SourceEvent::Changed);
         }
         Ok(if allowed {
