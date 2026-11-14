@@ -16,8 +16,7 @@ use schemars::generate::SchemaSettings;
 /// they reach under `$defs`. Deterministic, so it can be committed and checked for drift.
 #[must_use]
 pub fn agent_protocol_schema() -> serde_json::Value {
-    let generator = SchemaSettings::draft2020_12().into_generator();
-    let mut generator = generator;
+    let mut generator = SchemaSettings::draft2020_12().into_generator();
     let main = generator.subschema_for::<messages::MainMessage>();
     let agent = generator.subschema_for::<messages::AgentMessage>();
     let definitions = generator.take_definitions(true);

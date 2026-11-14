@@ -177,8 +177,6 @@ impl RawVirtualization {
     }
 }
 
-/// CPUID evidence on x86-64: the hypervisor-present bit, the vendor leaf, and Hyper-V's root
-/// partition privilege.
 /// One CPUID leaf. Callers only ask for leaf 1 or for hypervisor leaves the vendor leaf reported.
 #[cfg(target_arch = "x86_64")]
 // Newer toolchains made `__cpuid` safe; the pinned toolchain still requires `unsafe`.
@@ -189,6 +187,8 @@ fn cpuid(leaf: u32) -> std::arch::x86_64::CpuidResult {
     unsafe { std::arch::x86_64::__cpuid(leaf) }
 }
 
+/// CPUID evidence on x86-64: the hypervisor-present bit, the vendor leaf, and Hyper-V's root
+/// partition privilege.
 #[cfg(target_arch = "x86_64")]
 #[must_use]
 pub fn cpuid_virtualization() -> RawVirtualization {

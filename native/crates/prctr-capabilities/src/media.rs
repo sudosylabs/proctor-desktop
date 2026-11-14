@@ -9,7 +9,6 @@ use std::time::Duration;
 
 use prctr_core::{
     CapabilityDescriptor, FieldKind, FieldSpec, FieldValue, Observation, Sink, Source, SourceError,
-    SourceEvent,
 };
 use prctr_os::{RawMedia, RawMediaPermission};
 use prctr_protocol::facts::{Certainty, Envelope, Health, Permission};
@@ -312,7 +311,6 @@ fn rule_fields(
             }
         }
     }
-    // An unknown value has no field, so a rule on it is unknown rather than not met.
     match ready {
         Readiness::Ready => fields.insert(field(kind, "ready"), FieldValue::Symbol(id("ready"))),
         Readiness::NotReady => {
@@ -428,7 +426,7 @@ impl Source for MediaSource {
                     },
                     move || {
                         if let Some(sink) = &sink {
-                            sink(SourceEvent::Changed);
+                            sink(prctr_core::SourceEvent::Changed);
                         }
                     },
                 );
@@ -437,7 +435,6 @@ impl Source for MediaSource {
         }
         #[cfg(not(target_os = "macos"))]
         {
-            let _ = SourceEvent::Changed;
             Err(SourceError {
                 reason: "no permission prompt on this platform",
             })
