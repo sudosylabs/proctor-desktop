@@ -21,8 +21,8 @@ void test('sandboxed Chromium renderer runs deterministic browser fixtures', () 
 		readonly renderer?: unknown;
 		readonly zoomFactor?: unknown;
 	};
-	assert.equal(result.electron, '44.0.0');
-	assert.equal(result.chrome, '152.0.7977.54');
+	assert.equal(result.electron, '44.11.3');
+	assert.equal(result.chrome, '152.0.7977.169');
 	assert.equal(result.zoomFactor, 2);
 	assert.deepEqual(result.preferences, {
 		contextIsolation: true,
@@ -38,8 +38,8 @@ void test('sandboxed Chromium renderer runs deterministic browser fixtures', () 
 	if (typeof userAgent !== 'string') {
 		throw new TypeError('Renderer did not report a string user agent');
 	}
-	assert.match(userAgent, /\bChrome\/152\.0\.7977\.54\b/u);
-	assert.match(userAgent, /\bElectron\/44\.0\.0\b/u);
+	assert.match(userAgent, /\bChrome\/152\.0\.7977\.169\b/u);
+	assert.match(userAgent, /\bElectron\/44\.11\.3\b/u);
 	assert.deepEqual(renderer, {
 		activations: '1',
 		browserOwnerTests: '130',
