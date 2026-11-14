@@ -70,7 +70,7 @@ export class NativeRecordMapper {
 		);
 	}
 
-	public fact(fact: Fact): NativeRecord {
+	public fact(fact: Fact): Extract<NativeRecord, { kind: 'capability_fact' }> {
 		return {
 			kind: 'capability_fact',
 			observed_at: iso(this.clock.wall(fact.captured_at_ms)),

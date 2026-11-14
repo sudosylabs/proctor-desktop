@@ -5,7 +5,9 @@
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
 import type {
+	Notification,
 	Policy,
+	RecordingStart,
 	RuleStatus
 } from '../../../../platform/native/common/nativeAgentProtocol.generated.js';
 import type {
@@ -105,9 +107,7 @@ export interface ExamParticipationOptions {
 	/** The encrypted spool for one Attempt's native stream. */
 	readonly openSpool: (attemptId: string) => Promise<ProtectedRecordStore>;
 	/** The recorder's start parameters when the policy records the screen. */
-	readonly recording?: (
-		attemptId: string
-	) => Promise<Parameters<INativeAgentService['confirmParticipation']>[0]>;
+	readonly recording?: (attemptId: string) => Promise<RecordingStart | undefined>;
 	readonly randomBytes: (length: number) => Uint8Array;
 	readonly now?: () => number;
 }
@@ -338,7 +338,6 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			const mapped = new NativeRecordMapper(readiness.policy, this.clock, this.now).fact(
 				fact
 			);
-			if (mapped.kind !== 'capability_fact') throw new ParticipationError('invalid_state');
 			const { kind: _kind, observed_at: _observed, ...readinessFact } = mapped;
 			return readinessFact;
 		});
@@ -618,9 +617,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 
 	// ---- Native notifications --------------------------------------------------------------
 
-	private async notified(
-		notification: Parameters<Parameters<INativeAgentService['onDidNotify']>[0]>[0]
-	): Promise<void> {
+	private async notified(notification: Notification): Promise<void> {
 		if (notification.kind === 'heartbeat') {
 			this.clock.heartbeat(notification.monotonic_ms);
 			return;
