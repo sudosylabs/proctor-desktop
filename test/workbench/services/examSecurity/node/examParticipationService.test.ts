@@ -35,7 +35,7 @@ const SITTING = 'h9nfemqtwz47ydgjcx1ia56br8';
 const ATTEMPT = 'qtwz47ydgjcx1ia56br8kpous3';
 const PARTICIPATION = '8kpous3h9nfemqtwz47ydgjcx1';
 const DIGEST = (byte: string) => `sha256:${byte.repeat(64)}`;
-const REGISTRY = 'sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa';
+const REGISTRY = 'sha256:e4c05771fa6f34c08c0f01aa98e33f88973baacf832c67d760457f2b4f9d734d';
 
 const rules = [
 	{
