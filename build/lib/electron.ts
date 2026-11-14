@@ -163,15 +163,16 @@ function brandDarwin(source: string, bundle: string, name: string, appId: string
 	] as const) {
 		execFileSync('plutil', ['-replace', key, '-string', value, plist]);
 	}
-	// Nested helpers keep their own signatures. The x64 distribution ships them unsigned, and
-	// codesign refuses to seal a bundle around unsigned code, so those are signed ad hoc first.
+	// Nested helpers keep their own signatures. The x64 distribution ships them unsigned, down
+	// to the framework's own helpers, and codesign refuses to seal a bundle around unsigned
+	// code, so each unsigned one is signed ad hoc first, with everything inside it.
 	const frameworks = join(bundle, 'Contents/Frameworks');
 	for (const entry of readdirSync(frameworks)) {
 		const nested = join(frameworks, entry);
 		try {
 			execFileSync('codesign', ['--verify', nested], { stdio: 'ignore' });
 		} catch {
-			execFileSync('codesign', ['--force', '--sign', '-', nested]);
+			execFileSync('codesign', ['--force', '--deep', '--sign', '-', nested]);
 		}
 	}
 	// The executable's seal covers Info.plist.
