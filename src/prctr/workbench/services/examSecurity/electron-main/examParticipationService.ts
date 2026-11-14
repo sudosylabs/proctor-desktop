@@ -48,7 +48,7 @@ type SecurityPolicyResponse = Schemas['SecurityPolicyResponse'];
 type AdmittedSecurity = Schemas['AdmittedSecurity'];
 type SecurityControlResult = Schemas['SecurityControlResult'];
 
-/** Connect must reach the server within this long of the report. */
+/** Connect is sent only if the preflight report came back within this long. */
 export const CONNECT_WINDOW_MS = 30_000;
 
 /** Why Start or a later step stopped. Only stable codes cross to presentation. */
@@ -756,8 +756,8 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 	}
 
 	/**
-	 * Submits the Attempt with the live credentials, then deletes the local recording and keeps
-	 * delivering what remains without them until the upload deadline.
+	 * Submits the Attempt with the live credentials, then has the agent delete the local recording
+	 * and wakes native delivery to send what remains without them.
 	 */
 	public async submit(expected: {
 		readonly currentRevisionId: string;

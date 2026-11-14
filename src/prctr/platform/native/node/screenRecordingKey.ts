@@ -62,7 +62,7 @@ export class ScreenRecordingKeys {
 		return { recording_id: paths.id, key, directory: paths.directory };
 	}
 
-	/** Removes the Attempt's key and recording; called after `close { delete }` whatever the agent did. */
+	/** Removes the Attempt's key and its recording directory, whatever the agent left behind. */
 	public async delete(attemptId: string): Promise<void> {
 		await rm(join(this.paths(attemptId).key, '..'), { recursive: true, force: true });
 	}
