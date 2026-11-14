@@ -274,10 +274,28 @@ mod classification_tests {
         );
     }
 
+    /// A CI virtual machine's display is virtual and stays unclassified, so the hardware check
+    /// below runs on a physical Mac only.
+    #[cfg(target_arch = "aarch64")]
+    fn on_a_virtual_machine() -> bool {
+        let output = std::process::Command::new("/usr/sbin/sysctl")
+            .args(["-n", "kern.hv_vmm_present"])
+            .output()
+            .expect("sysctl runs");
+        let virtual_machine = String::from_utf8_lossy(&output.stdout).trim() == "1";
+        if virtual_machine {
+            eprintln!("skipped: the display hardware check needs a physical Mac");
+        }
+        virtual_machine
+    }
+
     /// Real OS: every online display on this Apple silicon Mac is classified.
     #[cfg(target_arch = "aarch64")]
     #[test]
     fn this_macs_displays_are_all_classified() {
+        if on_a_virtual_machine() {
+            return;
+        }
         let topology = online_displays().expect("reads displays");
         assert!(
             topology
