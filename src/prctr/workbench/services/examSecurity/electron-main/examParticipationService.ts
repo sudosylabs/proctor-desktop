@@ -106,8 +106,13 @@ export interface ExamParticipationOptions {
 	readonly configurationManifestFingerprint: string;
 	/** The encrypted spool for one Attempt's native stream. */
 	readonly openSpool: (attemptId: string) => Promise<ProtectedRecordStore>;
-	/** The recorder's start parameters when the policy records the screen. */
-	readonly recording?: (attemptId: string) => Promise<RecordingStart | undefined>;
+	/** The per-Attempt screen recording key and directory, when the build can record. */
+	readonly recordings?: {
+		/** The recorder's start parameters, when the policy records the screen. */
+		open(attemptId: string): Promise<RecordingStart>;
+		/** Removes the key and whatever recording the agent left behind. */
+		delete(attemptId: string): Promise<void>;
+	};
 	readonly randomBytes: (length: number) => Uint8Array;
 	readonly now?: () => number;
 }
@@ -672,7 +677,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 		const windowFact = await this.options.agent.query('candidate_window');
 		await this.deliver(admission, [admission.mapper.fact(windowFact)]);
 		const recording = admission.recording
-			? await this.options.recording?.(admission.attemptId)
+			? await this.options.recordings?.open(admission.attemptId)
 			: undefined;
 		const rules = await this.options.agent.confirmParticipation(recording);
 		this.absorb(rules);
@@ -787,6 +792,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 		this.attemptRevision++;
 		this.publish();
 		await this.options.agent.close('delete').catch(() => undefined);
+		await this.options.recordings?.delete(admission.attemptId).catch(() => undefined);
 		admission.pump.notify(admission.security.delivery_stream_id);
 	}
 

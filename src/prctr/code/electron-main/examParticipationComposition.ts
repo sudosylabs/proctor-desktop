@@ -56,7 +56,7 @@ export function createExamParticipationComposition(
 				maximumRecords: 64,
 				authorized: options.authorized
 			}),
-		recording: (attemptId) => recordings.open(attemptId),
+		recordings,
 		randomBytes: (length) => new Uint8Array(randomBytes(length))
 	});
 }

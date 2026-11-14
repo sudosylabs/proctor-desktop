@@ -384,6 +384,17 @@ function setup() {
 	const server = new Server();
 	const agent = new FakeAgent();
 	let counter = 0;
+	const recordings = {
+		deleted: [] as string[],
+		open: async (attemptId: string) => ({
+			recording_id: attemptId,
+			key: 'k'.repeat(43),
+			directory: '/recordings'
+		}),
+		delete: async (attemptId: string) => {
+			recordings.deleted.push(attemptId);
+		}
+	};
 	const service = new ExamParticipationService({
 		api: server.api(),
 		events: server.events(),
@@ -392,10 +403,11 @@ function setup() {
 		nativeRegistryDigest: REGISTRY,
 		configurationManifestFingerprint: DIGEST('8'),
 		openSpool: async () => new Store(),
+		recordings,
 		randomBytes: (length) => new Uint8Array(length).fill(++counter)
 	});
 	server.sessionId = Buffer.from(new Uint8Array(16).fill(1)).toString('hex');
-	return { server, agent, service };
+	return { server, agent, service, recordings };
 }
 
 async function settle(predicate: () => boolean): Promise<void> {
@@ -578,10 +590,11 @@ void test('suspension seals the recording and ends live access; reallow allows a
 });
 
 void test('submission sends the live credentials and deletes the local recording', async () => {
-	const { server, agent, service } = setup();
+	const { server, agent, service, recordings } = setup();
 	await service.start(SITTING);
 	await service.candidateMounted({ nativeWindow: '1' });
 	await service.submit({ currentRevisionId: 'revision', workspaceCursor: 3 });
+	assert.equal(recordings.deleted.length, 1, 'the recording key goes with the recording');
 	const submit = server.calls.find((call) => call.operation === 'submitExamAttempt')?.input;
 	assert.equal(
 		(submit?.['header'] as Record<string, string>)['X-Proctor-Attempt-Connection-ID'],
