@@ -2,14 +2,10 @@
 //! Contract: `docs/architecture/native-capability-families.md`, "Display topology".
 
 use std::collections::BTreeMap;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::thread::{self, JoinHandle};
 use std::time::Duration;
 
 use prctr_core::{
     CapabilityDescriptor, FieldKind, FieldSpec, FieldValue, Observation, Sink, Source, SourceError,
-    SourceEvent,
 };
 use prctr_os::{OsError, RawDisplay, RawKind, RawTopology};
 use prctr_protocol::facts::{Certainty, Envelope, Health, Permission};
@@ -19,6 +15,8 @@ use prctr_protocol::rules::{
 use prctr_protocol::scalars::{Count, Identifier};
 use schemars::JsonSchema;
 use serde::Serialize;
+
+use crate::poller::Poller;
 
 pub const CAPABILITY: &str = "display";
 /// Displays change rarely; reconciling twice a second cannot miss a change that happens in bursts.
@@ -316,11 +314,6 @@ fn query() -> Result<RawTopology, OsError> {
     })
 }
 
-struct Poller {
-    stop: Arc<AtomicBool>,
-    thread: JoinHandle<()>,
-}
-
 /// The display topology source: reconciles the OS topology every [`POLL_INTERVAL`].
 pub struct DisplaySource {
     query: fn() -> Result<RawTopology, OsError>,
@@ -362,29 +355,14 @@ impl Source for DisplaySource {
         sink: Sink,
     ) -> Result<Observation, SourceError> {
         self.stop();
-        let stop = Arc::new(AtomicBool::new(false));
         let query = self.query;
-        let mut last = query();
-        let thread_stop = Arc::clone(&stop);
-        let thread = thread::Builder::new()
-            .name("prctr-display".to_owned())
-            .spawn(move || {
-                while !thread_stop.load(Ordering::Acquire) {
-                    thread::park_timeout(POLL_INTERVAL);
-                    if thread_stop.load(Ordering::Acquire) {
-                        return;
-                    }
-                    let now = query();
-                    if now != last {
-                        last = now;
-                        sink(SourceEvent::Changed);
-                    }
-                }
-            })
-            .map_err(|_| SourceError {
-                reason: "cannot start the display poller",
-            })?;
-        self.poller = Some(Poller { stop, thread });
+        self.poller = Some(Poller::start(
+            "prctr-display",
+            POLL_INTERVAL,
+            query(),
+            query,
+            sink,
+        )?);
         Ok(self.current())
     }
 
@@ -395,9 +373,7 @@ impl Source for DisplaySource {
 
     fn stop(&mut self) {
         if let Some(poller) = self.poller.take() {
-            poller.stop.store(true, Ordering::Release);
-            poller.thread.thread().unpark();
-            let _ = poller.thread.join();
+            poller.stop();
         }
     }
 }
