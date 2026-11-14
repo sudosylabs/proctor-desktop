@@ -505,31 +505,46 @@ void test('an agent failure during readiness fails it until checks are retried',
 	service.dispose();
 });
 
-void test('a restart during participation re-attaches the window and delivers the fresh states', async () => {
+void test('a restart during participation re-attaches the window, resets each stream and delivers the fresh states', async () => {
 	const { server, agent, service } = setup();
 	await service.start(SITTING);
 	await service.candidateMounted({ nativeWindow: '4242' });
 	agent.hostEvents.length = 0;
+	agent.onDidNotifyEmitter.fire({ kind: 'fact', fact: fact('display', { displays: [] }, 3) });
 	agent.restartEmitter.fire({
-		facts: [fact('display', { displays: [] }, 0)],
+		facts: [{ ...fact('display', { displays: [] }, 0), source_instance_id: 'display00002' }],
 		rules: [status('baseline.window', 'not_met')]
 	});
 	assert.deepEqual(agent.hostEvents, [
 		{ capability: 'candidate_window', event: { attach: { window: '4242' } } }
 	]);
-	const displayFacts = () =>
+	type Sent = {
+		kind: string;
+		capability?: string;
+		source_instance_id?: string;
+		previous_source_instance_id?: string;
+		previous_final_sequence?: number;
+		new_source_instance_id?: string;
+	};
+	const display = () =>
 		server.calls
 			.filter((call) => call.operation === 'appendNativeDelivery')
-			.flatMap(
-				(call) =>
-					(call.input['body'] as { records: { kind: string; capability?: string }[] })
-						.records
-			)
-			.filter(
-				(record) => record.kind === 'capability_fact' && record.capability === 'display'
-			);
-	await settle(() => displayFacts().length > 0);
-	assert.equal(displayFacts().length, 1, 'the restarted display state is delivered');
+			.flatMap((call) => (call.input['body'] as { records: Sent[] }).records)
+			.filter((record) => record.capability === 'display');
+	await settle(() => display().some((record) => record.source_instance_id === 'display00002'));
+	assert.deepEqual(
+		display().map((record) => [
+			record.kind,
+			record.source_instance_id ?? record.previous_source_instance_id,
+			record.previous_final_sequence ?? record.new_source_instance_id
+		]),
+		[
+			['capability_fact', 'display00001', undefined],
+			['source_reset', 'display00001', 3],
+			['capability_fact', 'display00002', undefined]
+		],
+		'the old stream is reset at its last sequence before the fresh state'
+	);
 	service.dispose();
 });
 

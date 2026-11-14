@@ -789,23 +789,6 @@
         {
           "additionalProperties": false,
           "properties": {
-            "kind": {
-              "const": "reset",
-              "type": "string"
-            },
-            "reset": {
-              "$ref": "#/$defs/Reset"
-            }
-          },
-          "required": [
-            "kind",
-            "reset"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
             "interruption": {
               "$ref": "#/$defs/InterruptionKind"
             },
@@ -1220,31 +1203,6 @@
           "type": "object"
         }
       ]
-    },
-    "Reset": {
-      "additionalProperties": false,
-      "description": "A capability restarted under a new instance; its sequence starts again at zero.",
-      "properties": {
-        "capability": {
-          "$ref": "#/$defs/Identifier"
-        },
-        "previous_sequence": {
-          "$ref": "#/$defs/Count"
-        },
-        "previous_source_instance_id": {
-          "$ref": "#/$defs/OpaqueId"
-        },
-        "source_instance_id": {
-          "$ref": "#/$defs/OpaqueId"
-        }
-      },
-      "required": [
-        "capability",
-        "previous_source_instance_id",
-        "previous_sequence",
-        "source_instance_id"
-      ],
-      "type": "object"
     },
     "Response": {
       "oneOf": [

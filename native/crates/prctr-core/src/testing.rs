@@ -147,32 +147,6 @@ pub fn assert_capability_conformance(
     );
     assert_eq!(facts(&fresh)[0].sequence.get(), 5);
 
-    // A restart produces a reset naming the old instance, then sequence 0 of the new one.
-    let restarted = engine
-        .handle(Input::Restarted {
-            capability: capability.clone(),
-            source_instance_id: instance(2),
-            observation: first.clone(),
-            at_ms: 5,
-        })
-        .expect("applies");
-    let reset = restarted
-        .iter()
-        .find_map(|message| match &message.notification {
-            Notification::Reset { reset } => Some(reset.clone()),
-            _ => None,
-        })
-        .expect("a restart produces a reset");
-    assert_eq!(reset.previous_source_instance_id, instance(1));
-    assert_eq!(reset.previous_sequence.get(), 5);
-    assert_eq!(reset.source_instance_id, instance(2));
-    let after = facts(&restarted);
-    assert_eq!(after.len(), 1);
-    assert_eq!(
-        (after[0].sequence, &after[0].source_instance_id),
-        (Count::ZERO, &instance(2))
-    );
-
     // An interruption forces a fresh state before Start is allowed.
     engine
         .handle(Input::Interrupted {

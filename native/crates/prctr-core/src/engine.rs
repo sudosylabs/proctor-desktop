@@ -4,7 +4,7 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
-use prctr_protocol::facts::{Fact, FactRef, Gap, GapReason, InterruptionKind, Reset};
+use prctr_protocol::facts::{Fact, FactRef, Gap, GapReason, InterruptionKind};
 use prctr_protocol::messages::Notification;
 use prctr_protocol::rules::{LocalEffect, Mode, Policy, RuleStatus, Status, UnknownCause};
 use prctr_protocol::scalars::{Count, Identifier, OpaqueId};
@@ -60,13 +60,6 @@ pub enum Input {
     EventsLost {
         capability: Identifier,
         count: u64,
-        at_ms: u64,
-    },
-    /// The capability restarted under a new instance, with its first state.
-    Restarted {
-        capability: Identifier,
-        source_instance_id: OpaqueId,
-        observation: Observation,
         at_ms: u64,
     },
     /// Sleep, screen lock or user switch: every capability needs a fresh complete state.
@@ -263,30 +256,6 @@ impl Engine {
                         },
                     });
                 }
-                at_ms
-            }
-            Input::Restarted {
-                capability,
-                source_instance_id,
-                observation,
-                at_ms,
-            } => {
-                let stream = session.stream_mut(&capability)?;
-                out.push(Notification::Reset {
-                    reset: Reset {
-                        capability: capability.clone(),
-                        previous_source_instance_id: stream.instance.clone(),
-                        previous_sequence: stream.sequence,
-                        source_instance_id: source_instance_id.clone(),
-                    },
-                });
-                stream.instance = source_instance_id;
-                stream.sequence = Count::ZERO;
-                stream.observation = observation;
-                stream.captured_at_ms = at_ms;
-                stream.gap = false;
-                stream.withheld_from = None;
-                facts.push((capability.clone(), stream.fact(&capability)));
                 at_ms
             }
             Input::Interrupted { kind, at_ms } => {

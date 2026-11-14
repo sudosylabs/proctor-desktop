@@ -101,8 +101,8 @@ capability:
 - **activation** returns the complete state and the first sequence number in one step, so nothing
   falls between a query and a subscription;
 - **identical consecutive states** produce no event;
-- **per-capability sequence numbers**, explicit **gaps** when events are lost, and **resets** with a
-  fresh instance identity after a restart;
+- **per-capability sequence numbers** and explicit **gaps** when events are lost. A restarted agent
+  starts every capability on a fresh instance identity at sequence zero;
 - **interruptions** (sleep and resume, screen lock, user switch) end every stream and force a fresh
   complete state. A watcher in the agent samples the OS every second. Sleep is suspended time that
   grows by at least two seconds, read from a clock that counts sleep minus one that does not
@@ -191,9 +191,9 @@ participation contains while a fresh state is taken.
   fields, oversized frames or invalid values are fatal for the connection.
 - **Messages.** Requests with deadlines (query, open readiness, begin/confirm/abandon
   participation, permission request, recorder save/release, close, acknowledge); notifications from
-  the agent (facts, rule statuses, gaps, resets, health, heartbeat, fatal); host events from main
-  (window state, close attempts, blocked print commands, lost host events). One session exists at
-  a time and its policy is fixed for its lifetime.
+  the agent (facts, rule statuses, gaps, interruptions, health, heartbeat, fatal); host events
+  from main (window state, close attempts, blocked print commands, lost host events). One session
+  exists at a time and its policy is fixed for its lifetime.
 - **Flow control.** Electron main acknowledges regularly. Above 256 unacknowledged messages the agent
   keeps only the newest state per capability and reports a gap; health, rule statuses and fatal
   always pass.
@@ -204,9 +204,10 @@ participation contains while a fresh state is taken.
 
 - **Outside an exam** the agent is restarted automatically and readiness reopens.
 - **During participation** Electron main contains immediately and records a continuity
-  interruption. It restarts the agent **once**: the new session reports resets with fresh instance
-  identities and complete states before any rule can be met again. A second failure leaves the
-  candidate contained until explicit retry or a new preflight.
+  interruption. It restarts the agent **once**: the new session reports complete states on fresh
+  instance identities before any rule can be met again. Electron main, which knows the last fact
+  on each old instance, sends the server a reset ending each old stream before its fresh state. A
+  second failure leaves the candidate contained until explicit retry or a new preflight.
 - **Panics abort** the agent; it never continues in an unknown state.
 - **Normal departure** stops host-event intake, stops the recorder, stops capabilities in reverse
   order, reports final states and rule statuses, and deletes or seals the recording. Every step has a
@@ -278,16 +279,16 @@ The Rust workspace under `native/` holds the agent and its parts. Rust protocol 
 authority for every wire shape; JSON Schema, TypeScript types and validators, the capability
 registry and the rule conformance vectors are generated from them and checked for parity.
 
-| crate                 | owns                                                                                                                 |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `prctr-protocol`      | wire types: main↔agent messages, facts, rules, rule statuses                                                         |
-| `prctr-core`          | the deterministic engine: sessions, sequencing, gaps, resets, flow control, rule evaluation. No OS, threads or clock |
-| `prctr-os`            | safe wrappers over OS APIs; the only crate allowed `unsafe`                                                          |
-| `prctr-capabilities`  | one module per capability: state, changes, summary, rule fields, adapters, a fake                                    |
-| `prctr-recorder`      | capture, encoding, encrypted segment store, clip cutting                                                             |
-| `prctr-agent`         | the agent binary: threads, transport, wiring                                                                         |
-| `desktop-key-custody` | installation-key custody for Electron main (identity, not observation)                                               |
-| `prctr-xtask`         | generation of schemas, registry and vectors                                                                          |
+| crate                 | owns                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `prctr-protocol`      | wire types: main↔agent messages, facts, rules, rule statuses                                                 |
+| `prctr-core`          | the deterministic engine: sessions, sequencing, gaps, flow control, rule evaluation. No OS, threads or clock |
+| `prctr-os`            | safe wrappers over OS APIs; the only crate allowed `unsafe`                                                  |
+| `prctr-capabilities`  | one module per capability: state, changes, summary, rule fields, adapters, a fake                            |
+| `prctr-recorder`      | capture, encoding, encrypted segment store, clip cutting                                                     |
+| `prctr-agent`         | the agent binary: threads, transport, wiring                                                                 |
+| `desktop-key-custody` | installation-key custody for Electron main (identity, not observation)                                       |
+| `prctr-xtask`         | generation of schemas, registry and vectors                                                                  |
 
 Dependencies point `protocol ← core ← capabilities/recorder ← agent`, with `os` below the platform
 crates. Adding a capability means adding its
@@ -296,15 +297,15 @@ changes.
 
 ## Verification and release support
 
-| layer             | proves                                                                                                                                   |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| model tests       | classification and summaries from fixtures recorded on real machines                                                                     |
-| core conformance  | ordering, coalescing, gaps, resets, interruptions, flow control, recovery and rule evaluation, run for every capability through its fake |
-| rule vectors      | the three-valued logic; published so the server's evaluator passes the same cases                                                        |
-| wire tests        | stable JSON shapes and rejection of invalid input                                                                                        |
-| real-OS tests     | each fact is true: the test causes a change and checks the fact                                                                          |
-| agent integration | launch, handshake, readiness → participation without a gap, crash and restart, shutdown order, malformed frames                          |
-| certification     | hardware cases on physical machines: monitors, docks, phones, webcams                                                                    |
+| layer             | proves                                                                                                                           |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| model tests       | classification and summaries from fixtures recorded on real machines                                                             |
+| core conformance  | ordering, coalescing, gaps, interruptions, flow control, recovery and rule evaluation, run for every capability through its fake |
+| rule vectors      | the three-valued logic; published so the server's evaluator passes the same cases                                                |
+| wire tests        | stable JSON shapes and rejection of invalid input                                                                                |
+| real-OS tests     | each fact is true: the test causes a change and checks the fact                                                                  |
+| agent integration | launch, handshake, readiness → participation without a gap, crash and restart, shutdown order, malformed frames                  |
+| certification     | hardware cases on physical machines: monitors, docks, phones, webcams                                                            |
 
 Mocks verify coordinator and rule behaviour but never satisfy a platform claim. Every secure-
 candidate release carries a signed capability matrix keyed by OS version, architecture, packaged

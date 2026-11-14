@@ -4,7 +4,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::facts::{Fact, Gap, InterruptionKind, Permission, Reset};
+use crate::facts::{Fact, Gap, InterruptionKind, Permission};
 use crate::recording::{
     ClipOutcome, ClipRange, CloseDisposition, RecorderState, RecordingGap, RecordingStart,
 };
@@ -164,9 +164,6 @@ pub enum Notification {
     },
     Gap {
         gap: Gap,
-    },
-    Reset {
-        reset: Reset,
     },
     Interruption {
         interruption: InterruptionKind,

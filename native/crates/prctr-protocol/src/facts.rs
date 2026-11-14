@@ -106,16 +106,6 @@ pub struct Gap {
     pub reason: GapReason,
 }
 
-/// A capability restarted under a new instance; its sequence starts again at zero.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-#[serde(deny_unknown_fields)]
-pub struct Reset {
-    pub capability: Identifier,
-    pub previous_source_instance_id: OpaqueId,
-    pub previous_sequence: Count,
-    pub source_instance_id: OpaqueId,
-}
-
 /// An OS event that ends every capability's stream until a fresh complete state arrives.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]

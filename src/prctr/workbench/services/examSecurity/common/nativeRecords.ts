@@ -6,7 +6,6 @@ import type {
 	Fact,
 	Gap,
 	Policy,
-	Reset,
 	RuleStatus
 } from '../../../../platform/native/common/nativeAgentProtocol.generated.js';
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
@@ -58,6 +57,8 @@ const GAP_REASON = { source_loss: 'source_loss', flow_control: 'overflow' } as c
 export class NativeRecordMapper {
 	private readonly participationRules: ReadonlySet<string>;
 	private readonly sent = new Map<string, string>();
+	/** The last fact mapped on each capability: the stream a restart's reset ends. */
+	private readonly streams = new Map<string, { instance: string; sequence: number }>();
 	private confirmed = false;
 
 	public constructor(
@@ -71,6 +72,10 @@ export class NativeRecordMapper {
 	}
 
 	public fact(fact: Fact): Extract<NativeRecord, { kind: 'capability_fact' }> {
+		this.streams.set(fact.capability, {
+			instance: fact.source_instance_id,
+			sequence: fact.sequence
+		});
 		return {
 			kind: 'capability_fact',
 			observed_at: iso(this.clock.wall(fact.captured_at_ms)),
@@ -97,22 +102,29 @@ export class NativeRecordMapper {
 		};
 	}
 
-	/** A source restarted: `resetId` names this reset uniquely within the stream. */
-	public reset(
-		reset: Reset,
-		resetId: string,
-		reason: 'restart' | 'resume' | 'permission_changed' = 'restart'
-	): NativeRecord {
-		return {
-			kind: 'source_reset',
-			reset_id: resetId,
-			capability: reset.capability,
-			previous_source_instance_id: reset.previous_source_instance_id,
-			previous_final_sequence: reset.previous_sequence,
-			new_source_instance_id: reset.source_instance_id,
-			reason,
-			occurred_at: iso(this.now())
-		};
+	/**
+	 * The agent restarted with fresh source instances. Each capability already reported on an
+	 * older instance is reset from the last fact mapped on it, then its first fresh fact follows.
+	 * `resetId` names each reset uniquely within the stream.
+	 */
+	public restarted(facts: readonly Fact[], resetId: () => string): NativeRecord[] {
+		const records: NativeRecord[] = [];
+		for (const fact of facts) {
+			const previous = this.streams.get(fact.capability);
+			if (previous !== undefined && previous.instance !== fact.source_instance_id)
+				records.push({
+					kind: 'source_reset',
+					reset_id: resetId(),
+					capability: fact.capability,
+					previous_source_instance_id: previous.instance,
+					previous_final_sequence: previous.sequence,
+					new_source_instance_id: fact.source_instance_id,
+					reason: 'restart',
+					occurred_at: iso(this.now())
+				});
+			records.push(this.fact(fact));
+		}
+		return records;
 	}
 
 	/** Participation is confirmed; from here on participation rules are reported. */

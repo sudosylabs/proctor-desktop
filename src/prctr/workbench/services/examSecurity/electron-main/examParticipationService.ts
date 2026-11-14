@@ -644,10 +644,6 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			if (notification.kind === 'fact')
 				records.push(admission.mapper.fact(notification.fact));
 			if (notification.kind === 'gap') records.push(admission.mapper.gap(notification.gap));
-			if (notification.kind === 'reset')
-				records.push(
-					admission.mapper.reset(notification.reset, hex(this.options.randomBytes(16)))
-				);
 			if (notification.kind === 'rules')
 				records.push(
 					...admission.mapper.rules(notification.statuses, this.options.agent.contained)
@@ -705,7 +701,8 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 
 	/**
 	 * The agent restarted with fresh source instances. Readiness takes the new statuses; during
-	 * participation the new agent attaches to the window again and its states are delivered.
+	 * participation the new agent attaches to the window again, and each old stream is reset
+	 * before its fresh state is delivered.
 	 */
 	private async agentRestarted(snapshot: NativeAgentSnapshot): Promise<void> {
 		const readiness = this.readiness;
@@ -720,7 +717,9 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 					attach: { window: admission.window }
 				});
 			await this.deliver(admission, [
-				...snapshot.facts.map((fact) => admission.mapper.fact(fact)),
+				...admission.mapper.restarted(snapshot.facts, () =>
+					hex(this.options.randomBytes(16))
+				),
 				...admission.mapper.rules(snapshot.rules, this.options.agent.contained)
 			]);
 		}
