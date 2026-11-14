@@ -1350,8 +1350,6 @@ mod identity {
     //! Unprivileged code identity for the candidate's own-session processes: the running image's
     //! Authenticode or catalog signer and its original file name. A process whose image cannot be
     //! opened (another session, a system process) has no identity and classifies as unidentified.
-    //! Moved from the removed privileged helper (git commit 3a5c360); unchanged except that it now
-    //! runs in the agent for its own session instead of a service for every session.
 
     use std::fmt::Write as _;
     use std::fs::File;
@@ -1360,9 +1358,9 @@ mod identity {
     use std::os::windows::io::AsRawHandle;
     use std::path::Path;
 
-    use windows::Win32::Foundation::{CloseHandle, HANDLE, HWND};
+    use windows::Win32::Foundation::{CloseHandle, FILETIME, HANDLE, HWND};
     use windows::Win32::System::Threading::{
-        OpenProcess, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
+        GetProcessTimes, OpenProcess, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
         QueryFullProcessImageNameW,
     };
     use windows::core::{HSTRING, PWSTR};
@@ -1382,6 +1380,29 @@ mod identity {
         unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid) }
             .ok()
             .map(Process)
+    }
+
+    /// The process's creation time in 100 ns ticks, which tells a reused process number apart.
+    pub fn created(pid: u32) -> Option<u64> {
+        let process = open(pid)?;
+        let mut created = FILETIME::default();
+        let (mut exited, mut kernel, mut user) = (
+            FILETIME::default(),
+            FILETIME::default(),
+            FILETIME::default(),
+        );
+        // SAFETY: live process handle and four writable out-parameters.
+        unsafe {
+            GetProcessTimes(
+                process.0,
+                &raw mut created,
+                &raw mut exited,
+                &raw mut kernel,
+                &raw mut user,
+            )
+        }
+        .ok()?;
+        Some(u64::from(created.dwHighDateTime) << 32 | u64::from(created.dwLowDateTime))
     }
 
     fn locked_file(path: &Path) -> Option<File> {
@@ -1784,6 +1805,7 @@ mod processes {
     };
     use windows::Win32::System::RemoteDesktop::ProcessIdToSessionId;
 
+    use super::identity::created;
     use crate::{RawProcess, fingerprint};
 
     const MAX_PROCESSES: usize = 32_768;
@@ -1795,9 +1817,8 @@ mod processes {
         Some(session)
     }
 
-    /// Every process in the agent's interactive session. A process number and parent are not an
-    /// instance by themselves: the snapshot's thread count stands in for a start time until the
-    /// privileged service supplies creation times.
+    /// Every process in the agent's interactive session. A process number is reused, so the
+    /// instance also hashes the creation time; a process that cannot be opened hashes zero.
     #[must_use]
     pub fn processes() -> Option<Vec<RawProcess>> {
         let own = session(std::process::id())?;
@@ -1815,8 +1836,9 @@ mod processes {
                 processes.push(RawProcess {
                     instance: fingerprint(
                         &[
-                            entry.th32ProcessID.to_le_bytes(),
-                            entry.th32ParentProcessID.to_le_bytes(),
+                            &entry.th32ProcessID.to_le_bytes()[..],
+                            &entry.th32ParentProcessID.to_le_bytes(),
+                            &created(entry.th32ProcessID).unwrap_or(0).to_le_bytes(),
                         ]
                         .concat(),
                     ),
@@ -1852,4 +1874,23 @@ pub fn suspended_ns() -> Option<u64> {
     // SAFETY: no arguments.
     let total = unsafe { QueryInterruptTime() };
     total.saturating_sub(awake).checked_mul(100)
+}
+
+#[cfg(test)]
+mod tests {
+    /// Real OS: this process has a creation time, and two reads give it the same instance.
+    #[test]
+    fn this_process_keeps_one_instance_between_reads() {
+        let own = std::process::id();
+        assert!(super::identity::created(own).is_some_and(|ticks| ticks > 0));
+        let instance = || {
+            super::processes()
+                .expect("processes are listed")
+                .into_iter()
+                .find(|process| process.pid == own)
+                .expect("this process is in its own session")
+                .instance
+        };
+        assert_eq!(instance(), instance());
+    }
 }
