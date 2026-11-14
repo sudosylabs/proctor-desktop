@@ -12,7 +12,6 @@ import {
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
-import { isReadAction } from '../common/administrationPresentation.js';
 import { readOnce, readPages } from '../widgets/adminReads.js';
 
 const RECENT_CHANGES = 5;
@@ -65,7 +64,12 @@ export class OverviewPage extends Disposable implements PageView {
 	private async loadRecent(): Promise<void> {
 		if (this.recent.element.dataset.state !== 'ready')
 			this.recent.setState({ kind: 'loading' }, false);
-		const audits = await readPages(this.administration, 'audits', {}, 50);
+		const audits = await readPages(
+			this.administration,
+			'audits',
+			{ auditKind: 'change' },
+			RECENT_CHANGES
+		);
 		if (this._store.isDisposed) return;
 		if (audits.kind === 'failure') {
 			this.recent.setState(
@@ -77,9 +81,7 @@ export class OverviewPage extends Disposable implements PageView {
 			);
 			return;
 		}
-		const changes = audits.value.items
-			.filter((audit) => !isReadAction(audit.action))
-			.slice(0, RECENT_CHANGES);
+		const changes = audits.value.items.slice(0, RECENT_CHANGES);
 		this.recent.setState(
 			{ kind: 'ready' },
 			changes.length === 0 ? this.format.text('overviewRecentEmpty') : false

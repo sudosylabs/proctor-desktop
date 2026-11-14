@@ -274,6 +274,8 @@ export type AccountData =
 	| {
 			readonly section: 'history';
 			readonly entries: readonly AccountHistoryEntry[];
+			/** Stretches of entries on this page that read as one line, in order, never overlapping. */
+			readonly runs: readonly AccountHistoryRun[];
 			/** Continues the same query; absent after the final page. */
 			readonly cursor?: string;
 			/** How many events match the query; only the first page of a query carries it. */
@@ -287,6 +289,14 @@ export type AccountData =
 			/** The server holds further notices beyond this bounded first page. */
 			readonly more: boolean;
 	  };
+/** Two or more neighbouring entries of the same change, with the server's one sentence for them. */
+export interface AccountHistoryRun {
+	/** Index in the page's entries of the run's first entry. */
+	readonly start: number;
+	readonly length: number;
+	/** A plural sentence counted by entries, as in "You changed 5 profile pictures". */
+	readonly summary: string;
+}
 export type AccountFailure =
 	| 'unavailable'
 	| 'sessionEnded'
@@ -734,9 +744,28 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 			(typeof data.total !== 'number' || !Number.isSafeInteger(data.total) || data.total < 0)
 		)
 			throw new TypeError('Invalid history total');
+		let next = 0;
+		const runs = projectionList(data.runs ?? [], 100).map((value) => {
+			const r = projectionRecord(value);
+			const start = r.start;
+			const length = r.length;
+			if (
+				typeof start !== 'number' ||
+				typeof length !== 'number' ||
+				!Number.isSafeInteger(start) ||
+				!Number.isSafeInteger(length) ||
+				start < next ||
+				length < 2 ||
+				start + length > entries.length
+			)
+				throw new TypeError('Invalid history run');
+			next = start + length;
+			return Object.freeze({ start, length, summary: projectionText(r.summary, 500) });
+		});
 		result = {
 			section: 'history',
 			entries: Object.freeze(entries),
+			runs: Object.freeze(runs),
 			...(data.cursor === undefined ? {} : { cursor: data.cursor }),
 			...(data.total === undefined
 				? {}

@@ -433,6 +433,7 @@ export const academicPreviewRowStates = [
 	'canceled'
 ] as const;
 export const userStates = ['active', 'disabled'] as const;
+export const auditKinds = ['change', 'read'] as const;
 export const auditStatuses = ['attempt', 'success', 'fail'] as const;
 /** The list orders the server offers, by list. */
 export const sortDirections = ['asc', 'desc'] as const;
@@ -560,6 +561,8 @@ export const administrationReads = {
 	roles: page,
 	roleBindings: {
 		...page,
+		/** Everyone holding any of these Roles now; not with a user or scope. */
+		roleIds: { optional: { list: 'id', max: 16 } },
 		userId: { optional: 'id' },
 		scopeType: { optional: 'code' },
 		scopeId: { optional: 'id' }
@@ -571,6 +574,8 @@ export const administrationReads = {
 		actorId: { optional: 'id' },
 		/** Whom the events were about, as actor or resource. */
 		subjectUserId: { optional: 'id' },
+		/** Only changes, or only reads; both when absent. */
+		auditKind: { optional: auditKinds },
 		actions: { optional: { list: 'code', max: 32 } },
 		status: { optional: auditStatuses },
 		resourceType: { optional: 'code' },
@@ -1107,7 +1112,20 @@ const roleShape = {
 	description: 'longText',
 	builtIn: 'flag',
 	permissions: { list: 'code', max: 256 },
-	archivedAt: { optional: 'instant' }
+	archivedAt: { optional: 'instant' },
+	/** Who holds it now among the bindings the viewer may see; absent when they may see none. */
+	holders: {
+		optional: {
+			shape: {
+				bindings: 'count',
+				bindingsIsLowerBound: 'flag',
+				users: 'count',
+				usersIsLowerBound: 'flag',
+				scopes: 'count',
+				scopesIsLowerBound: 'flag'
+			}
+		}
+	}
 } as const;
 const roleBindingShape = {
 	id: 'id',
@@ -1176,6 +1194,10 @@ const mailDeliveryShape = {
 	id: 'id',
 	state: mailDeliveryStates,
 	recipient: 'text',
+	/** The recipient's name, only while the viewer may see them; never for an invitation. */
+	recipientName: { optional: 'text' },
+	/** Left out for an email to an invitee who has no account yet. */
+	targetUserId: { optional: 'id' },
 	template: 'code',
 	attempts: 'count',
 	createdAt: 'instant',
@@ -1187,8 +1209,6 @@ const mailDeliveryShape = {
 } as const;
 const mailDeliveryDetailShape = {
 	...mailDeliveryShape,
-	/** Left out for an email to an invitee who has no account yet. */
-	targetUserId: { optional: 'id' },
 	/** Present instead of the user for an email to an invitee. */
 	targetInvitationId: { optional: 'id' },
 	messageId: 'longText'

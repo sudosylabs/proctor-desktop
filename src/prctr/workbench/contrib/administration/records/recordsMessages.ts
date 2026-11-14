@@ -136,11 +136,6 @@ export const recordsMessages = Object.freeze({
 		defaultMessage: 'Choose a longer period to see older events.',
 		description: 'Explains how to see older audit events.'
 	}),
-	auditsPageReads: defineMessage({
-		id: 'administration.records.audits.page.reads',
-		defaultMessage: 'Reads on this page are hidden.',
-		description: 'Note when a page holds only reads.'
-	}),
 	retentionPolicy: defineMessage({
 		id: 'administration.records.retention.policy',
 		defaultMessage: 'How long records are kept',

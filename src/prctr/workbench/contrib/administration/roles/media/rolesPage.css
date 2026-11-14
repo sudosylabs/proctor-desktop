@@ -58,6 +58,12 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
+	.prctr-admin-roles .prctr-admin-roles__item-count {
+		color: var(--prctr-color-text-tertiary);
+		flex: none;
+		font-size: 12px;
+		font-variant-numeric: tabular-nums;
+	}
 	.prctr-admin-roles .prctr-admin-roles__item-meta {
 		align-items: center;
 		color: var(--prctr-color-text-tertiary);

@@ -250,14 +250,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.folded.note": {
-      "message": "The same change {count} times in a row",
-      "description": "Under a row that stands for a run of the same change.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
-    },
     "account.history.go.to.date": {
       "message": "Go to a date",
       "description": "Opens a dialog to show the history up to a chosen day.",
@@ -2695,6 +2687,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
+    "administration.access.at.least": {
+      "message": "{count}+",
+      "description": "A count the server stopped at, as in \"10,000+\".",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
     "administration.access.auto.provision": {
       "message": "Anyone from the provider",
       "description": "Provider admission: anyone the provider signs in gets an account.",
@@ -2869,6 +2869,27 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
+    "administration.access.given.to": {
+      "message": "Given to",
+      "description": "Label of who holds a role now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.given.to.nobody": {
+      "message": "Nobody yet",
+      "description": "No one you can see holds the role now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.given.to.people": {
+      "message": "{people} in {places}",
+      "description": "Who holds a role, as in \"23 people in 6 places\".",
+      "placeholders": [
+        "people",
+        "places"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
     "administration.access.history": {
       "message": "Changes",
       "description": "Section with the policy’s past changes.",
@@ -3012,6 +3033,22 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
+    "administration.access.people": {
+      "message": "{count} people",
+      "description": "How many people hold a role.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.people.one": {
+      "message": "{count} person",
+      "description": "How many people hold a role, for one.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
     "administration.access.permission.count": {
       "message": "Allows",
       "description": "Role detail: how many permissions it has.",
@@ -3054,6 +3091,22 @@
       "message": "This role allows nothing yet.",
       "description": "A role with no permissions.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.places": {
+      "message": "{count} places",
+      "description": "In how many places (the institution, units or classes) a role is given.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.places.one": {
+      "message": "{count} place",
+      "description": "In how many places (the institution, a unit or a class) a role is given, for one.",
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.access.policy.none": {
@@ -7494,12 +7547,6 @@
     "administration.records.audits.outcome.any": {
       "message": "Any outcome",
       "description": "Audits filter choice: allowed and refused events.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
-    },
-    "administration.records.audits.page.reads": {
-      "message": "Reads on this page are hidden.",
-      "description": "Note when a page holds only reads.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },

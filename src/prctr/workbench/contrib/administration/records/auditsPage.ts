@@ -8,7 +8,7 @@ import type { PageView } from '../../../browser/authenticated/pages/pagePane.js'
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
-import { isReadAction, readableCode } from '../common/administrationPresentation.js';
+import { readableCode } from '../common/administrationPresentation.js';
 import { AdminFilters } from '../widgets/adminFilters.js';
 import { AdminList, type AdminListItem, type AdminListQuery } from '../widgets/adminList.js';
 import { readOnce } from '../widgets/adminReads.js';
@@ -38,16 +38,13 @@ function since(period: Period, now: number): AdminListQuery<'audits'> {
 
 /**
  * Everything that happened at the institution, newest first: who did what to which record and
- * whether the server allowed it. Reads are recorded too; they can be hidden, and
- * a page holding only reads says so rather than looking empty.
+ * whether the server allowed it. Reads are recorded too; the page starts with changes only.
  */
 export class AuditsPage extends Disposable implements PageView {
 	private readonly list: AdminList<'audits'>;
 	private readonly names = new Map<string, string>();
 	private readonly filters: AdminFilters;
 	private query: AdminListQuery<'audits'>;
-	/** Reads are recorded too; the page starts with changes only, as Overview does. */
-	private everything = false;
 
 	constructor(
 		body: HTMLElement,
@@ -58,7 +55,7 @@ export class AuditsPage extends Disposable implements PageView {
 		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService
 	) {
 		super();
-		this.query = since('week', format.now());
+		this.query = { ...since('week', format.now()), auditKind: 'change' };
 		this.filters = this._register(new AdminFilters(body));
 		this.filters.addSelect<Period>(
 			format.text('auditsPeriod'),
@@ -86,9 +83,9 @@ export class AuditsPage extends Disposable implements PageView {
 			],
 			'changes',
 			(choice) => {
-				this.everything = choice === 'everything';
-				this.list.redraw();
-				this.updateNote();
+				const { auditKind: _kind, ...rest } = this.query;
+				this.query = choice === 'everything' ? rest : { ...rest, auditKind: 'change' };
+				this.list.setQuery(this.query);
 			}
 		);
 		// Event narrows to one kind of change, By to who did it, About to whom it happened.
@@ -229,7 +226,6 @@ export class AuditsPage extends Disposable implements PageView {
 					params: (sort) => ({ order: sort.dir })
 				},
 				dateJump: (endOfDay) => ({ createdBefore: endOfDay }),
-				hidden: (audit) => !this.everything && isReadAction(audit.action),
 				actions: (audit) =>
 					audit.actorId === undefined
 						? []
@@ -252,12 +248,7 @@ export class AuditsPage extends Disposable implements PageView {
 				}
 			})
 		);
-		this._register(
-			this.list.onDidLoad((audits) => {
-				this.updateNote();
-				void this.loadNames(audits);
-			})
-		);
+		this._register(this.list.onDidLoad((audits) => void this.loadNames(audits)));
 	}
 
 	private client(client: string | undefined): string {
@@ -275,15 +266,6 @@ export class AuditsPage extends Disposable implements PageView {
 
 	setVisible(visible: boolean): void {
 		this.list.setActive(visible);
-	}
-
-	private updateNote(): void {
-		const rows = this.list.rows;
-		const onlyReads =
-			!this.everything &&
-			rows.length > 0 &&
-			rows.every((audit) => isReadAction(audit.action));
-		this.filters.setNote(onlyReads ? this.format.text('auditsPageReads') : '');
 	}
 
 	private async loadNames(audits: readonly Audit[]): Promise<void> {

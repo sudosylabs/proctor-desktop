@@ -336,7 +336,7 @@ void test('history filters become the server query', () => {
 	assert.ok(failed.createdAfter! <= NOW - 7 * DAY && failed.createdAfter! > NOW - 8 * DAY);
 });
 
-void test('runs of the same change fold into one row, shorter runs stay apart', () => {
+void test('the server’s runs fold into one row with its sentence; other entries stand alone', () => {
 	const entry = (id: string, event: string): AccountHistoryEntry => ({
 		id: id.repeat(26),
 		createdAt: NOW,
@@ -346,16 +346,23 @@ void test('runs of the same change fold into one row, shorter runs stay apart', 
 		actor: 'self',
 		summary: event
 	});
-	const runs = foldHistory([
-		entry('a', 'profile_picture.changed'),
-		entry('b', 'profile_picture.changed'),
-		entry('c', 'profile_picture.changed'),
-		entry('d', 'sign_in.succeeded'),
-		entry('e', 'sign_in.succeeded')
-	]);
+	const runs = foldHistory(
+		[
+			entry('a', 'sign_in.succeeded'),
+			entry('b', 'profile_picture.changed'),
+			entry('c', 'profile_picture.changed'),
+			entry('d', 'profile_picture.changed'),
+			entry('e', 'sign_out')
+		],
+		[{ start: 1, length: 3, summary: 'You changed 3 profile pictures' }]
+	);
 	assert.deepStrictEqual(
-		runs.map((run) => run.entries.length),
-		[3, 1, 1]
+		runs.map((run) => [run.entries.length, run.summary]),
+		[
+			[1, undefined],
+			[3, 'You changed 3 profile pictures'],
+			[1, undefined]
+		]
 	);
 });
 

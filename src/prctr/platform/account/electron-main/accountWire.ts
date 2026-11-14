@@ -244,6 +244,10 @@ export function readAccountHistory(raw: unknown): AccountData {
 			for (const key of Object.keys(entry)) if (entry[key] === undefined) delete entry[key];
 			return entry;
 		}),
+		runs: accountList(page.runs ?? [], 100).map((value) => {
+			const r = record(value);
+			return { start: r.start, length: r.length, summary: r.summary };
+		}),
 		...(page.next_cursor === undefined ? {} : { cursor: page.next_cursor }),
 		...(page.total === undefined
 			? {}
