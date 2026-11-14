@@ -62,7 +62,10 @@ interface PendingRequest {
 /** One running native agent, from a verified spawn and handshake until it closes or fails. */
 export class NativeAgentConnection extends Disposable {
 	private readonly _onDidNotify = this._register(new Emitter<Notification>());
-	/** Facts, rule statuses, gaps, resets and interruptions, in order. Heartbeats are not forwarded. */
+	/**
+	 * Facts, rule statuses, gaps, resets, interruptions and heartbeats, in order. A heartbeat pairs
+	 * the agent's monotonic clock with the moment it arrives, which dates every later fact.
+	 */
 	public readonly onDidNotify: Event<Notification> = this._onDidNotify.event;
 
 	private readonly _onDidFail = this._register(new Emitter<NativeAgentFailure>());
@@ -236,10 +239,7 @@ export class NativeAgentConnection extends Disposable {
 		this.lastMessageNumber = message.message_number;
 		this.scheduleAcknowledge();
 		const notification = message.notification;
-		if (notification.kind === 'heartbeat') {
-			this.armHeartbeat();
-			return;
-		}
+		if (notification.kind === 'heartbeat') this.armHeartbeat();
 		if (notification.kind === 'fatal') {
 			this.fail('fatal');
 			return;

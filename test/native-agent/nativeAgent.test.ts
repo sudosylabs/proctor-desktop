@@ -341,6 +341,21 @@ void test('a crash during participation contains, restarts once with fresh insta
 	}
 });
 
+void test('heartbeats reach the service listeners', async () => {
+	const service = new NativeAgentService({ launch: LAUNCH });
+	try {
+		const heartbeat = next<Notification>(
+			service.onDidNotify,
+			(notification) => notification.kind === 'heartbeat'
+		);
+		await service.openReadiness(COLLECTION, POLICY);
+		await heartbeat;
+	} finally {
+		await service.close('delete');
+		service.dispose();
+	}
+});
+
 void test('a hung agent is detected by the missing heartbeat', async () => {
 	const connection = await NativeAgentConnection.launch(LAUNCH);
 	try {
