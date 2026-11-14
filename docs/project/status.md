@@ -55,11 +55,14 @@
   containment, a readiness overview before the exam, matches-only application
   privacy, and a screen evidence recorder. Every capability and the recorder
   are implemented on Windows and macOS and tested on both, with Linux reporting
-  unsupported where it must. The privileged helper that full process and session
-  coverage needs (the Windows `ProctorNative` service and the macOS Endpoint
-  Security LaunchDaemon) is implemented; on Windows its privileged tests pass as
-  SYSTEM, while its MSI, the macOS packaging and a run on a SIP-off Mac are
-  still to come. Electron main's exam participation (readiness, preflight,
+  unsupported where it must. Process and interactive session read unprivileged,
+  polling each second: a field the OS reports is complete, and one it cannot see
+  unprivileged (macOS screen sharing; the identity of another session's Windows
+  processes) is reported unknown. A privileged helper for full coverage (a
+  Windows service and a macOS Endpoint Security daemon) was built and removed on
+  2026-11-14 to ship without Apple's entitlement or candidate admin rights; it
+  stays in git history for a later optional upgrade. Electron main's exam
+  participation (readiness, preflight,
   Connect, renewal with security control, native delivery, the CandidateWindow
   seam, suspension, Focus Loss and submission) is implemented and tested against
   fakes, with a composition factory; the readiness overview, the CandidateWindow
@@ -310,12 +313,11 @@ compatibility-gated state until their adapters match the verified server contrac
 5. **Candidate identity/security** — admission, Attempt Configuration,
    CandidateWindow lifecycle, active Session/Participation projection, pause,
    suspension handoff, ready join, close/departure, correction, and submission.
-6. **Native capabilities** — replace partial process/session observations with
-   the signed privileged helper implementations, close per-platform full-
-   coverage gaps, then add coordinator integration, production effect wiring,
-   packaged target conformance, and capability-matrix generation/signing over
-   the implemented schemas, registry, supervision, eleven-source utility
-   bridge, helper protocol, private clipboard, print gate, and matrix verifier.
+6. **Native capabilities** — production effect wiring, packaged target
+   conformance, and capability-matrix generation/signing over the implemented
+   schemas, registry, capabilities, private clipboard and print gate. Full
+   process/session coverage through a privileged helper is a later optional
+   upgrade (kept in git history), not a release requirement.
 7. **Integrated browser** — frozen policy validation/enforcement, Candidate item,
    minimized activity, protected spool, ordered delivery, and privacy/access
    verification.

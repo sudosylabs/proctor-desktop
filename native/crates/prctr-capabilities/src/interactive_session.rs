@@ -1,18 +1,15 @@
-//! The candidate's interactive OS session. With the privileged helper it sees every session, lock
-//! and remote attachment (full coverage); without a helper on this platform it reads the
-//! unprivileged per-platform sources and reports `snapshot_only` coverage with partial certainty.
+//! The candidate's interactive OS session, polled from the unprivileged per-platform sources every
+//! [`POLL_INTERVAL`]. A field the platform reports is complete; a field it cannot see is left out
+//! of the rule fields, so a rule naming it is unknown rather than guessed.
 //! Contract: `docs/architecture/native-capability-families.md`, "Interactive session".
 
-use std::sync::Arc;
 use std::time::Duration;
 
 use prctr_core::{
     CapabilityDescriptor, FieldKind, FieldSpec, FieldValue, Observation, Sink, Source, SourceError,
-    SourceEvent,
 };
 use prctr_os::RawSession;
 use prctr_protocol::facts::{Certainty, Envelope, Health, Permission};
-use prctr_protocol::helper::{HelperSessions, SessionState};
 use prctr_protocol::rules::{
     Compare, CompareOp, Condition, Mode, Rule, RulePhase, RuleValue, Scalar,
 };
@@ -20,7 +17,6 @@ use prctr_protocol::scalars::{Count, Identifier};
 use schemars::JsonSchema;
 use serde::Serialize;
 
-use crate::helper::{ComponentStatus, HelperChange, HelperClient};
 use crate::poller::Poller;
 
 pub const CAPABILITY: &str = "interactive_session";
@@ -32,7 +28,7 @@ const MAX_SESSIONS: u64 = 1_024;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Coverage {
-    FullLifecycle,
+    /// Read every [`POLL_INTERVAL`]: a change shorter than one interval can go unseen.
     SnapshotOnly,
     Unavailable,
 }
@@ -68,54 +64,58 @@ pub struct InteractiveSessionState {
     pub coverage: Coverage,
     pub console_owner: ConsoleOwner,
     pub lock: Lock,
+    /// `unknown` where the platform cannot see remote attachment unprivileged (macOS screen
+    /// sharing).
     pub remote_attachment: RemoteAttachment,
     /// `None` when the platform cannot count other sessions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub other_human_sessions: Option<u64>,
-    /// The privileged component this capability needs on Windows and macOS.
-    pub component: ComponentStatus,
 }
 
 impl ConsoleOwner {
-    const fn text(self) -> &'static str {
+    const fn known(self) -> Option<&'static str> {
         match self {
-            Self::Candidate => "candidate",
-            Self::OtherHuman => "other_human",
-            Self::None => "none",
-            Self::Unknown => "unknown",
+            Self::Candidate => Some("candidate"),
+            Self::OtherHuman => Some("other_human"),
+            Self::None => Some("none"),
+            Self::Unknown => None,
         }
     }
 }
 
 impl Lock {
-    const fn text(self) -> &'static str {
+    const fn known(self) -> Option<&'static str> {
         match self {
-            Self::Unlocked => "unlocked",
-            Self::Locked => "locked",
-            Self::Unknown => "unknown",
+            Self::Unlocked => Some("unlocked"),
+            Self::Locked => Some("locked"),
+            Self::Unknown => None,
         }
     }
 }
 
 impl RemoteAttachment {
-    const fn text(self) -> &'static str {
+    const fn known(self) -> Option<&'static str> {
         match self {
-            Self::Absent => "absent",
-            Self::Present => "present",
-            Self::Unknown => "unknown",
+            Self::Absent => Some("absent"),
+            Self::Present => Some("present"),
+            Self::Unknown => None,
         }
     }
 }
 
-/// The facts for one raw session read. Unprivileged reads are always `snapshot_only` and partial.
+/// The facts for one session read. What the platform reports is complete; what it cannot see is
+/// absent from the rule fields. A read that reports nothing is unavailable.
 #[must_use]
 pub fn classify(raw: RawSession) -> Observation {
     let state = InteractiveSessionState {
-        coverage: Coverage::SnapshotOnly,
+        coverage: if raw == RawSession::default() {
+            Coverage::Unavailable
+        } else {
+            Coverage::SnapshotOnly
+        },
         console_owner: match raw.on_console {
             Some(true) => ConsoleOwner::Candidate,
-            // Another session holds the console, or none does; without the privileged component the
-            // two cannot be told apart.
+            // Another session holds the console.
             Some(false) => ConsoleOwner::OtherHuman,
             None => ConsoleOwner::Unknown,
         },
@@ -132,119 +132,40 @@ pub fn classify(raw: RawSession) -> Observation {
         other_human_sessions: raw
             .other_human_sessions
             .map(|count| count.min(MAX_SESSIONS)),
-        component: ComponentStatus::Unsupported,
     };
-    observe(
-        &state,
+    let envelope = if state.coverage == Coverage::Unavailable {
         Envelope {
             permission: Permission::Granted,
-            health: Health::Degraded,
-            certainty: Certainty::Partial,
-        },
-    )
-}
-
-/// The facts from the privileged helper's report: every session is seen, so certainty is complete.
-#[must_use]
-pub fn classify_helper(report: &HelperSessions) -> Observation {
-    let own = report
-        .sessions
-        .iter()
-        .find(|session| session.id == report.own);
-    let console_owner = match report.console {
-        Some(console) if console == report.own => ConsoleOwner::Candidate,
-        Some(console) => {
-            let human = report
-                .sessions
-                .iter()
-                .any(|session| session.id == console && session.has_user);
-            if human {
-                ConsoleOwner::OtherHuman
-            } else {
-                ConsoleOwner::None
-            }
+            health: Health::Unsupported,
+            certainty: Certainty::Unknown,
         }
-        None => ConsoleOwner::None,
-    };
-    let lock = match own.and_then(|session| session.locked) {
-        Some(true) => Lock::Locked,
-        Some(false) => Lock::Unlocked,
-        None => Lock::Unknown,
-    };
-    let remote_attachment = match own {
-        Some(session) if session.remote => RemoteAttachment::Present,
-        Some(_) => RemoteAttachment::Absent,
-        None => RemoteAttachment::Unknown,
-    };
-    let others = report
-        .sessions
-        .iter()
-        .filter(|session| {
-            session.id != report.own && session.has_user && session.state != SessionState::Other
-        })
-        .count();
-    let state = InteractiveSessionState {
-        coverage: Coverage::FullLifecycle,
-        console_owner,
-        lock,
-        remote_attachment,
-        other_human_sessions: Some(
-            u64::try_from(others)
-                .unwrap_or(MAX_SESSIONS)
-                .min(MAX_SESSIONS),
-        ),
-        component: ComponentStatus::Running,
-    };
-    observe(
-        &state,
+    } else {
         Envelope {
             permission: Permission::Granted,
             health: Health::Healthy,
             certainty: Certainty::Complete,
-        },
-    )
-}
-
-/// The facts when the privileged component is needed but not serving.
-#[must_use]
-pub fn unavailable(component: ComponentStatus) -> Observation {
-    let state = InteractiveSessionState {
-        coverage: Coverage::Unavailable,
-        console_owner: ConsoleOwner::Unknown,
-        lock: Lock::Unknown,
-        remote_attachment: RemoteAttachment::Unknown,
-        other_human_sessions: None,
-        component,
+        }
     };
-    observe(
-        &state,
-        Envelope {
-            permission: component.permission(),
-            health: if component.expected_running() {
-                Health::Failed
-            } else {
-                Health::Unsupported
-            },
-            certainty: Certainty::Unknown,
-        },
-    )
+    observe(&state, envelope)
 }
 
 fn observe(state: &InteractiveSessionState, envelope: Envelope) -> Observation {
-    let symbol = |name: &str, value: &str| (id(name), FieldValue::Symbol(id(value)));
-    let mut fields: std::collections::BTreeMap<Identifier, FieldValue> = [
-        symbol(
-            "interactive_session.console_owner",
-            state.console_owner.text(),
-        ),
-        symbol("interactive_session.lock", state.lock.text()),
-        symbol(
-            "interactive_session.remote_attachment",
-            state.remote_attachment.text(),
-        ),
-    ]
-    .into_iter()
-    .collect();
+    let mut fields: std::collections::BTreeMap<Identifier, FieldValue> =
+        std::collections::BTreeMap::new();
+    let mut symbol = |name: &str, value: Option<&str>| {
+        if let Some(value) = value {
+            fields.insert(id(name), FieldValue::Symbol(id(value)));
+        }
+    };
+    symbol(
+        "interactive_session.console_owner",
+        state.console_owner.known(),
+    );
+    symbol("interactive_session.lock", state.lock.known());
+    symbol(
+        "interactive_session.remote_attachment",
+        state.remote_attachment.known(),
+    );
     if let Some(count) = state.other_human_sessions {
         fields.insert(
             id("interactive_session.other_human_sessions"),
@@ -302,8 +223,10 @@ pub fn descriptor() -> CapabilityDescriptor {
     }
 }
 
-/// `baseline.session`: the candidate owns the console, unlocked, with no remote attachment and no
-/// other human session. Unknown until full coverage exists.
+/// `baseline.session`: the candidate owns the console, unlocked, with no other human session.
+/// These are the fields every supported platform reports unprivileged. Remote attachment is not
+/// part of the baseline, because macOS cannot see screen sharing unprivileged; an exam that needs
+/// it adds its own rule on `interactive_session.remote_attachment`.
 ///
 /// # Panics
 /// Never: every identifier and count in it is a valid constant.
@@ -326,7 +249,6 @@ pub fn baseline_rule() -> Rule {
             conditions: vec![
                 symbol("interactive_session.console_owner", "candidate"),
                 symbol("interactive_session.lock", "unlocked"),
-                symbol("interactive_session.remote_attachment", "absent"),
                 Condition::Compare(Compare {
                     field: id("interactive_session.other_human_sessions"),
                     op: CompareOp::Eq,
@@ -349,33 +271,16 @@ fn read() -> RawSession {
     RawSession::default()
 }
 
-/// How often a disconnected helper is retried while the capability runs.
-const RECONNECT: Duration = Duration::from_secs(2);
-
-/// The interactive session source. With the privileged helper it follows the helper's session
-/// reports; without one it reconciles the unprivileged read every [`POLL_INTERVAL`].
+/// The interactive session source: reconciles the session state every [`POLL_INTERVAL`].
 pub struct InteractiveSessionSource {
     read: fn() -> RawSession,
     poller: Option<Poller>,
-    helper: Option<Arc<HelperClient>>,
-    listening: Option<u64>,
 }
 
 impl InteractiveSessionSource {
     #[must_use]
     pub fn new() -> Self {
-        Self::with_helper(None)
-    }
-
-    /// A source that reads the privileged helper when `helper` is set.
-    #[must_use]
-    pub fn with_helper(helper: Option<Arc<HelperClient>>) -> Self {
-        Self {
-            read,
-            poller: None,
-            helper,
-            listening: None,
-        }
+        Self { read, poller: None }
     }
 }
 
@@ -396,24 +301,6 @@ impl Source for InteractiveSessionSource {
         sink: Sink,
     ) -> Result<Observation, SourceError> {
         self.stop();
-        if let Some(helper) = self.helper.clone() {
-            let wake = Arc::clone(&sink);
-            self.listening = Some(helper.listen(move |change| {
-                if matches!(change, HelperChange::Sessions | HelperChange::Disconnected) {
-                    wake(SourceEvent::Changed);
-                }
-            }));
-            let first = helper.want(None, Some(true));
-            let retry = Arc::clone(&helper);
-            self.poller = Some(Poller::start(
-                "prctr-session-helper",
-                RECONNECT,
-                first,
-                move || retry.view().connected || retry.want(None, Some(true)),
-                sink,
-            )?);
-            return Ok(self.current());
-        }
         let read = self.read;
         self.poller = Some(Poller::start(
             "prctr-session",
@@ -426,24 +313,12 @@ impl Source for InteractiveSessionSource {
     }
 
     fn current(&mut self) -> Observation {
-        let Some(helper) = self.helper.as_ref() else {
-            return classify((self.read)());
-        };
-        let view = helper.view();
-        match view.sessions.as_ref() {
-            Some(report) if view.connected => classify_helper(report),
-            _ if view.connected => unavailable(ComponentStatus::Running),
-            _ => unavailable(helper.status()),
-        }
+        classify((self.read)())
     }
 
     fn stop(&mut self) {
         if let Some(poller) = self.poller.take() {
             poller.stop();
-        }
-        if let (Some(helper), Some(key)) = (self.helper.as_ref(), self.listening.take()) {
-            helper.unlisten(key);
-            let _ = helper.want(None, Some(false));
         }
     }
 }
@@ -471,25 +346,36 @@ mod tests {
         }
     }
 
-    fn policy() -> Policy {
+    fn policy(rules: Vec<Rule>) -> Policy {
         Policy {
             activations: vec![Activation {
                 capability: id(CAPABILITY),
                 categories: Vec::new(),
             }],
-            rules: vec![baseline_rule()],
+            rules,
         }
     }
 
-    fn baseline(raw: RawSession) -> (Status, Option<UnknownCause>) {
+    fn evaluate(rule: Rule, raw: RawSession) -> (Status, Option<UnknownCause>) {
         let mut engine = Engine::new(Registry {
             capabilities: vec![descriptor()],
             baseline_rules: vec![baseline_rule()],
             applications: Vec::new(),
         });
+        // The engine requires every policy to carry the registry's baseline rules. A rule under
+        // test that is the baseline itself is not added twice; its status is read from index 0.
+        let rule_id = rule.rule_id.clone();
+        let mut rules = vec![baseline_rule()];
+        if rule_id != baseline_rule().rule_id {
+            rules.push(rule);
+        }
+        let index = rules
+            .iter()
+            .position(|candidate| candidate.rule_id == rule_id)
+            .expect("the rule under test is in the policy");
         let (_, statuses) = engine
             .open_readiness(
-                policy(),
+                policy(rules),
                 vec![InitialState {
                     capability: id(CAPABILITY),
                     source_instance_id: OpaqueId::new("session00001").expect("valid"),
@@ -497,46 +383,97 @@ mod tests {
                 }],
                 0,
             )
-            .expect("baseline policy is valid");
-        (statuses[0].status, statuses[0].unknown_cause)
+            .expect("policy is valid");
+        (statuses[index].status, statuses[index].unknown_cause)
+    }
+
+    fn baseline(raw: RawSession) -> (Status, Option<UnknownCause>) {
+        evaluate(baseline_rule(), raw)
+    }
+
+    /// An exam's own rule on remote attachment.
+    fn no_remote() -> Rule {
+        Rule {
+            rule_id: id("session.no_remote"),
+            capability: id(CAPABILITY),
+            mode: Mode::Enforce,
+            phase: RulePhase::Both,
+            reason: id(REASON_SESSION),
+            requirement: Condition::Compare(Compare {
+                field: id("interactive_session.remote_attachment"),
+                op: CompareOp::Eq,
+                value: RuleValue::One(Scalar::Symbol(id("absent"))),
+            }),
+        }
     }
 
     #[test]
-    fn a_snapshot_never_meets_the_session_baseline_without_full_coverage() {
+    fn a_lone_unlocked_candidate_meets_the_session_baseline() {
+        assert_eq!(baseline(alone()), (Status::Met, None));
+        let observation = classify(alone());
+        assert_eq!(observation.state["coverage"], "snapshot_only");
+        assert_eq!(observation.envelope.certainty, Certainty::Complete);
+    }
+
+    #[test]
+    fn a_lock_another_session_or_another_console_owner_breaks_the_baseline() {
+        let mut locked = alone();
+        locked.locked = Some(true);
+        assert_eq!(baseline(locked).0, Status::NotMet);
+        let mut other = alone();
+        other.other_human_sessions = Some(1);
+        assert_eq!(baseline(other).0, Status::NotMet);
+        let mut away = alone();
+        away.on_console = Some(false);
+        assert_eq!(baseline(away).0, Status::NotMet);
+    }
+
+    #[test]
+    fn unseen_remote_attachment_leaves_the_baseline_met_and_its_own_rule_unknown() {
+        let mut macos = alone();
+        macos.remote = None;
+        assert_eq!(baseline(macos).0, Status::Met);
         assert_eq!(
-            baseline(alone()),
-            (Status::Unknown, Some(UnknownCause::Partial))
+            evaluate(no_remote(), macos),
+            (Status::Unknown, Some(UnknownCause::Unavailable))
         );
-        assert_eq!(classify(alone()).state["coverage"], "snapshot_only");
+        assert_eq!(classify(macos).state["remote_attachment"], "unknown");
+        let mut remote = alone();
+        remote.remote = Some(true);
+        assert_eq!(evaluate(no_remote(), remote).0, Status::NotMet);
     }
 
     #[test]
-    fn each_platform_unknown_is_reported_as_unknown_not_guessed() {
-        let observation = classify(RawSession::default());
-        assert_eq!(observation.state["console_owner"], "unknown");
+    fn each_platform_unknown_is_left_out_of_the_rule_fields_not_guessed() {
+        let mut partial = alone();
+        partial.locked = None;
+        partial.other_human_sessions = None;
+        let observation = classify(partial);
         assert_eq!(observation.state["lock"], "unknown");
-        assert_eq!(observation.state["remote_attachment"], "unknown");
         assert!(observation.state.get("other_human_sessions").is_none());
+        assert!(
+            !observation
+                .fields
+                .contains_key(&id("interactive_session.lock"))
+        );
         assert!(
             !observation
                 .fields
                 .contains_key(&id("interactive_session.other_human_sessions")),
             "a missing count is an unavailable field, never zero"
         );
+        assert_eq!(
+            baseline(partial),
+            (Status::Unknown, Some(UnknownCause::Unavailable))
+        );
     }
 
     #[test]
-    fn a_lock_a_remote_session_and_another_user_are_each_reported() {
-        let observation = classify(RawSession {
-            on_console: Some(false),
-            locked: Some(true),
-            remote: Some(true),
-            other_human_sessions: Some(2),
-        });
-        assert_eq!(observation.state["console_owner"], "other_human");
-        assert_eq!(observation.state["lock"], "locked");
-        assert_eq!(observation.state["remote_attachment"], "present");
-        assert_eq!(observation.state["other_human_sessions"], 2);
+    fn a_read_that_reports_nothing_is_unavailable() {
+        let observation = classify(RawSession::default());
+        assert_eq!(observation.state["coverage"], "unavailable");
+        assert_eq!(observation.envelope.health, Health::Unsupported);
+        assert_eq!(baseline(RawSession::default()).0, Status::Unknown);
     }
 
     #[test]
@@ -546,7 +483,8 @@ mod tests {
             baseline_rules: vec![baseline_rule()],
             applications: Vec::new(),
         };
-        assert!(ValidPolicy::new(policy(), &registry).is_ok());
+        assert!(ValidPolicy::new(policy(vec![baseline_rule()]), &registry).is_ok());
+        assert!(ValidPolicy::new(policy(vec![baseline_rule(), no_remote()]), &registry).is_ok());
     }
 
     #[test]
@@ -558,78 +496,6 @@ mod tests {
             &classify(alone()),
             &classify(locked),
         );
-    }
-
-    fn report(
-        console: Option<u64>,
-        sessions: &[(u64, bool, bool, Option<bool>)],
-    ) -> HelperSessions {
-        use prctr_protocol::helper::HelperSession;
-        let count = |value: u64| Count::new(value).expect("small");
-        HelperSessions {
-            console: console.map(count),
-            own: count(1),
-            sessions: sessions
-                .iter()
-                .map(|(id, has_user, remote, locked)| HelperSession {
-                    id: count(*id),
-                    state: SessionState::Active,
-                    has_user: *has_user,
-                    remote: *remote,
-                    locked: *locked,
-                })
-                .collect(),
-        }
-    }
-
-    fn baseline_of(observation: Observation) -> (Status, Option<UnknownCause>) {
-        let mut engine = Engine::new(Registry {
-            capabilities: vec![descriptor()],
-            baseline_rules: vec![baseline_rule()],
-            applications: Vec::new(),
-        });
-        let (_, statuses) = engine
-            .open_readiness(
-                policy(),
-                vec![InitialState {
-                    capability: id(CAPABILITY),
-                    source_instance_id: OpaqueId::new("session00001").expect("valid"),
-                    observation,
-                }],
-                0,
-            )
-            .expect("baseline policy is valid");
-        (statuses[0].status, statuses[0].unknown_cause)
-    }
-
-    #[test]
-    fn the_helpers_full_report_meets_the_session_baseline_when_alone() {
-        let alone = classify_helper(&report(Some(1), &[(1, true, false, Some(false))]));
-        assert_eq!(alone.state["coverage"], "full_lifecycle");
-        assert_eq!(baseline_of(alone), (Status::Met, None));
-    }
-
-    #[test]
-    fn another_person_on_the_console_a_remote_session_or_a_second_login_breaks_the_baseline() {
-        let other_console = classify_helper(&report(
-            Some(2),
-            &[(1, true, false, Some(false)), (2, true, false, Some(false))],
-        ));
-        assert_eq!(other_console.state["console_owner"], "other_human");
-        assert_eq!(other_console.state["other_human_sessions"], 1);
-        assert_eq!(baseline_of(other_console).0, Status::NotMet);
-        let remote = classify_helper(&report(None, &[(1, true, true, Some(false))]));
-        assert_eq!(remote.state["remote_attachment"], "present");
-        assert_eq!(remote.state["console_owner"], "none");
-        assert_eq!(baseline_of(remote).0, Status::NotMet);
-    }
-
-    #[test]
-    fn a_missing_component_leaves_the_baseline_unknown() {
-        let missing = unavailable(ComponentStatus::NotInstalled);
-        assert_eq!(missing.state["component"], "not_installed");
-        assert_eq!(missing.envelope.permission, Permission::Unavailable);
-        assert_eq!(baseline_of(missing).0, Status::Unknown);
     }
 
     /// Real OS: the session of the process running the tests is readable and consistent.
@@ -645,5 +511,7 @@ mod tests {
         );
         assert!(raw.other_human_sessions.is_some(), "utmpx was read");
         assert_eq!(read(), read(), "two consecutive reads agree");
+        // The console owner and other-session fields depend on the machine, so the baseline's
+        // status is not asserted here; the unit tests above cover its logic.
     }
 }

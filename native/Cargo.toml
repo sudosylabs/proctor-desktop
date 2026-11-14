@@ -5,7 +5,6 @@ members = [
   "crates/prctr-core",
   "crates/prctr-xtask",
   "crates/prctr-agent",
-  "crates/prctr-helper",
   "crates/prctr-os",
   "crates/prctr-capabilities",
   "crates/prctr-recorder",

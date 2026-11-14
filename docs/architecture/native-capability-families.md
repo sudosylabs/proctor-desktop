@@ -7,10 +7,10 @@ privacy limits. The [native capability architecture](./native-capabilities.md) o
 model, lifecycle and protocol; [native rules](./native-rules.md) owns how rules read these facts.
 
 Architecture acceptance is not an implementation or support claim. A capability is supported only
-when the exact packaged application, agent, privileged component and OS/architecture tuple appears
+when the exact packaged application, agent and OS/architecture tuple appears
 in the signed release capability matrix. Windows x64 and macOS arm64/x64 are the initial
 certification targets; on them every capability is implemented to the **strongest coverage the OS
-offers** through public APIs and the privileged components. Linux keeps the same interfaces and may
+offers** through public, unprivileged APIs. Linux keeps the same interfaces and may
 report a capability as unsupported.
 
 Every capability states one coverage claim per target:
@@ -139,20 +139,21 @@ owners are never read.
 **Purpose.** The candidate's local session must be the only human session, unlocked, and not
 viewed or controlled remotely. It also holds the remote-viewing fact.
 
-**Unprivileged coverage.** Explicit unprivileged sources report `snapshot_only` coverage with
-partial certainty. A configured helper that is missing or unavailable makes the capability
-unavailable. Neither case can establish `baseline.session` (console owned by the candidate,
-unlocked, no remote attachment, no other human session).
-What each platform can read without privilege:
+**Coverage.** The session is polled every second. Each field the platform reports is complete; a
+field it cannot read is reported `unknown` and left out of the rule fields, so only a rule naming
+that field is unknown. The always-on `baseline.session` rule (console owned by the candidate,
+unlocked, no other human session) uses only fields every target reads, so it holds everywhere;
+remote attachment is not part of it. What each platform reads:
 
 - **macOS:** console and lock from the window-server session; other users from `utmpx`; remote
-  attachment unknown.
-- **Windows:** console, lock and remote use from WTS; other active or disconnected human sessions.
+  attachment unknown (screen sharing needs privilege).
+- **Windows:** console, lock and remote use (RDP, `SM_REMOTESESSION`) from WTS; other active or
+  disconnected human sessions.
 - **Linux:** logind session files; lock unknown.
 
 A count the platform cannot read is left out, never reported as zero.
 
-**State.** `coverage` (full_lifecycle, snapshot_only, unavailable), `certainty`, `console_owner`
+**State.** `coverage` (snapshot_only, unavailable), `certainty`, `console_owner`
 (candidate, other_human, none, unknown), `lock` (unlocked, locked, unknown), `remote_attachment`
 (absent, present, unknown: RDP into this session, screen sharing, remote management),
 `other_human_sessions` (count, active or disconnected).
@@ -162,17 +163,13 @@ interruptions of every capability; remote attachment is a fact of this capabilit
 
 **Platforms.**
 
-- Windows: the privileged service enumerates every session and receives logon, lock, remote and
-  console changes; only `WTSActive` is console ownership. Without it, the current session's
-  notifications and remote-session flag give `snapshot_only`.
-- macOS: the root Endpoint Security launchd daemon observes login-window login/logout/lock/unlock
-  and screen-sharing attach/detach. `IOConsoleUsers` and `IOConsoleLocked` give initial console
-  state; established TCP on local ports 5900/3283 supplies the initial screen-sharing signal.
-  An unassignable remote attachment or unreadable initial state remains unavailable. SSH-session
-  expansion and privileged target-machine certification remain outstanding.
+- Windows: WTS for the current session's console ownership, lock and `SM_REMOTESESSION`, plus a
+  session enumeration for other active or disconnected human sessions.
+- macOS: the window-server session dictionary for console and lock, and `utmpx` for other users.
+  Screen sharing is not observable unprivileged, so remote attachment is `unknown`.
 - Linux: logind sessions; partial.
 
-**Permission.** The privileged components' approval.
+**Permission.** None; every read is unprivileged.
 
 **Never leaves the agent.** Usernames, account IDs, SIDs, hostnames, remote addresses.
 
@@ -186,7 +183,7 @@ outside this capability.
 
 **Two layers.** The inventory (instance by process number plus start time, verified identity,
 catalog match) exists **only inside the agent**. The fact that leaves it is the match state:
-`coverage` (full_lifecycle, snapshot_only, unavailable), `checking` (new processes whose identity is
+`coverage` (snapshot_only, unavailable), `checking` (new processes whose identity is
 still being verified), and per application rule its `rule_id`, `matched` (the condition is violated)
 and, for blocklist rules, the `catalog_app_ids` found. Allowlist matches carry no IDs, names or
 counts. The capability has no rule fields: rules on it are application conditions.
@@ -210,17 +207,15 @@ be read; an unidentifiable process never matches a blocklist. Proctor is the age
 its own identity, so an allowed editor that launches a shell is matched on the shell. Paths and
 process names are never identity.
 
-**Platforms.** Explicit unprivileged reads use one-second snapshots with `snapshot_only` coverage
-and partial certainty. A missing or unavailable configured helper makes the capability unavailable.
-Application rules remain unknown until the privileged components provide the full lifecycle.
+**Platforms.** The agent's session is polled every second; each completed snapshot classifies every
+process it sees, so its matches are complete, and a read that returns nothing is unavailable.
 
 - **macOS:** `proc_listallpids` for the agent's account; identity from the running code's signature
   (signing identifier, Team ID, and whether it satisfies `anchor apple`), verified once per
-  instance. The privileged daemon implements ES exec, fork and exit notifications; full coverage
-  still requires privileged target-machine proof.
-- **Windows:** a Toolhelp snapshot of the agent's session. The unprivileged agent cannot verify
-  catalog-signed system files, so identity is unavailable until the privileged service, which opens
-  each image itself, provides it; allowlists are violated and blocklists match nothing until then.
+  instance.
+- **Windows:** a Toolhelp snapshot of the agent's session; identity by verifying each image's
+  Authenticode or catalog signature and reading its original file name, cached once per instance.
+  A process whose image cannot be opened (another session, SYSTEM) is unidentified.
 - **Linux:** `/proc` for the agent's account; identity is the executable's file name, a weak stand-in
   because Linux has no code identity.
 

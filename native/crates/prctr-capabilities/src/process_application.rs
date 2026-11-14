@@ -8,18 +8,15 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
-use prctr_core::{
-    AppMatches, CapabilityDescriptor, Observation, Sink, Source, SourceError, SourceEvent,
-};
+use prctr_core::{AppMatches, CapabilityDescriptor, Observation, Sink, Source, SourceError};
 use prctr_os::{RawIdentity, RawProcess};
-use prctr_protocol::facts::{Certainty, Envelope, Health};
+use prctr_protocol::facts::{Certainty, Envelope, Health, Permission};
 use prctr_protocol::rules::{Condition, Rule};
 use prctr_protocol::scalars::Identifier;
 use schemars::JsonSchema;
 use serde::Serialize;
 
 use crate::catalog::{self, Classified};
-use crate::helper::{ComponentStatus, HelperChange, HelperClient, raw_identity};
 use crate::poller::Poller;
 
 pub const CAPABILITY: &str = "process_application";
@@ -34,9 +31,8 @@ const MAX_ANCESTRY: usize = 64;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Coverage {
-    /// Every process start and exit is seen (the privileged components).
-    FullLifecycle,
-    /// Periodic snapshots: a short-lived process can come and go unseen.
+    /// Read every [`POLL_INTERVAL`]: a process shorter than one interval can come and go unseen,
+    /// but each read classifies every process it sees, so its matches are complete.
     SnapshotOnly,
     Unavailable,
 }
@@ -58,8 +54,6 @@ pub struct ProcessState {
     /// New processes whose identity is still being verified.
     pub checking: u64,
     pub rule_matches: Vec<RuleMatch>,
-    /// The privileged component this capability needs on Windows and macOS.
-    pub component: ComponentStatus,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
@@ -183,47 +177,6 @@ pub fn own_processes(processes: &[RawProcess], root: u32) -> BTreeSet<u32> {
         .collect()
 }
 
-/// Every process the helper reports, classified, and how many still await identity. Proctor's own
-/// processes are `root` (the agent's parent) and its descendants by parent instance.
-#[must_use]
-pub fn helper_seen(
-    processes: &BTreeMap<u64, prctr_protocol::helper::HelperProcess>,
-    root: u32,
-) -> (Vec<Seen>, u64) {
-    let roots: BTreeSet<u64> = processes
-        .values()
-        .filter(|process| process.pid.get() == u64::from(root))
-        .map(|process| process.instance.get())
-        .collect();
-    let own = |mut instance: u64| {
-        for _ in 0..MAX_ANCESTRY {
-            if roots.contains(&instance) {
-                return true;
-            }
-            match processes.get(&instance).and_then(|process| process.parent) {
-                Some(parent) if parent.get() != instance => instance = parent.get(),
-                _ => return false,
-            }
-        }
-        false
-    };
-    let mut checking = 0_u64;
-    let seen = processes
-        .values()
-        .filter_map(|process| {
-            let Some(raw) = raw_identity(&process.identity) else {
-                checking += 1;
-                return None;
-            };
-            Some(Seen {
-                own: own(process.instance.get()),
-                classified: catalog::classify(&raw),
-            })
-        })
-        .collect();
-    (seen, checking)
-}
-
 /// The device-only inventory: identities cached per process instance, so each is verified once.
 #[derive(Debug, Default)]
 pub struct Inventory {
@@ -301,24 +254,6 @@ mod platform {
     }
 }
 
-/// The process that started the agent, among the helper's processes.
-#[cfg(unix)]
-fn helper_root(_processes: &BTreeMap<u64, prctr_protocol::helper::HelperProcess>) -> u32 {
-    std::os::unix::process::parent_id()
-}
-
-#[cfg(not(unix))]
-fn helper_root(processes: &BTreeMap<u64, prctr_protocol::helper::HelperProcess>) -> u32 {
-    let own = u64::from(std::process::id());
-    processes
-        .values()
-        .find(|process| process.pid.get() == own)
-        .and_then(|process| process.parent)
-        .and_then(|parent| processes.get(&parent.get()))
-        .and_then(|parent| u32::try_from(parent.pid.get()).ok())
-        .unwrap_or(std::process::id())
-}
-
 /// The matcher's whole input: the rules and the shared identity cache.
 #[derive(Debug, Default)]
 pub struct Matcher {
@@ -337,16 +272,6 @@ impl Matcher {
             .collect();
     }
 
-    /// The rule matches over the helper's processes, and how many await identity.
-    #[must_use]
-    pub fn match_helper(
-        &self,
-        processes: &BTreeMap<u64, prctr_protocol::helper::HelperProcess>,
-    ) -> (Vec<RuleMatch>, u64) {
-        let (seen, checking) = helper_seen(processes, helper_root(processes));
-        (match_rules(&self.rules, &seen), checking)
-    }
-
     /// The rule matches now, or `None` when no process list could be read.
     pub fn read(&mut self) -> Option<Vec<RuleMatch>> {
         let processes = platform::processes()?;
@@ -363,20 +288,9 @@ pub struct Tracking {
 }
 
 impl Tracking {
-    /// The facts for one read. Without the privileged components every read is a snapshot, so
-    /// certainty is partial and application rules are unknown.
+    /// The facts for one read. A completed snapshot classifies every process it sees, so its
+    /// matches are complete; a read that returns nothing is unavailable.
     pub fn classify(&mut self, matches: Option<Vec<RuleMatch>>, coverage: Coverage) -> Observation {
-        self.classify_with(matches, coverage, 0, ComponentStatus::Unsupported)
-    }
-
-    /// The facts for one read with the helper's `checking` count and component status.
-    pub fn classify_with(
-        &mut self,
-        matches: Option<Vec<RuleMatch>>,
-        coverage: Coverage,
-        checking: u64,
-        component: ComponentStatus,
-    ) -> Observation {
         let coverage = if matches.is_some() {
             coverage
         } else {
@@ -393,15 +307,11 @@ impl Tracking {
             Vec::new()
         };
         let (health, certainty) = match coverage {
-            Coverage::FullLifecycle => (Health::Healthy, Certainty::Complete),
-            Coverage::SnapshotOnly => (Health::Degraded, Certainty::Partial),
-            Coverage::Unavailable if component.expected_running() => {
-                (Health::Failed, Certainty::Unknown)
-            }
+            Coverage::SnapshotOnly => (Health::Healthy, Certainty::Complete),
             Coverage::Unavailable => (Health::Unsupported, Certainty::Unknown),
         };
         let apps = (coverage != Coverage::Unavailable).then(|| AppMatches {
-            checking,
+            checking: 0,
             violated: rule_matches
                 .iter()
                 .filter_map(|rule| {
@@ -413,18 +323,17 @@ impl Tracking {
         });
         let state = ProcessState {
             coverage,
-            checking,
+            checking: 0,
             rule_matches,
-            component,
         };
         Observation {
             envelope: Envelope {
-                permission: component.permission(),
+                permission: Permission::Granted,
                 health,
                 certainty,
             },
             state: serde_json::to_value(&state).unwrap_or_default(),
-            summary: serde_json::to_value(ProcessSummary { checking }).unwrap_or_default(),
+            summary: serde_json::to_value(ProcessSummary { checking: 0 }).unwrap_or_default(),
             fields: BTreeMap::new(),
             apps,
             changes,
@@ -432,34 +341,20 @@ impl Tracking {
     }
 }
 
-/// The process and application source. With the privileged helper it follows every process start
-/// and exit (full lifecycle); without a helper on this platform it polls snapshots.
+/// The process and application source: the agent polls snapshots every [`POLL_INTERVAL`].
 pub struct ProcessSource {
     matcher: Arc<Mutex<Matcher>>,
     tracking: Tracking,
     poller: Option<Poller>,
-    helper: Option<Arc<HelperClient>>,
-    listening: Option<u64>,
 }
-
-/// How often a disconnected helper is retried while the capability runs.
-const RECONNECT: Duration = Duration::from_secs(2);
 
 impl ProcessSource {
     #[must_use]
     pub fn new() -> Self {
-        Self::with_helper(None)
-    }
-
-    /// A source that reads the privileged helper when `helper` is set.
-    #[must_use]
-    pub fn with_helper(helper: Option<Arc<HelperClient>>) -> Self {
         Self {
             matcher: Arc::new(Mutex::new(Matcher::default())),
             tracking: Tracking::default(),
             poller: None,
-            helper,
-            listening: None,
         }
     }
 
@@ -468,25 +363,6 @@ impl ProcessSource {
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
             .read()
-    }
-
-    fn start_helper(&mut self, helper: &Arc<HelperClient>, sink: Sink) -> Result<(), SourceError> {
-        let wake = Arc::clone(&sink);
-        self.listening = Some(helper.listen(move |change| {
-            if matches!(change, HelperChange::Processes | HelperChange::Disconnected) {
-                wake(SourceEvent::Changed);
-            }
-        }));
-        let first = helper.want(Some(true), None);
-        let retry = Arc::clone(helper);
-        self.poller = Some(Poller::start(
-            "prctr-process-helper",
-            RECONNECT,
-            first,
-            move || retry.view().connected || retry.want(Some(true), None),
-            sink,
-        )?);
-        Ok(())
     }
 }
 
@@ -515,10 +391,6 @@ impl Source for ProcessSource {
     ) -> Result<Observation, SourceError> {
         self.stop();
         self.tracking = Tracking::default();
-        if let Some(helper) = self.helper.clone() {
-            self.start_helper(&helper, sink)?;
-            return Ok(self.current());
-        }
         let matcher = Arc::clone(&self.matcher);
         let first = Self::read(&matcher);
         self.poller = Some(Poller::start(
@@ -532,42 +404,13 @@ impl Source for ProcessSource {
     }
 
     fn current(&mut self) -> Observation {
-        let Some(helper) = self.helper.as_ref() else {
-            let matches = Self::read(&self.matcher);
-            return self.tracking.classify(matches, Coverage::SnapshotOnly);
-        };
-        let view = helper.view();
-        let component = if view.connected {
-            ComponentStatus::Running
-        } else {
-            helper.status()
-        };
-        let read = view.processes.as_ref().map(|processes| {
-            self.matcher
-                .lock()
-                .unwrap_or_else(PoisonError::into_inner)
-                .match_helper(processes)
-        });
-        match read {
-            Some((matches, checking)) => self.tracking.classify_with(
-                Some(matches),
-                Coverage::FullLifecycle,
-                checking,
-                component,
-            ),
-            None => self
-                .tracking
-                .classify_with(None, Coverage::Unavailable, 0, component),
-        }
+        let matches = Self::read(&self.matcher);
+        self.tracking.classify(matches, Coverage::SnapshotOnly)
     }
 
     fn stop(&mut self) {
         if let Some(poller) = self.poller.take() {
             poller.stop();
-        }
-        if let (Some(helper), Some(key)) = (self.helper.as_ref(), self.listening.take()) {
-            helper.unlisten(key);
-            let _ = helper.want(Some(false), None);
         }
     }
 }

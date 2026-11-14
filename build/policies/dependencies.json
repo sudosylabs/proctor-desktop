@@ -4,13 +4,9 @@
     "(MIT OR Apache-2.0) AND Unicode-3.0",
     "(MIT OR CC0-1.0)",
     "(Unlicense OR Apache-2.0)",
-    "0BSD",
-    "0BSD OR Apache-2.0",
     "Apache-2.0",
     "Apache-2.0 OR MIT",
-    "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
     "BSD-2-Clause",
-    "BSD-2-Clause OR Apache-2.0 OR MIT",
     "BSD-2-Clause OR MIT OR Apache-2.0",
     "BSD-3-Clause",
     "BlueOak-1.0.0",
@@ -894,7 +890,6 @@
             "Win32_Security_WinTrust",
             "Win32_Security_Cryptography_Catalog",
             "Win32_Security_Cryptography_Sip",
-            "Win32_System_Diagnostics_Etw",
             "Win32_Graphics_Direct3D",
             "Win32_Graphics_Direct3D11",
             "Win32_Graphics_Dwm",
@@ -913,8 +908,6 @@
             "Win32_Security_Cryptography",
             "Win32_Storage_FileSystem",
             "Win32_System_Com",
-            "Win32_System_Console",
-            "Win32_System_Pipes",
             "Win32_System_Com_StructuredStorage",
             "Win32_System_DataExchange",
             "Win32_System_Diagnostics_ToolHelp",
@@ -938,129 +931,12 @@
           "targetScope": "cfg(target_os = \"windows\")"
         }
       ],
-      "processes": ["native-agent", "native-helper"],
+      "processes": ["native-agent"],
       "networkBehavior": "None; display configuration queries are process-local.",
-      "nativeBehavior": "Links user32, setupapi, kernel32, advapi32, winspool, d3d11, dxgi and mfplat for display, device, storage, print-job, media and screen-capture queries; storage devices are opened with no data access; unsafe calls are confined to prctr-os with documented safety. In the privileged helper: Authenticode and catalog signature verification (WinTrust, CryptCATAdmin), the ETW session's loss counters, every session's WTS state, and named-pipe client and server process IDs for peer checks.",
+      "nativeBehavior": "Links user32, setupapi, kernel32, advapi32, winspool, d3d11, dxgi and mfplat for display, device, storage, print-job, media and screen-capture queries; storage devices are opened with no data access; unsafe calls are confined to prctr-os with documented safety.",
       "transitiveRisk": "Adds windows-core, windows-link, windows-result, windows-strings and their companions on Windows only; exact versions are locked and license checked.",
       "bundleTreatment": "external-native",
       "localAlternative": "windows-sys gives raw declarations only; the windows crate adds typed results and safe defaults for the structures the agent reads.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "ferrisetw",
-      "version": "1.2.0",
-      "kind": "production",
-      "purpose": "Consume Microsoft-Windows-Kernel-Process start and stop events in the privileged Windows service, so no process falls between snapshots.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/ferrisetw/1.2.0",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "allowed",
-      "declarations": [
-        {
-          "manifest": "native/crates/prctr-helper/Cargo.toml",
-          "alias": "ferrisetw",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"windows\")"
-        }
-      ],
-      "processes": ["native-helper"],
-      "networkBehavior": "None.",
-      "nativeBehavior": "Starts and stops one named real-time ETW session in the service; needs the service's SYSTEM token.",
-      "transitiveRisk": "Adds windows 0.57 (a second windows crate version), widestring, num-traits, num-derive, bitflags, once_cell, rand and log; all MIT or Apache-2.0.",
-      "bundleTreatment": "external-native",
-      "localAlternative": "Hand-written ETW consumer FFI; an established safe wrapper keeps raw ETW handles and callbacks out of Proctor code.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "interprocess",
-      "version": "2.4.8",
-      "kind": "production",
-      "purpose": "The local named pipe between the agent and the privileged Windows service, with a security descriptor and client/server process IDs for peer checks.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/interprocess/2.4.8",
-      "license": "0BSD OR Apache-2.0",
-      "lifecycleScripts": "allowed",
-      "declarations": [
-        {
-          "manifest": "native/crates/prctr-helper/Cargo.toml",
-          "alias": "interprocess",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"windows\")"
-        },
-        {
-          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
-          "alias": "interprocess",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"windows\")"
-        },
-        {
-          "manifest": "native/crates/prctr-os/Cargo.toml",
-          "alias": "interprocess",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"windows\")"
-        }
-      ],
-      "processes": ["native-helper", "native-agent"],
-      "networkBehavior": "None; a local named pipe only.",
-      "nativeBehavior": "Creates and connects local named pipes; remote clients are refused.",
-      "transitiveRisk": "Adds windows-sys, widestring, recvmsg and doctest-file; all permissively licensed.",
-      "bundleTreatment": "external-native",
-      "localAlternative": "Hand-written overlapped named-pipe FFI; the crate supplies split concurrent halves and security descriptors.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "windows-service",
-      "version": "0.8.1",
-      "kind": "production",
-      "purpose": "The privileged Windows service's SCM entry point and status, and the agent's query of the service's process ID and state.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/windows-service/0.8.1",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "allowed",
-      "declarations": [
-        {
-          "manifest": "native/crates/prctr-helper/Cargo.toml",
-          "alias": "windows-service",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"windows\")"
-        },
-        {
-          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
-          "alias": "windows-service",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"windows\")"
-        }
-      ],
-      "processes": ["native-helper", "native-agent"],
-      "networkBehavior": "None.",
-      "nativeBehavior": "Registers the service control handler and reports status to the Service Control Manager.",
-      "transitiveRisk": "Adds windows-sys, bitflags and widestring; all MIT or Apache-2.0.",
-      "bundleTreatment": "external-native",
-      "localAlternative": "Hand-written SCM dispatcher FFI with process-global state; the crate is the maintained standard.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
     },
@@ -1763,96 +1639,6 @@
       "source": "https://www.npmjs.com/package/@electron-forge/cli",
       "license": "MIT",
       "lifecycleScripts": "none"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "endpoint-sec-sys",
-      "version": "0.6.2",
-      "kind": "production",
-      "purpose": "Public Endpoint Security NOTIFY event bindings inside the root helper.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/endpoint-sec-sys/0.6.2",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "none",
-      "declarations": [
-        {
-          "manifest": "native/crates/prctr-os/Cargo.toml",
-          "alias": "endpoint-sec-sys",
-          "kind": "production",
-          "features": ["macos_13_0_0", "objc2"],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"macos\")"
-        }
-      ],
-      "processes": ["native-helper", "native-agent"],
-      "networkBehavior": "None.",
-      "nativeBehavior": "Links EndpointSecurity; entitlement and Full Disk Access are required. Only passive NOTIFY subscriptions. Linked into the agent as well, through prctr-os, but only the helper daemon creates an Endpoint Security client; the agent has no entitlement and never calls it.",
-      "transitiveRisk": "Reuses block2/libc/objc2 and adds mach2 0.7.0 (BSD-2-Clause OR MIT OR Apache-2.0); no build script, network calls or runtime downloads.",
-      "bundleTreatment": "external-native",
-      "localAlternative": "Maintained versioned ES ABI bindings avoid hand-written unions and callback layouts.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "objc2-service-management",
-      "version": "0.3.2",
-      "kind": "production",
-      "purpose": "Setup-only launchd daemon registration and approval status through SMAppService.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/objc2-service-management/0.3.2",
-      "license": "Zlib OR Apache-2.0 OR MIT",
-      "lifecycleScripts": "none",
-      "declarations": [
-        {
-          "manifest": "native/crates/prctr-os/Cargo.toml",
-          "alias": "objc2-service-management",
-          "kind": "production",
-          "features": ["SMAppService", "objc2", "objc2-foundation", "std"],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"macos\")"
-        }
-      ],
-      "processes": ["native-helper", "native-agent"],
-      "networkBehavior": "None.",
-      "nativeBehavior": "Links ServiceManagement; registration occurs only on an explicit one-shot setup command.",
-      "transitiveRisk": "Reuses existing objc2/Foundation graph; no build script or network calls.",
-      "bundleTreatment": "external-native",
-      "localAlternative": "Public typed framework bindings avoid hand-written Objective-C messaging.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "widestring",
-      "version": "1.2.1",
-      "kind": "production",
-      "purpose": "Create the fixed pipe security descriptor string for interprocess.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/widestring/1.2.1",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "none",
-      "declarations": [
-        {
-          "manifest": "native/crates/prctr-helper/Cargo.toml",
-          "alias": "widestring",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os = \"windows\")"
-        }
-      ],
-      "processes": ["native-helper"],
-      "networkBehavior": "None.",
-      "nativeBehavior": "UTF-16 allocation and validation only.",
-      "transitiveRisk": "Already locked transitively; no network, native code or build scripts.",
-      "bundleTreatment": "external-native",
-      "localAlternative": "Required string type for the admitted interprocess descriptor API.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
     }
   ]
 }

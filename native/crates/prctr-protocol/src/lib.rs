@@ -5,7 +5,6 @@
 
 pub mod facts;
 pub mod frame;
-pub mod helper;
 pub mod messages;
 pub mod recording;
 pub mod rules;
@@ -27,23 +26,6 @@ pub fn agent_protocol_schema() -> serde_json::Value {
         "$id": "prctr-agent-protocol.schema.json",
         "title": "Proctor native agent protocol",
         "oneOf": [main, agent],
-        "$defs": definitions,
-    })
-}
-
-/// The JSON Schema of the agent ↔ privileged helper protocol. Only Rust reads it; it is committed
-/// so its digest, which both sides check at the handshake, changes visibly.
-#[must_use]
-pub fn helper_protocol_schema() -> serde_json::Value {
-    let mut generator = SchemaSettings::draft2020_12().into_generator();
-    let agent = generator.subschema_for::<helper::AgentToHelper>();
-    let helper = generator.subschema_for::<helper::HelperToAgent>();
-    let definitions = generator.take_definitions(true);
-    serde_json::json!({
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$id": "prctr-helper-protocol.schema.json",
-        "title": "Proctor native helper protocol",
-        "oneOf": [agent, helper],
         "$defs": definitions,
     })
 }

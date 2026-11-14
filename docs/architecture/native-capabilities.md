@@ -18,16 +18,15 @@ compliant: an enforce rule that cannot be evaluated contains. Administrator/root
 compromise and external hardware remain outside the guaranteed threat boundary.
 
 Secure candidate mode targets declared Windows and macOS versions and architectures, where every
-capability is implemented to the strongest coverage the OS offers through public APIs and the
-privileged components below. Linux keeps the same interfaces and may report a capability as
-unsupported. Untested combinations fail preflight; there is no silently weakened mode. Exact
+capability is implemented to the strongest coverage the OS offers through public, unprivileged
+APIs. Linux keeps the same interfaces and may report a capability as unsupported. Untested combinations fail preflight; there is no silently weakened mode. Exact
 version ranges belong to the signed release capability matrix.
 
 **Implementation status.** This architecture replaced an earlier design built on an Electron
-utility process, a Node-API bridge and schema-generated Rust; that code has been removed. Electron
-main's exam participation service supervises the agent, delivers its records and passes it host
-events (`platform/native/electron-main/candidateHostEvents.ts`); its production entry is not
-composed yet. A capability counts as implemented on a platform only when its real-OS
+utility process, a Node-API bridge and schema-generated Rust; that code has been removed. Every capability reads unprivileged, polling where the OS offers no event stream.
+Electron main's exam participation service supervises the agent, delivers its records and passes
+it host events (`platform/native/electron-main/candidateHostEvents.ts`); its production entry is
+not composed yet. A capability counts as implemented on a platform only when its real-OS
 tests prove each fact there.
 
 Implemented in source:
@@ -48,18 +47,21 @@ Known limits:
 
 - Intel Macs report external displays unclassified (partial certainty); Apple silicon classifies
   them by framebuffer transport.
-- A missing or unavailable configured helper makes its dependent capabilities unavailable, so
-  `baseline.session` and application rules stay unknown. Explicit unprivileged sources retain
-  `snapshot_only` coverage; they cannot establish the stronger claim.
-- On Windows, process identity requires the privileged service to verify images; failed trust or
-  resource reads remain unavailable.
+- Process and interactive-session reads are unprivileged polls: a change shorter than one poll
+  interval can go unseen. A field the OS reports is complete; a field it cannot see unprivileged is
+  reported `unknown`, so only a rule naming that field is unknown — not the whole capability.
+- macOS cannot see screen sharing unprivileged, so `interactive_session.remote_attachment` is
+  `unknown` on macOS; the always-on `baseline.session` rule does not require it. Windows reports RDP
+  through `SM_REMOTESESSION`.
+- On Windows, a process whose image cannot be opened (another session, SYSTEM) has no verified
+  identity and classifies as unidentified.
 - Reads still to be proved on certification rigs: Sidecar, AirPlay and DisplayLink displays; the
   macOS `utun` heuristic; Windows camera use from the ConsentStore; phones over PTP/MTP.
 
-The privileged helper core, Windows service/ETW/WTS adapters, macOS root launchd/Endpoint Security
-adapters and authenticated agent links are implemented in source. Privileged target-machine and
-packaged conformance remain unverified; this source status does not establish full coverage.
-Setup layout and executable checks live in the [helper guide](../../native/crates/prctr-helper/README.md).
+A privileged helper for full process and interactive-session coverage (a Windows service and a
+macOS Endpoint Security daemon) was built and then removed on 2026-11-14 to ship without Apple's
+Endpoint Security entitlement or candidate admin rights; it remains in git history (commit
+`3a5c360`) for a later optional upgrade.
 
 ## Processes and ownership
 
@@ -71,10 +73,6 @@ Electron main ──────────────── server: signed fa
         │  one private pipe, length-prefixed JSON frames
         ▼
 native agent (unprivileged Rust process inside the app bundle)
-        │  helper messages
-        ▼
-privileged components: macOS root Endpoint Security launchd daemon,
-                       Windows service (ETW/WTS)
 ```
 
 - **Native agent.** One unprivileged Rust binary that Electron main spawns **on demand**: while a
@@ -85,16 +83,8 @@ privileged components: macOS root Endpoint Security launchd daemon,
   owns permission requests and Proctor-owned effects (private clipboard, print-command denial,
   content protection), adds wall-clock time, signs records with the installation credential and
   delivers them to the server. It never evaluates rules itself.
-- **Privileged components** give full process and interactive-session coverage: a signed Windows
-  service using ETW and WTS, and an approved root macOS Endpoint Security launchd daemon registered
-  through `SMAppService`, with the Endpoint Security entitlement and Full Disk Access. They are
-  installed and approved during setup, never during an exam, stay dormant
-  outside a session, and are reached only by the agent. A missing service, approval, entitlement,
-  signature or compatible version makes the dependent coverage unavailable; there is no
-  unprivileged substitute for the stronger claim.
-- **Renderers** never reach the agent or the privileged components. Only Electron main holds the
-  installation credential; the agent and the components can never sign or send anything to the
-  server.
+- **Renderers** never reach the agent. Only Electron main holds the installation credential; the
+  agent can never sign or send anything to the server.
 
 The exam-security coordinator in Electron main owns policy authenticity, readiness and posture,
 Participation continuity and delivery (see the
@@ -131,7 +121,7 @@ classifications, counts, opaque per-session identities and Attempt-keyed pseudon
 paths, serials, addresses, account identifiers and content never leave the agent.
 
 **Queries outside a session.** Non-sensitive capabilities (display, virtualization, permission
-state, camera/microphone presence, privileged component status) may be queried any time.
+state, camera/microphone presence) may be queried any time.
 Sensitive capabilities (process/application, interactive session, removable storage, network)
 are read only inside a session for a specific sitting, and only as the facts their contract
 allows.
@@ -217,8 +207,6 @@ participation contains while a fresh state is taken.
   interruption. It restarts the agent **once**: the new session reports resets with fresh instance
   identities and complete states before any rule can be met again. A second failure leaves the
   candidate contained until explicit retry or a new preflight.
-- **A privileged component failure** makes its capabilities unhealthy, so enforce rules become unknown
-  and contain; the agent reconnects under the same one-restart rule.
 - **Panics abort** the agent; it never continues in an unknown state.
 - **Normal departure** stops host-event intake, stops the recorder, stops capabilities in reverse
   order, reports final states and rule statuses, and deletes or seals the recording. Every step has a
@@ -292,18 +280,17 @@ registry and the rule conformance vectors are generated from them and checked fo
 
 | crate                 | owns                                                                                                                 |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `prctr-protocol`      | wire types: main↔agent and agent↔helper messages, facts, rules, rule statuses                                        |
+| `prctr-protocol`      | wire types: main↔agent messages, facts, rules, rule statuses                                                         |
 | `prctr-core`          | the deterministic engine: sessions, sequencing, gaps, resets, flow control, rule evaluation. No OS, threads or clock |
 | `prctr-os`            | safe wrappers over OS APIs; the only crate allowed `unsafe`                                                          |
 | `prctr-capabilities`  | one module per capability: state, changes, summary, rule fields, adapters, a fake                                    |
 | `prctr-recorder`      | capture, encoding, encrypted segment store, clip cutting                                                             |
 | `prctr-agent`         | the agent binary: threads, transport, wiring                                                                         |
-| `prctr-helper`        | the privileged components: one crate, two binaries                                                                   |
 | `desktop-key-custody` | installation-key custody for Electron main (identity, not observation)                                               |
 | `prctr-xtask`         | generation of schemas, registry and vectors                                                                          |
 
 Dependencies point `protocol ← core ← capabilities/recorder ← agent`, with `os` below the platform
-crates and `helper` depending only on `protocol` and `os`. Adding a capability means adding its
+crates. Adding a capability means adding its
 module and one registration entry; nothing in the core, protocol envelope, agent or Electron main
 changes.
 
@@ -317,11 +304,11 @@ changes.
 | wire tests        | stable JSON shapes and rejection of invalid input                                                                                        |
 | real-OS tests     | each fact is true: the test causes a change and checks the fact                                                                          |
 | agent integration | launch, handshake, readiness → participation without a gap, crash and restart, shutdown order, malformed frames                          |
-| certification     | hardware cases on physical machines: monitors, docks, phones, webcams, privileged components                                             |
+| certification     | hardware cases on physical machines: monitors, docks, phones, webcams                                                                    |
 
 Mocks verify coordinator and rule behaviour but never satisfy a platform claim. Every secure-
 candidate release carries a signed capability matrix keyed by OS version, architecture, packaged
-build and helper identity, and the per-capability coverage each certified target proves. A failed,
+build identity, and the per-capability coverage each certified target proves. A failed,
 skipped, flaky, stale or absent required target test removes the claim or blocks release.
 
 Electron and native build tools, signing, package integrity and updates follow the

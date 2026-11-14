@@ -1580,4 +1580,3 @@ pub fn suspended_ns() -> Option<u64> {
     u64::try_from(ticks * u128::from(timebase.numer) / u128::from(timebase.denom)).ok()
 }
 
-pub mod helper;
