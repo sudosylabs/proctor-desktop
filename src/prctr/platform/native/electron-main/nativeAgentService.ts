@@ -219,6 +219,7 @@ export class NativeAgentService extends Disposable implements INativeAgentServic
 	private async open(): Promise<NativeAgentSnapshot> {
 		const session = this.session;
 		if (session === undefined) throw new NativeAgentStateError(this._phase);
+		await this.launch();
 		const response = await this.request({
 			kind: 'open_readiness',
 			collection_session_id: session.collectionSessionId,
@@ -228,22 +229,23 @@ export class NativeAgentService extends Disposable implements INativeAgentServic
 		return { facts: response.facts, rules: response.rules };
 	}
 
+	/** Only opening readiness starts an agent; any other request needs the running one. */
 	private async request(request: Request): Promise<Response> {
-		const connection = await this.ensureConnection();
+		const connection = this.connection;
+		if (connection === undefined) throw new NativeAgentStateError(this._phase);
 		const response = await connection.request(request);
 		if (response.kind === 'refused') throw new NativeAgentRefusedError(response.code);
 		return response;
 	}
 
-	private async ensureConnection(): Promise<NativeAgentConnection> {
-		if (this.connection !== undefined) return this.connection;
+	private async launch(): Promise<void> {
+		if (this.connection !== undefined) return;
 		const connection = await NativeAgentConnection.launch(this.options.launch);
 		this.connection = connection;
 		this.connectionListeners = [
 			connection.onDidNotify((notification) => this.receive(notification)),
 			connection.onDidFail((failure) => void this.handleFailure(connection, failure))
 		];
-		return connection;
 	}
 
 	private receive(notification: Notification): void {

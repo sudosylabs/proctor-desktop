@@ -165,8 +165,10 @@ export class ScreenClipUploader extends Disposable {
 		}
 		const signature = await this.signer.sign(clip.content_digest);
 		await this.transport.complete(clipId, { content_digest: clip.content_digest, signature });
-		await this.recorder.recorderRelease(clipId);
 		this.setState(clipId, 'uploaded');
+		// The server holds the clip now, so releasing its file is best effort: a closed agent
+		// refuses it, and the file then goes with the recording when that is deleted.
+		await this.recorder.recorderRelease(clipId).catch(() => undefined);
 	}
 
 	/**

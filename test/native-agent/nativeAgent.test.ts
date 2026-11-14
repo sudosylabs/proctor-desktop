@@ -18,7 +18,10 @@ import {
 	unsignedDevelopmentVerifier,
 	type NativeAgentFailure
 } from '../../src/prctr/platform/native/node/nativeAgentConnection.ts';
-import { NativeAgentService } from '../../src/prctr/platform/native/electron-main/nativeAgentService.ts';
+import {
+	NativeAgentService,
+	NativeAgentStateError
+} from '../../src/prctr/platform/native/electron-main/nativeAgentService.ts';
 
 const EXECUTABLE = join(
 	process.cwd(),
@@ -352,6 +355,19 @@ void test('heartbeats reach the service listeners', async () => {
 		await heartbeat;
 	} finally {
 		await service.close('delete');
+		service.dispose();
+	}
+});
+
+void test('a request with no open session is refused instead of starting an agent', async () => {
+	const service = new NativeAgentService({ launch: LAUNCH });
+	try {
+		await assert.rejects(service.query('scripted'), NativeAgentStateError);
+		await service.openReadiness(COLLECTION, POLICY);
+		await service.close('delete');
+		await assert.rejects(service.query('scripted'), NativeAgentStateError);
+		await assert.rejects(service.recorderRelease('clip-request-0001'), NativeAgentStateError);
+	} finally {
 		service.dispose();
 	}
 });

@@ -93,10 +93,12 @@ class FakeRecorder {
 	public readonly onDidClip = this.emitter.event;
 	public readonly saved: { id: string; range: ClipRange }[] = [];
 	public readonly released: string[] = [];
+	public closed = false;
 	public async recorderSave(id: string, range: ClipRange) {
 		this.saved.push({ id, range });
 	}
 	public async recorderRelease(id: string) {
+		if (this.closed) throw new Error('the agent is closed');
 		this.released.push(id);
 	}
 	public deliver(clipRequestId: string, outcome: ClipOutcome) {
@@ -175,6 +177,24 @@ void test('an upload resumes past received chunks, verifies each one, signs, com
 			{ content_digest: 'd'.repeat(64), signature: 'signed-dddd' }
 		]);
 		assert.deepEqual(recorder.released, ['a'], 'released only after completion');
+		uploader.dispose();
+	} finally {
+		rmSync(directory, { recursive: true, force: true });
+	}
+});
+
+void test('a clip completed after the agent closed still counts as uploaded', async () => {
+	const directory = mkdtempSync(join(tmpdir(), 'prctr-clips-'));
+	try {
+		const server = new FakeServer([request('a')]);
+		const recorder = new FakeRecorder();
+		const uploader = new ScreenClipUploader(server, recorder, signer);
+		await uploader.poll();
+		recorder.closed = true;
+		recorder.deliver('a', sealClip(directory, randomBytes(25)));
+		await settled(uploader, 'a');
+		assert.equal(server.completed.length, 1);
+		assert.equal(uploader.state('a'), 'uploaded', 'closing the agent deletes the file anyway');
 		uploader.dispose();
 	} finally {
 		rmSync(directory, { recursive: true, force: true });
