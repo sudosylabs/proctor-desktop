@@ -5,7 +5,6 @@
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
 import type {
-	Fact,
 	Policy,
 	RuleStatus
 } from '../../../../platform/native/common/nativeAgentProtocol.generated.js';
@@ -118,7 +117,6 @@ interface Readiness {
 	readonly overview: SecurityPolicyOverview;
 	readonly policy: Policy;
 	readonly securitySessionId: string;
-	facts: Map<string, Fact>;
 	rules: Map<string, RuleStatus>;
 }
 
@@ -140,7 +138,6 @@ interface Admission {
 	processedControl: number;
 	interactionAllowed: boolean;
 	focusSequence: number;
-	mounted: boolean;
 	timer: ReturnType<typeof setInterval> | undefined;
 }
 
@@ -242,19 +239,17 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			overview,
 			policy,
 			securitySessionId,
-			facts: new Map(),
 			rules: new Map()
 		};
-		this.absorb(snapshot);
+		this.absorb(snapshot.rules);
 		this._phase = 'readiness';
 		this.publish();
 	}
 
-	private absorb(snapshot: NativeAgentSnapshot): void {
+	private absorb(rules: readonly RuleStatus[]): void {
 		const readiness = this.readiness;
 		if (readiness === undefined) return;
-		for (const fact of snapshot.facts) readiness.facts.set(fact.capability, fact);
-		for (const rule of snapshot.rules) readiness.rules.set(rule.rule_id, rule);
+		for (const rule of rules) readiness.rules.set(rule.rule_id, rule);
 	}
 
 	/** Closes readiness without starting. */
@@ -285,7 +280,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			if (missing.length > 0) throw new ParticipationError('uncertified', missing);
 			const snapshot = await this.options.agent.beginParticipation();
 			bound = true;
-			this.absorb(snapshot);
+			this.absorb(snapshot.rules);
 			const reportedAt = this.now();
 			const result = await this.report(prepared, snapshot);
 			if (result.admission !== 'eligible')
@@ -478,7 +473,6 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			processedControl: 0,
 			interactionAllowed: true,
 			focusSequence: 0,
-			mounted: false,
 			timer: undefined
 		};
 		this._phase = 'admitted';
@@ -614,7 +608,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			recovered.security.policy_content_digest !== admission.security.policy_content_digest ||
 			recovered.security.generation !== admission.security.generation
 		) {
-			this.contain('binding_mismatch');
+			this.contain();
 			return;
 		}
 		if (recovered.security_control) this.applyControl(admission, recovered.security_control);
@@ -631,14 +625,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			this.clock.heartbeat(notification.monotonic_ms);
 			return;
 		}
-		const readiness = this.readiness;
-		if (readiness !== undefined) {
-			if (notification.kind === 'fact')
-				readiness.facts.set(notification.fact.capability, notification.fact);
-			if (notification.kind === 'rules')
-				for (const status of notification.statuses)
-					readiness.rules.set(status.rule_id, status);
-		}
+		if (notification.kind === 'rules') this.absorb(notification.statuses);
 		const admission = this.admission;
 		if (
 			admission !== undefined &&
@@ -667,7 +654,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			await admission.delivery.enqueue(records);
 			admission.pump.notify(admission.security.delivery_stream_id);
 		} catch {
-			this.contain('spool');
+			this.contain();
 		}
 	}
 
@@ -691,8 +678,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			? await this.options.recording?.(admission.attemptId)
 			: undefined;
 		const rules = await this.options.agent.confirmParticipation(recording);
-		this.absorb({ facts: [], rules });
-		admission.mounted = true;
+		this.absorb(rules);
 		this._phase = 'participating';
 		await this.deliver(admission, [
 			admission.mapper.participationConfirmed(),
@@ -811,7 +797,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 
 	private contained = false;
 
-	private contain(_cause: string): void {
+	private contain(): void {
 		this.contained = true;
 		this.publish();
 	}
