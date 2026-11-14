@@ -6,6 +6,7 @@ import {
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
+	readdirSync,
 	readFileSync,
 	renameSync,
 	rmSync,
@@ -162,7 +163,18 @@ function brandDarwin(source: string, bundle: string, name: string, appId: string
 	] as const) {
 		execFileSync('plutil', ['-replace', key, '-string', value, plist]);
 	}
-	// The executable's seal covers Info.plist; nested helpers keep their own signatures.
+	// Nested helpers keep their own signatures. The x64 distribution ships them unsigned, and
+	// codesign refuses to seal a bundle around unsigned code, so those are signed ad hoc first.
+	const frameworks = join(bundle, 'Contents/Frameworks');
+	for (const entry of readdirSync(frameworks)) {
+		const nested = join(frameworks, entry);
+		try {
+			execFileSync('codesign', ['--verify', nested], { stdio: 'ignore' });
+		} catch {
+			execFileSync('codesign', ['--force', '--sign', '-', nested]);
+		}
+	}
+	// The executable's seal covers Info.plist.
 	execFileSync('codesign', ['--force', '--sign', '-', join(bundle, 'Contents/MacOS/Electron')]);
 	execFileSync('codesign', ['--force', '--sign', '-', bundle]);
 }
