@@ -175,21 +175,39 @@ function encodeBinary(schema: ApiSchema, mediaType: string, body: unknown): Uint
 }
 
 /**
- * Encodes a multipart body. `metadata` goes first so the server can check it before it reads
- * any file part; files are sent as bytes and validated only as present.
+ * Encodes a multipart body. The JSON part (`metadata` or a batch `manifest`) goes first so the
+ * server can check it before it reads any file part; files are sent as bytes and validated only
+ * as present. An array of binary items becomes one part per item, in order, under one name.
  */
 function encodeMultipart(media: ApiMediaContract, body: unknown): FormData {
 	const schema = media.schema && resolveSchema(media.schema);
 	if (!schema || !body || typeof body !== 'object') throw new ServerApiError('invalidRequest');
 	const form = new FormData();
 	const validation: Record<string, unknown> = {};
-	const fields = Object.entries(body as Record<string, unknown>).sort(([left], [right]) =>
-		left === 'metadata' ? -1 : right === 'metadata' ? 1 : left.localeCompare(right)
+	const leading = (key: string) => (key === 'metadata' || key === 'manifest' ? 0 : 1);
+	const fields = Object.entries(body as Record<string, unknown>).sort(
+		([left], [right]) => leading(left) - leading(right) || left.localeCompare(right)
 	);
 	for (const [key, value] of fields) {
 		const field = schema.properties?.[key];
 		if (!field) throw new ServerApiError('invalidRequest');
 		const resolved = resolveSchema(field);
+		const items = resolved.type === 'array' && resolved.items && resolveSchema(resolved.items);
+		if (items && items.format === 'binary') {
+			const maximum =
+				typeof items.maxLength === 'number' ? items.maxLength : MAX_BINARY_BODY_BYTES;
+			if (
+				!Array.isArray(value) ||
+				(typeof resolved.maxItems === 'number' && value.length > resolved.maxItems) ||
+				value.some((part) => !(part instanceof Uint8Array) || part.byteLength > maximum)
+			)
+				throw new ServerApiError('invalidRequest');
+			const partType = media.encoding?.[key]?.contentType ?? 'application/octet-stream';
+			for (const part of value as Uint8Array[])
+				form.append(key, new Blob([new Uint8Array(part)], { type: partType }), key);
+			validation[key] = value.map(() => '');
+			continue;
+		}
 		const partType =
 			media.encoding?.[key]?.contentType ??
 			(resolved.type === 'object' || resolved.type === 'array'

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sha256": "91363ec648bc5230911475f37d27a04be3fcd882958f72104e754fc2dae3d1e4",
-  "paths": 264,
+  "sha256": "38c8d74b113d40e9259c9afd717dd53d36757fc5dcd0440e4a929702eeeaa674",
+  "paths": 288,
   "operations": [
     {
       "operationId": "runAcademicAdministrationBatch",
@@ -187,6 +187,30 @@
       "operationId": "endAffiliation",
       "method": "DELETE",
       "path": "/api/v1/affiliations/{affiliation_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAssistantProfiles",
+      "method": "GET",
+      "path": "/api/v1/assistant-profiles",
+      "transport": "http"
+    },
+    {
+      "operationId": "createAssistantProfile",
+      "method": "POST",
+      "path": "/api/v1/assistant-profiles",
+      "transport": "http"
+    },
+    {
+      "operationId": "retireAssistantProfile",
+      "method": "POST",
+      "path": "/api/v1/assistant-profiles/{assistant_profile_id}/retire",
+      "transport": "http"
+    },
+    {
+      "operationId": "getAssistantProfileUsage",
+      "method": "GET",
+      "path": "/api/v1/assistant-profiles/{assistant_profile_id}/usage",
       "transport": "http"
     },
     {
@@ -532,6 +556,72 @@
       "transport": "http"
     },
     {
+      "operationId": "listEnvironmentProfiles",
+      "method": "GET",
+      "path": "/api/v1/environment-profiles",
+      "transport": "http"
+    },
+    {
+      "operationId": "createEnvironmentProfile",
+      "method": "POST",
+      "path": "/api/v1/environment-profiles",
+      "transport": "http"
+    },
+    {
+      "operationId": "retireEnvironmentProfile",
+      "method": "POST",
+      "path": "/api/v1/environment-profiles/{environment_profile_id}/retire",
+      "transport": "http"
+    },
+    {
+      "operationId": "decideCandidateAssistantApproval",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/approvals/{call_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "exportCandidateAssistantTranscript",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/export",
+      "transport": "http"
+    },
+    {
+      "operationId": "sendCandidateAssistantMessage",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/messages",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCandidateAssistantSessions",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/sessions",
+      "transport": "http"
+    },
+    {
+      "operationId": "readCandidateAssistantSessionScreen",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/sessions/{tag}/screen",
+      "transport": "http"
+    },
+    {
+      "operationId": "stopCandidateAssistantSession",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/sessions/{tag}/stop",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCandidateAssistantTranscript",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/turns",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelCandidateAssistantTurn",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/assistant/turns/{turn_id}/cancel",
+      "transport": "http"
+    },
+    {
       "operationId": "browserSourceList",
       "method": "GET",
       "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources",
@@ -589,6 +679,48 @@
       "operationId": "stopDeliveryDetails",
       "method": "POST",
       "path": "/api/v1/exam-attempts/{exam_attempt_id}/delivery-limits/stop-details",
+      "transport": "http"
+    },
+    {
+      "operationId": "getCandidateEnvironment",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/environment",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCandidatePreviewPorts",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/environment/ports",
+      "transport": "http"
+    },
+    {
+      "operationId": "connectCandidatePreview",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/environment/ports/{port}/socket",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCandidateTerminals",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/environment/terminals",
+      "transport": "http"
+    },
+    {
+      "operationId": "openCandidateTerminal",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/environment/terminals",
+      "transport": "http"
+    },
+    {
+      "operationId": "signalCandidateTerminal",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/environment/terminals/{terminal}/signal",
+      "transport": "http"
+    },
+    {
+      "operationId": "connectCandidateTerminal",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/environment/terminals/{terminal}/socket",
       "transport": "http"
     },
     {
@@ -700,44 +832,20 @@
       "transport": "http"
     },
     {
+      "operationId": "applyCandidateExamWorkspaceBatch",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/batches",
+      "transport": "http"
+    },
+    {
       "operationId": "listCandidateExamWorkspaceChanges",
       "method": "GET",
       "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/changes",
       "transport": "http"
     },
     {
-      "operationId": "createCandidateExamWorkspaceDirectory",
-      "method": "POST",
-      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/directories",
-      "transport": "http"
-    },
-    {
-      "operationId": "deleteCandidateExamWorkspaceEntry",
-      "method": "DELETE",
-      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/entries/{attempt_workspace_entry_id}",
-      "transport": "http"
-    },
-    {
-      "operationId": "moveCandidateExamWorkspaceEntry",
-      "method": "PATCH",
-      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/entries/{attempt_workspace_entry_id}",
-      "transport": "http"
-    },
-    {
-      "operationId": "createCandidateExamWorkspaceFile",
-      "method": "POST",
-      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/files",
-      "transport": "http"
-    },
-    {
       "operationId": "getCandidateExamWorkspaceContent",
       "method": "GET",
-      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/files/{attempt_workspace_entry_id}/content",
-      "transport": "http"
-    },
-    {
-      "operationId": "replaceCandidateExamWorkspaceFile",
-      "method": "PUT",
       "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/files/{attempt_workspace_entry_id}/content",
       "transport": "http"
     },
@@ -784,9 +892,21 @@
       "transport": "http"
     },
     {
+      "operationId": "configureExamDraftAssistant",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/assistant",
+      "transport": "http"
+    },
+    {
       "operationId": "configureExamDraftBrowserPolicy",
       "method": "PUT",
       "path": "/api/v1/exams/{exam_id}/draft/browser-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "configureExamDraftExecution",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/policies/execution",
       "transport": "http"
     },
     {
@@ -991,6 +1111,12 @@
       "operationId": "endExamAttemptByManager",
       "method": "POST",
       "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/end",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceExamAttemptEnvironment",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/environment/replace",
       "transport": "http"
     },
     {
@@ -1582,6 +1708,24 @@
       "transport": "http"
     },
     {
+      "operationId": "listSubmissionAssistantTranscript",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/assistant-transcript",
+      "transport": "http"
+    },
+    {
+      "operationId": "getSubmissionAssistantUsage",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/assistant-usage",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAttemptEvidence",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/attempt-evidence",
+      "transport": "http"
+    },
+    {
       "operationId": "listExamIntegrityDiscrepancies",
       "method": "GET",
       "path": "/api/v1/submissions/{submission_id}/integrity-discrepancies",
@@ -1603,6 +1747,12 @@
       "operationId": "listNativeConditions",
       "method": "GET",
       "path": "/api/v1/submissions/{submission_id}/native-conditions",
+      "transport": "http"
+    },
+    {
+      "operationId": "getSubmissionPreviewUsage",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/preview-usage",
       "transport": "http"
     },
     {

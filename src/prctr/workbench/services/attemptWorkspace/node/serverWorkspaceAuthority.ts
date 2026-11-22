@@ -23,7 +23,8 @@ import type {
 import { workspacePath } from '../common/path.js';
 
 type ServerEntry = components['schemas']['CandidateExamWorkspaceItemResponse'];
-type Receipt = components['schemas']['CandidateWorkspaceMutationResponse'];
+type Mutation = components['schemas']['CandidateWorkspaceBatchMutation'];
+type Change = components['schemas']['CandidateWorkspaceJournalEntryResponse'];
 /** Supplied only by the privileged admitted-Participation owner. Never a renderer DTO. */
 export interface WorkspaceServerBinding {
 	readonly attemptId: string;
@@ -185,126 +186,47 @@ export class ServerWorkspaceAuthority implements AuthoritativeWorkspacePort {
 		const signal = AbortSignal.any([abort.signal, this.#lifetime.signal]);
 		let received = false;
 		try {
-			const header = { ...headers(scope), 'Idempotency-Key': command.idempotencyKey };
-			const path = { exam_attempt_id: scope.attemptId };
-			const body = { participation_id: scope.participationId, generation: scope.generation };
-			let receipt: Receipt;
-			switch (command.kind) {
-				case 'createDirectory': {
-					const response = await this.options.api.request(
-						'createCandidateExamWorkspaceDirectory',
-						{ header, path, body: { ...body, path: command.path } },
-						{ signal }
-					);
-					if (response.status !== 201) throw new ServerApiError('invalidResponse');
-					receipt = response.value;
-					break;
-				}
-				case 'createFile': {
-					const response = await this.options.api.request(
-						'createCandidateExamWorkspaceFile',
-						{
-							header,
-							path,
-							body: {
-								metadata: {
-									...body,
-									path: command.path,
-									media_type: command.mediaType,
-									size: command.content.byteLength,
-									sha256: digest(command.content)
-								},
-								content: command.content
-							}
+			const { mutation, content } = batchMutation(command);
+			const response = await this.options.api.request(
+				'applyCandidateExamWorkspaceBatch',
+				{
+					header: { ...headers(scope), 'Idempotency-Key': command.idempotencyKey },
+					path: { exam_attempt_id: scope.attemptId },
+					body: {
+						manifest: {
+							participation_id: scope.participationId,
+							generation: scope.generation,
+							mutations: [mutation],
+							...(command.kind === 'delete' &&
+							command.expectedWorkspaceCursor !== undefined
+								? { expected_workspace_cursor: command.expectedWorkspaceCursor }
+								: {})
 						},
-						{ signal }
-					);
-					if (response.status !== 201) throw new ServerApiError('invalidResponse');
-					receipt = response.value;
-					break;
-				}
-				case 'replaceContent': {
-					const response = await this.options.api.request(
-						'replaceCandidateExamWorkspaceFile',
-						{
-							header,
-							path: { ...path, attempt_workspace_entry_id: command.reference },
-							body: {
-								metadata: {
-									...body,
-									expected_path: command.expectedPath,
-									expected_content_version: command.expectedContentVersion,
-									media_type: command.mediaType,
-									size: command.content.byteLength,
-									sha256: digest(command.content)
-								},
-								content: command.content
-							}
-						},
-						{ signal }
-					);
-					if (response.status !== 200) throw new ServerApiError('invalidResponse');
-					receipt = response.value;
-					break;
-				}
-				case 'move': {
-					const response = await this.options.api.request(
-						'moveCandidateExamWorkspaceEntry',
-						{
-							header,
-							path: { ...path, attempt_workspace_entry_id: command.reference },
-							body: {
-								...body,
-								expected_path: command.currentPath,
-								destination_path: command.destination
-							}
-						},
-						{ signal }
-					);
-					if (response.status !== 200) throw new ServerApiError('invalidResponse');
-					receipt = response.value;
-					break;
-				}
-				case 'delete': {
-					const response = await this.options.api.request(
-						'deleteCandidateExamWorkspaceEntry',
-						{
-							header,
-							path: { ...path, attempt_workspace_entry_id: command.reference },
-							body: {
-								...body,
-								expected_path: command.expectedPath,
-								recursive: command.recursive ?? false,
-								...(command.expectedContentVersion
-									? { expected_content_version: command.expectedContentVersion }
-									: {}),
-								...(command.expectedWorkspaceCursor !== undefined
-									? { expected_workspace_cursor: command.expectedWorkspaceCursor }
-									: {})
-							}
-						},
-						{ signal }
-					);
-					if (response.status !== 200) throw new ServerApiError('invalidResponse');
-					receipt = response.value;
-					break;
-				}
-			}
+						...(content ? { content: [content] } : {})
+					}
+				},
+				{ signal }
+			);
+			if (response.status !== 200) throw new ServerApiError('invalidResponse');
+			const receipt = response.value;
 			received = true;
 			this.#check(scope);
+			const change = receipt.changes[0];
 			if (
 				receipt.workspace_id !== scope.workspaceId ||
-				receipt.operation !== operations[command.kind]
+				receipt.changes.length !== 1 ||
+				!change ||
+				change.operation !== operations[command.kind] ||
+				change.cursor !== receipt.workspace_cursor ||
+				receipt.first_workspace_cursor !== receipt.workspace_cursor
 			)
 				throw new ServerApiError('invalidResponse');
-			const acknowledgedEntry = receipt.entry ? decodeEntry(receipt.entry) : undefined;
-			if (command.kind !== 'delete' && !acknowledgedEntry)
-				throw new ServerApiError('invalidResponse');
-			if (acknowledgedEntry) validateReceipt(command, acknowledgedEntry);
+			validateChange(command, change);
 			const snapshot = await this.getSnapshot();
 			this.#check(scope);
 			if (snapshot.cursor < receipt.workspace_cursor)
 				throw new ServerApiError('invalidResponse');
+			const acknowledgedEntry = acknowledged(command, change, snapshot);
 			return {
 				kind: 'acknowledged',
 				cursor: receipt.workspace_cursor as WorkspaceCursor,
@@ -346,6 +268,9 @@ export class ServerWorkspaceAuthority implements AuthoritativeWorkspacePort {
 								? 'localCreationCollision'
 								: 'destinationCollision'
 					};
+				// A rate-limited batch stages nothing, so the command can be sent again later.
+				if (code === 'exam.attempt.workspace.rate_limited' || error.status === 429)
+					return { kind: 'notDispatched' };
 				// In-progress/key conflicts and unknown 409s do not establish the original outcome.
 				if (error.status === 409) return { kind: 'outcomeUnknown' };
 				if (error.status === 401 || error.status === 403 || error.status === 404)
@@ -460,23 +385,118 @@ function decodeEntry(value: ServerEntry): WorkspaceEntry {
 			: {})
 	});
 }
-function validateReceipt(command: WorkspaceMutationCommand, entry: WorkspaceEntry): void {
-	if ('reference' in command && entry.reference !== command.reference)
+function batchMutation(command: WorkspaceMutationCommand): {
+	readonly mutation: Mutation;
+	readonly content?: Uint8Array;
+} {
+	switch (command.kind) {
+		case 'createDirectory':
+			return { mutation: { operation: 'create_directory', path: command.path } };
+		case 'createFile':
+			return {
+				mutation: {
+					operation: 'create_file',
+					path: command.path,
+					media_type: command.mediaType,
+					size: command.content.byteLength,
+					sha256: digest(command.content)
+				},
+				content: command.content
+			};
+		case 'replaceContent':
+			return {
+				mutation: {
+					operation: 'replace_file',
+					entry_id: command.reference,
+					expected_path: command.expectedPath,
+					expected_content_version: command.expectedContentVersion,
+					media_type: command.mediaType,
+					size: command.content.byteLength,
+					sha256: digest(command.content)
+				},
+				content: command.content
+			};
+		case 'move':
+			return {
+				mutation: {
+					operation: 'move_entry',
+					entry_id: command.reference,
+					expected_path: command.currentPath,
+					destination_path: command.destination
+				}
+			};
+		case 'delete':
+			return {
+				mutation: {
+					operation: 'delete_entry',
+					entry_id: command.reference,
+					expected_path: command.expectedPath,
+					...(command.recursive ? { recursive: true } : {}),
+					...(command.expectedContentVersion
+						? { expected_content_version: command.expectedContentVersion }
+						: {})
+				}
+			};
+	}
+}
+/** The journal change must describe exactly the requested mutation. */
+function validateChange(command: WorkspaceMutationCommand, change: Change): void {
+	if ('reference' in command && change.entry_id !== command.reference)
 		throw new ServerApiError('invalidResponse');
-	const expectedPath =
-		command.kind === 'createFile' || command.kind === 'createDirectory'
-			? command.path
-			: command.kind === 'move'
-				? command.destination
-				: command.expectedPath;
-	if (entry.path !== expectedPath) throw new ServerApiError('invalidResponse');
-	if (
-		'content' in command &&
-		(entry.kind !== 'file' ||
-			entry.byteSize !== command.content.byteLength ||
-			entry.sha256 !== digest(command.content))
-	)
+	const kind = command.kind === 'createDirectory' ? 'directory' : 'file';
+	if (command.kind !== 'move' && command.kind !== 'delete' && change.kind !== kind)
 		throw new ServerApiError('invalidResponse');
+	if (command.kind === 'delete') {
+		if (change.old_path !== command.expectedPath || change.new_path !== undefined)
+			throw new ServerApiError('invalidResponse');
+		return;
+	}
+	const path =
+		command.kind === 'move'
+			? command.destination
+			: command.kind === 'replaceContent'
+				? command.expectedPath
+				: command.path;
+	const previous =
+		command.kind === 'move'
+			? command.currentPath
+			: command.kind === 'replaceContent'
+				? command.expectedPath
+				: undefined;
+	if (change.new_path !== path || change.old_path !== previous)
+		throw new ServerApiError('invalidResponse');
+	if (change.kind === 'file' && !change.content_version)
+		throw new ServerApiError('invalidResponse');
+}
+/**
+ * The acknowledged entry as of the change itself, independent of newer snapshot state. Content
+ * metadata comes from the command for writes, and from the snapshot for a moved file only when
+ * the snapshot still holds the acknowledged content version.
+ */
+function acknowledged(
+	command: WorkspaceMutationCommand,
+	change: Change,
+	snapshot: AuthoritativeWorkspaceSnapshot
+): WorkspaceEntry | undefined {
+	if (command.kind === 'delete') return undefined;
+	const reference = change.entry_id as WorkspaceEntryReference;
+	const path = workspacePath(change.new_path!);
+	if (change.kind === 'directory') return Object.freeze({ reference, path, kind: 'directory' });
+	const contentVersion = change.content_version as WorkspaceContentVersion;
+	if ('content' in command)
+		return Object.freeze({
+			reference,
+			path,
+			kind: 'file',
+			contentVersion,
+			mediaType: command.mediaType,
+			byteSize: command.content.byteLength,
+			sha256: digest(command.content)
+		});
+	const current = snapshot.entries.find(
+		(entry) => entry.reference === reference && entry.contentVersion === contentVersion
+	);
+	return current ? Object.freeze({ ...current, path }) : undefined;
 }
 export function workspaceLimitsFromCapacity(
 	capacity: components['schemas']['ExamCapacityPolicy']

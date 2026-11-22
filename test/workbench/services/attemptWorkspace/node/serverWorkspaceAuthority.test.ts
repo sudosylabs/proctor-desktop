@@ -52,6 +52,22 @@ const file = {
 	content_version: 'a'.repeat(26)
 };
 const manifest = { workspace_id: id, workspace_cursor: 1, items: [file], refresh_required: false };
+const created = {
+	cursor: 1,
+	changed_at: '2026-11-22T00:00:00.000Z',
+	author: { kind: 'candidate', ref: id },
+	entry_id: entryId,
+	kind: 'file',
+	operation: 'create_file',
+	new_path: 'answer.txt',
+	content_version: 'a'.repeat(26)
+};
+const batch = (change: { readonly cursor: number; readonly [key: string]: unknown }) => ({
+	workspace_id: id,
+	first_workspace_cursor: change.cursor,
+	workspace_cursor: change.cursor,
+	changes: [change]
+});
 void test('server workspace validates frozen limits and verified current file reads', async () => {
 	const limits = workspaceLimitsFromCapacity({
 		resource_maximum_count: 20,
@@ -108,18 +124,15 @@ void test('mutation uses exact metadata and retains acknowledgement independent 
 		execute: async (request) => {
 			if (request.method === 'POST') {
 				assert.ok(request.body instanceof FormData);
-				const part = request.body.get('metadata');
+				assert.ok(request.url.endsWith(`/exam-attempts/${id}/workspace/batches`));
+				const part = request.body.get('manifest');
 				assert.ok(part instanceof Blob);
 				metadata = JSON.parse(await part.text());
-				return json(
-					{
-						workspace_id: id,
-						workspace_cursor: 1,
-						operation: 'create_file',
-						entry: file
-					},
-					201
-				);
+				const bodies = request.body.getAll('content');
+				assert.equal(bodies.length, 1);
+				assert.ok(bodies[0] instanceof Blob);
+				assert.deepEqual(new Uint8Array(await bodies[0].arrayBuffer()), content);
+				return json(batch(created));
 			}
 			return json({
 				...manifest,
@@ -150,13 +163,20 @@ void test('mutation uses exact metadata and retains acknowledgement independent 
 		if (result.kind !== 'acknowledged') return;
 		assert.equal(result.acknowledgedEntry?.contentVersion, 'a'.repeat(26));
 		assert.equal(result.snapshot.entries[0]?.contentVersion, 'b'.repeat(26));
+		assert.equal(result.acknowledgedEntry?.sha256, digest(content));
+		assert.deepEqual(result.referenceMappings, { 'local-one': entryId });
 		assert.deepEqual(metadata, {
 			participation_id: id,
 			generation: 1,
-			path: 'answer.txt',
-			media_type: 'text/plain',
-			size: content.length,
-			sha256: digest(content)
+			mutations: [
+				{
+					operation: 'create_file',
+					path: 'answer.txt',
+					media_type: 'text/plain',
+					size: content.length,
+					sha256: digest(content)
+				}
+			]
 		});
 	} finally {
 		authority.dispose();
@@ -345,16 +365,7 @@ void test('a committed mutation remains uncertain if refreshing its snapshot is 
 		binding: testBinding,
 		origin: 'https://institution.test',
 		execute: async (request) => {
-			if (request.method === 'POST')
-				return json(
-					{
-						workspace_id: id,
-						workspace_cursor: 1,
-						operation: 'create_file',
-						entry: file
-					},
-					201
-				);
+			if (request.method === 'POST') return json(batch(created));
 			throw new ServerApiError('server', { status: 403 });
 		}
 	});
@@ -377,6 +388,115 @@ void test('a committed mutation remains uncertain if refreshing its snapshot is 
 			CancellationToken.None
 		);
 		assert.equal(result.kind, 'outcomeUnknown');
+	} finally {
+		authority.dispose();
+		api.dispose();
+	}
+});
+
+void test('move, delete and rate limits map one mutation per batch and its own change', async () => {
+	const { ServerApiError } =
+		await import('../../../../../src/prctr/platform/serverApi/common/serverApi.js');
+	const manifests: unknown[] = [];
+	let reply: () => HttpResponse = () => json({});
+	const api = new SessionApi({
+		binding: testBinding,
+		origin: 'https://institution.test',
+		execute: async (request) => {
+			if (request.method !== 'POST') return json({ ...manifest, workspace_cursor: 3 });
+			assert.ok(request.body instanceof FormData);
+			assert.deepEqual(request.body.getAll('content'), []);
+			manifests.push(JSON.parse(await (request.body.get('manifest') as Blob).text()));
+			return reply();
+		}
+	});
+	const authority = new ServerWorkspaceAuthority({
+		api,
+		current: () => binding,
+		limits: WORKSPACE_V1_DEFAULT_LIMITS
+	});
+	const move = {
+		kind: 'move' as const,
+		reference: entryId as WorkspaceEntryReference,
+		currentPath: workspacePath('answer.txt'),
+		destination: workspacePath('final.txt'),
+		expectDestinationAbsent: true as const,
+		idempotencyKey: 'move-one'
+	};
+	const moved = {
+		...created,
+		cursor: 2,
+		operation: 'move_entry',
+		old_path: 'answer.txt',
+		new_path: 'final.txt'
+	};
+	try {
+		reply = () => json(batch(moved));
+		const result = await authority.dispatch(move, CancellationToken.None);
+		assert.equal(result.kind, 'acknowledged');
+		assert.equal(
+			result.kind === 'acknowledged' ? result.acknowledgedEntry?.path : undefined,
+			'final.txt'
+		);
+		// A change for a different path than the one requested is not an acknowledgement.
+		reply = () => json(batch({ ...moved, new_path: 'other.txt' }));
+		assert.equal(
+			(await authority.dispatch(move, CancellationToken.None)).kind,
+			'outcomeUnknown'
+		);
+		reply = () =>
+			json(
+				batch({
+					...created,
+					cursor: 3,
+					operation: 'delete_entry',
+					kind: 'directory',
+					old_path: 'src',
+					new_path: undefined,
+					content_version: undefined,
+					recursive: true
+				})
+			);
+		const deleted = await authority.dispatch(
+			{
+				kind: 'delete',
+				reference: entryId as WorkspaceEntryReference,
+				expectedPath: workspacePath('src'),
+				recursive: true,
+				expectedWorkspaceCursor: 2 as never,
+				idempotencyKey: 'delete-one'
+			},
+			CancellationToken.None
+		);
+		assert.equal(deleted.kind, 'acknowledged');
+		assert.deepEqual(manifests.at(-1), {
+			participation_id: id,
+			generation: 1,
+			expected_workspace_cursor: 2,
+			mutations: [
+				{
+					operation: 'delete_entry',
+					entry_id: entryId,
+					expected_path: 'src',
+					recursive: true
+				}
+			]
+		});
+		reply = () => {
+			throw new ServerApiError('server', {
+				status: 429,
+				problem: {
+					code: 'exam.attempt.workspace.rate_limited',
+					status: 429,
+					title: 'Too fast',
+					type: 'about:blank'
+				}
+			});
+		};
+		assert.equal(
+			(await authority.dispatch(move, CancellationToken.None)).kind,
+			'notDispatched'
+		);
 	} finally {
 		authority.dispose();
 		api.dispose();

@@ -30,47 +30,65 @@ void test('operation inputs reject unknown routes/parameters, traversal and rend
 });
 
 void test('multipart content keeps bytes and metadata encoding separate', async () => {
-	const operation = operationContract('createCandidateExamWorkspaceFile');
+	const operation = operationContract('applyCandidateExamWorkspaceBatch');
 	const schema = resolveSchema(operation.requestBody!.content['multipart/form-data'].schema!);
 	assert.ok(schema.properties?.content);
-	// Invalid metadata is rejected before any network request.
+	const header = {
+		'X-Proctor-Attempt-Credential': 'a'.repeat(43),
+		'X-Proctor-Attempt-Connection-ID': id,
+		'Idempotency-Key': 'upload-1'
+	};
+	// An invalid manifest is rejected before any network request.
 	assert.throws(() =>
 		encodeRequest(origin, operation.id, {
 			path: { exam_attempt_id: id },
-			body: { content: new Uint8Array([0, 255]), metadata: {} }
+			header,
+			body: { content: [new Uint8Array([0, 255])], manifest: {} }
 		})
 	);
-	const upload = encodeRequest(origin, 'createCandidateExamWorkspaceFile', {
+	// Content parts are an ordered list of bytes, never one bare body.
+	assert.throws(() =>
+		encodeRequest(origin, operation.id, {
+			path: { exam_attempt_id: id },
+			header,
+			body: {
+				content: new Uint8Array([0, 255]),
+				manifest: { participation_id: id, generation: 1, mutations: [] }
+			}
+		})
+	);
+	const file = (path: string, size: number) => ({
+		operation: 'create_file',
+		path,
+		media_type: 'text/plain',
+		size,
+		sha256: 'a'.repeat(64)
+	});
+	const upload = encodeRequest(origin, 'applyCandidateExamWorkspaceBatch', {
 		path: { exam_attempt_id: id },
-		header: {
-			'X-Proctor-Attempt-Credential': 'a'.repeat(43),
-			'X-Proctor-Attempt-Connection-ID': id,
-			'Idempotency-Key': 'upload-1'
-		},
+		header,
 		body: {
-			content: new Uint8Array([0, 255]),
-			metadata: {
+			content: [new Uint8Array([0, 255]), new Uint8Array([7])],
+			manifest: {
 				participation_id: id,
 				generation: 1,
-				path: 'main.ts',
-				media_type: 'text/plain',
-				size: 2,
-				sha256: 'a'.repeat(64)
+				mutations: [file('main.ts', 2), file('notes.txt', 1)]
 			}
 		}
 	});
 	assert.ok(upload.body instanceof FormData);
-	assert.deepEqual([...upload.body.keys()], ['metadata', 'content']);
-	const metadata = upload.body.get('metadata');
-	const content = upload.body.get('content');
-	assert.ok(metadata instanceof Blob && content instanceof Blob);
-	assert.equal(JSON.parse(await metadata.text()).size, 2);
+	assert.deepEqual([...upload.body.keys()], ['manifest', 'content', 'content']);
+	const manifest = upload.body.get('manifest');
+	const [content, second] = upload.body.getAll('content');
+	assert.ok(manifest instanceof Blob && content instanceof Blob && second instanceof Blob);
+	assert.equal(JSON.parse(await manifest.text()).mutations[0].size, 2);
+	assert.deepEqual(new Uint8Array(await second.arrayBuffer()), new Uint8Array([7]));
 	const encoded = await new Request(upload.url, {
 		method: upload.method,
 		body: upload.body
 	}).text();
-	assert.match(encoded, /name="metadata"\r\nContent-Type: application\/json/);
-	assert.ok(encoded.indexOf('name="metadata"') < encoded.indexOf('name="content"'));
+	assert.match(encoded, /name="manifest"\r\nContent-Type: application\/json/);
+	assert.ok(encoded.indexOf('name="manifest"') < encoded.indexOf('name="content"'));
 	const correction = encodeRequest(origin, 'stageExamSittingCorrectionResourceContent', {
 		path: { exam_id: id, exam_sitting_id: id },
 		header: { 'Idempotency-Key': 'stage-1' },

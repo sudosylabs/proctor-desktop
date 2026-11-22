@@ -105,6 +105,112 @@ export interface components {
             readonly state: "suspended" | "active";
         };
         /**
+         * Assistant approval requested
+         * @description A command or edit waits for the candidate's approval. The summary is the command, or the path and new content, cut to 8 KiB. An unanswered request is declined at expires_at.
+         */
+        readonly exam_attempt_assistant_approval_requested: {
+            readonly call_id: components["schemas"]["id"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            readonly expires_at: components["schemas"]["instant"];
+            readonly summary: string;
+            /** @enum {string} */
+            readonly tool: "run_command" | "start_session" | "send_input" | "apply_edit";
+            readonly truncated: boolean;
+            readonly turn_id: components["schemas"]["id"];
+        };
+        /**
+         * Assistant session ended
+         * @description A session ended for the candidate.
+         */
+        readonly exam_attempt_assistant_session_ended: {
+            /** Format: date-time */
+            readonly ended_at: string;
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** @enum {string} */
+            readonly outcome: "exited" | "stopped" | "timed_out" | "sealed" | "ended";
+            readonly tag: string;
+        };
+        /**
+         * Assistant session started
+         * @description A session started for the candidate.
+         */
+        readonly exam_attempt_assistant_session_started: {
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** Format: date-time */
+            readonly started_at: string;
+            readonly tag: string;
+        };
+        /**
+         * Assistant text delta
+         * @description One chunk of the assistant's reply, numbered from zero within the turn. Deltas are hints: a client that misses one reloads the transcript.
+         */
+        readonly exam_attempt_assistant_text_delta: {
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            readonly index: number;
+            readonly text: string;
+            readonly turn_id: components["schemas"]["id"];
+        };
+        /**
+         * Assistant tool call
+         * @description The assistant started or ended a tool call. Only the tool and the outcome are included; the arguments and result are in the transcript.
+         */
+        readonly exam_attempt_assistant_tool_call: {
+            readonly call_id: components["schemas"]["id"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            readonly outcome?: string;
+            /** @enum {string} */
+            readonly phase: "started" | "ended";
+            readonly tool: string;
+            readonly turn_id: components["schemas"]["id"];
+        };
+        /**
+         * Assistant turn ended
+         * @description The assistant's turn ended. Reload the transcript for the recorded reply.
+         */
+        readonly exam_attempt_assistant_turn_ended: {
+            readonly ended_at: components["schemas"]["instant"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            readonly stop_reason: string;
+            readonly turn_id: components["schemas"]["id"];
+            readonly usage: {
+                readonly cache_read: number;
+                readonly cache_write: number;
+                readonly estimated: boolean;
+                readonly input: number;
+                readonly output: number;
+            };
+        };
+        /**
+         * Assistant turn started
+         * @description The assistant started answering the candidate's message.
+         */
+        readonly exam_attempt_assistant_turn_started: {
+            readonly conversation_id: components["schemas"]["id"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            readonly started_at: components["schemas"]["instant"];
+            readonly turn_id: components["schemas"]["id"];
+        };
+        /**
+         * Assistant unavailable
+         * @description The model provider failed the turn. The exam goes on; the candidate may ask again after retry_after_seconds.
+         */
+        readonly exam_attempt_assistant_unavailable: {
+            readonly changed_at: components["schemas"]["instant"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** @enum {string} */
+            readonly reason: "rate_limited" | "overloaded" | "invalid" | "context_too_long" | "unavailable";
+            readonly retry_after_seconds?: number;
+            readonly turn_id: components["schemas"]["id"];
+        };
+        /**
          * Exam Attempt connect
          * @description Binds this WebSocket to the candidate's Attempt in the Sitting: admits a new Attempt, rejoins a Ready one, or resumes the current Participation.
          */
@@ -285,6 +391,7 @@ export interface components {
          * @description A submitted Attempt for Sitting viewers, with who or what submitted it.
          */
         readonly exam_attempt_submitted: {
+            readonly assistant_transcript_digest: string;
             readonly candidate_user_id: components["schemas"]["id"];
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
@@ -302,6 +409,7 @@ export interface components {
          * @description The candidate's own copy of the submission. It leaves out the candidate identity.
          */
         readonly exam_attempt_submitted_for_candidate: {
+            readonly assistant_transcript_digest: string;
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly manifest_digest: components["schemas"]["sha256"];
@@ -329,15 +437,13 @@ export interface components {
         };
         /**
          * Attempt Workspace changed
-         * @description A refetch hint for the candidate's Attempt Workspace. Paths, content and mutation bodies are never included.
+         * @description A refetch hint for the candidate's Attempt Workspace after one committed batch. The batch took the cursors from first_workspace_cursor to workspace_cursor. Paths, content and mutation bodies are never included.
          */
         readonly exam_attempt_workspace_changed: {
             readonly changed_at: components["schemas"]["instant"];
-            readonly entry_id: components["schemas"]["id"];
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
-            /** @enum {string} */
-            readonly operation: "create_file" | "create_directory" | "replace_file" | "move_entry" | "delete_entry";
+            readonly first_workspace_cursor: number;
             readonly workspace_cursor: number;
         };
         /**
@@ -681,6 +787,14 @@ export const serverEventCatalog = {
 	"exam_archived": { "exam.view": "exam_archived" },
 	"exam_attempt_access_reallowed": { "exam.sitting.participate": "exam_attempt_access_changed" },
 	"exam_attempt_access_suspended": { "exam.sitting.participate": "exam_attempt_access_changed" },
+	"exam_attempt_assistant_approval_requested": { "@user": "exam_attempt_assistant_approval_requested" },
+	"exam_attempt_assistant_session_ended": { "@user": "exam_attempt_assistant_session_ended" },
+	"exam_attempt_assistant_session_started": { "@user": "exam_attempt_assistant_session_started" },
+	"exam_attempt_assistant_text_delta": { "@user": "exam_attempt_assistant_text_delta" },
+	"exam_attempt_assistant_tool_call": { "@user": "exam_attempt_assistant_tool_call" },
+	"exam_attempt_assistant_turn_ended": { "@user": "exam_attempt_assistant_turn_ended" },
+	"exam_attempt_assistant_turn_started": { "@user": "exam_attempt_assistant_turn_started" },
+	"exam_attempt_assistant_unavailable": { "@user": "exam_attempt_assistant_unavailable" },
 	"exam_attempt_connection_closed": { "exam.sitting.view": "exam_attempt_connection_changed" },
 	"exam_attempt_connection_opened": { "exam.sitting.view": "exam_attempt_connection_changed" },
 	"exam_attempt_focus_warning": { "exam.sitting.participate": "exam_attempt_focus_warning" },
@@ -726,6 +840,14 @@ export interface ServerEventVariants {
 	"exam_archived": { "exam.view": components['schemas']["exam_archived"] };
 	"exam_attempt_access_reallowed": { "exam.sitting.participate": components['schemas']["exam_attempt_access_changed"] };
 	"exam_attempt_access_suspended": { "exam.sitting.participate": components['schemas']["exam_attempt_access_changed"] };
+	"exam_attempt_assistant_approval_requested": { "@user": components['schemas']["exam_attempt_assistant_approval_requested"] };
+	"exam_attempt_assistant_session_ended": { "@user": components['schemas']["exam_attempt_assistant_session_ended"] };
+	"exam_attempt_assistant_session_started": { "@user": components['schemas']["exam_attempt_assistant_session_started"] };
+	"exam_attempt_assistant_text_delta": { "@user": components['schemas']["exam_attempt_assistant_text_delta"] };
+	"exam_attempt_assistant_tool_call": { "@user": components['schemas']["exam_attempt_assistant_tool_call"] };
+	"exam_attempt_assistant_turn_ended": { "@user": components['schemas']["exam_attempt_assistant_turn_ended"] };
+	"exam_attempt_assistant_turn_started": { "@user": components['schemas']["exam_attempt_assistant_turn_started"] };
+	"exam_attempt_assistant_unavailable": { "@user": components['schemas']["exam_attempt_assistant_unavailable"] };
 	"exam_attempt_connection_closed": { "exam.sitting.view": components['schemas']["exam_attempt_connection_changed"] };
 	"exam_attempt_connection_opened": { "exam.sitting.view": components['schemas']["exam_attempt_connection_changed"] };
 	"exam_attempt_focus_warning": { "exam.sitting.participate": components['schemas']["exam_attempt_focus_warning"] };
