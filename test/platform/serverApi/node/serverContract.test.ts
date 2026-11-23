@@ -10,8 +10,8 @@ import { ServerApiError } from '../../../../src/prctr/platform/serverApi/common/
 
 void test('every packaged operation has executable request/response schemas, including conditional and non-JSON routes', () => {
 	const operations = [...operationContracts()];
-	assert.equal(operations.length, 346);
-	assert.equal(new Set(operations.map((operation) => operation.path)).size, 288);
+	assert.equal(operations.length, 349);
+	assert.equal(new Set(operations.map((operation) => operation.path)).size, 290);
 	const compiles = (operation: string, run: () => void) => {
 		try {
 			run();
