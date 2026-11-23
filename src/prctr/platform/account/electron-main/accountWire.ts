@@ -1,3 +1,4 @@
+import { signInStandingFromServer } from '../../identity/common/signInStanding.js';
 import type { ApiInput } from '../../serverApi/common/serverApi.js';
 import {
 	projectionRecord as record,
@@ -34,6 +35,9 @@ export function readAccountProfile(raw: unknown, binding: SessionBinding): Accou
 			photoKind: p.profile_picture_kind
 		}
 	});
+}
+export function readAccountSignIn(mfa: unknown): AccountData {
+	return checked({ section: 'signIn', signIn: signInStandingFromServer(mfa) });
 }
 export function readAccountSecurity(methods: unknown, mfa: unknown): AccountData {
 	const s = record(methods);

@@ -572,9 +572,15 @@ export class DesktopAuthorizationService extends Disposable {
 			await this.options.openBrowser(page.href);
 			const code = await listener.waitForCode();
 			current();
-			await api.request('completeDesktopReauthentication', {
+			const completed = await api.request('completeDesktopReauthentication', {
 				body: { code, code_verifier: verifier, state }
 			} as never);
+			current();
+			// A confirmation that asked for the code raises this Session to two-step, and the
+			// server then revokes its access tokens: rotate now so the change goes on with
+			// tokens that carry the new strength. Rotating an unchanged Session is harmless.
+			if (record(completed.value).authentication_strength === 'multi_factor')
+				await this.refresh();
 			return 'success';
 		} catch (error) {
 			if (error instanceof DesktopAuthorizationError) {

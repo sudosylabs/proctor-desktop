@@ -1321,6 +1321,8 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 	let pageOrigin = 'https://example.edu';
 	const opened: string[] = [];
 	const completions: Record<string, unknown>[] = [];
+	let strength: 'single_factor' | 'multi_factor' = 'single_factor';
+	let refreshes = 0;
 	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/desktop/authorizations')) {
@@ -1337,7 +1339,10 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 			exchanges++;
 			return response(tokens());
 		}
-		if (path.endsWith('/refresh')) return response(tokens());
+		if (path.endsWith('/refresh')) {
+			refreshes++;
+			return response(tokens());
+		}
 		if (path.endsWith('/context')) return response(context());
 		if (path.endsWith('/logout')) return new Response(null, { status: 204 });
 		assert.ok(new Headers(init?.headers).get('DPoP'), `${path} is sender-constrained`);
@@ -1353,7 +1358,10 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 		}
 		if (path === '/api/v1/auth/desktop/reauthentications/complete') {
 			completions.push(JSON.parse(String(init?.body)));
-			return response({ recently_authenticated_until: '2026-01-01T00:15:00Z' });
+			return response({
+				recently_authenticated_until: '2026-01-01T00:15:00Z',
+				authentication_strength: strength
+			});
 		}
 		throw new Error('Unexpected route');
 	});
@@ -1407,6 +1415,16 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 		);
 		assert.ok(opened.at(-1)!.startsWith('https://example.edu/reauthenticate/desktop'));
 		assert.equal(exchanges, 1, 'confirming never issues a new session');
+		assert.equal(refreshes, 0, 'a single-factor confirmation keeps its tokens');
+
+		// With the authenticator code the Session becomes two-step and its old access tokens
+		// are revoked, so the confirmation rotates them before it reports success.
+		strength = 'multi_factor';
+		assert.deepEqual(await accountOf(service).account(binding, { kind: 'reauthenticate' }), {
+			kind: 'success'
+		});
+		assert.equal(refreshes, 1, 'a raised Session is refreshed right after complete');
+		assert.equal(exchanges, 1, 'raising never issues a new session');
 
 		browser = 'wait';
 		const waiting = accountOf(service).account(binding, { kind: 'reauthenticate' });
@@ -1418,7 +1436,7 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 			}
 		);
 		assert.deepEqual(await waiting, { kind: 'error', reason: 'cancelled' });
-		assert.equal(completions.length, 1, 'a cancelled confirmation is never completed');
+		assert.equal(completions.length, 2, 'a cancelled confirmation is never completed');
 
 		browser = 'answer';
 		pageOrigin = 'https://elsewhere.example';

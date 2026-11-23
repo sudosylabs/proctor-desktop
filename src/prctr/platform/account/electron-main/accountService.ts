@@ -21,6 +21,7 @@ import {
 	readAccountNotices,
 	readAccountProfile,
 	readAccountSecurity,
+	readAccountSignIn,
 	readAccountSessions,
 	readAccountToken,
 	readAccountTokenCreation,
@@ -143,6 +144,10 @@ export class AccountService {
 			return { kind: 'data', data: readAccountHistory(result.value) };
 		}
 		const section = intent.section;
+		if (section === 'signIn') {
+			const mfa = await api.request('getMFAStatus', {}, { signal });
+			return { kind: 'data', data: readAccountSignIn(mfa.value) };
+		}
 		if (section === 'security') {
 			const [methods, mfa] = await Promise.all([
 				api.request('listAuthenticationMethods', {}, { signal }),
