@@ -232,12 +232,16 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 	/** Opens the readiness overview for a Sitting: reads its policy and starts the agent on it. */
 	public async openReadiness(sittingId: string): Promise<ReadinessView> {
 		this.require('idle', 'readiness', 'failed');
+		await this.reopenReadiness(sittingId);
+		return this.readinessView()!;
+	}
+
+	private async reopenReadiness(sittingId: string): Promise<void> {
 		const result = await this.options.api.request('getSecurityPolicyOverview', {
 			path: { exam_sitting_id: sittingId }
 		});
 		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		await this.openWith(sittingId, result.value);
-		return this.readinessView()!;
 	}
 
 	private async openWith(sittingId: string, overview: SecurityPolicyOverview): Promise<void> {
@@ -325,15 +329,8 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		const prepared: SecurityPolicyResponse = result.value;
 		if (prepared.readiness_digest !== this.readiness?.overview.readiness_digest) {
-			await this.openWith(sittingId, {
-				server_time: prepared.server_time,
-				policy: prepared.policy,
-				readiness_digest: prepared.readiness_digest,
-				capability_matrix_digest: prepared.capability_matrix_digest,
-				catalog_bindings: prepared.catalog_bindings,
-				browser_activity_disclosure: prepared.browser_activity_disclosure,
-				screen_recording_disclosure: prepared.screen_recording_disclosure
-			});
+			// The policy changed under the overview: read it again, so the person rechecks it whole.
+			await this.reopenReadiness(sittingId);
 			throw new ParticipationError('readiness_changed');
 		}
 		return prepared;

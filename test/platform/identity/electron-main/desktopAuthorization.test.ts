@@ -1771,7 +1771,7 @@ void test('administration runs on the bound Session: DPoP signed, cached, invali
 				administrator_message: '',
 				availability: 'ready',
 				minimum_desktop_release: '1.0.0',
-				revoked_desktop_build_ids: [],
+				revoked_desktop_builds: [],
 				revision: 2,
 				created_at: '2026-01-01T00:00:00Z',
 				updated_at: '2026-01-01T00:00:00Z'
@@ -1853,7 +1853,7 @@ void test('administration runs on the bound Session: DPoP signed, cached, invali
 				availability: 'ready',
 				minimumRelease: '1.0.0',
 				message: '',
-				revokedBuildIds: []
+				revokedBuilds: []
 			}),
 			{ kind: 'success' }
 		);

@@ -3163,6 +3163,24 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
+    "administration.access.revoked.reason": {
+      "message": "Reason for newly blocked builds",
+      "description": "Label of the field giving why builds added to the blocked list are refused.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoked.reason.hint": {
+      "message": "Builds already blocked keep their reason.",
+      "description": "Hint under the reason for newly blocked builds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoked.reason.required": {
+      "message": "Say why these builds are blocked.",
+      "description": "Error when builds were added to the blocked list without a reason.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
     "administration.access.saved": {
       "message": "{name} is saved",
       "description": "Toast after a role is saved.",
@@ -8775,6 +8793,12 @@
       "placeholders": [
         "name"
       ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.member.former": {
+      "message": "A former user",
+      "description": "Name shown for a unit member whose account was removed.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.unit.members": {

@@ -11,7 +11,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Run one bounded typed existing-User academic administration batch
-         * @description Applies one operation to 1 to 200 existing Users in a single request. Each item runs on its own, with the same authorization, audit, mail and retry behavior as the matching single-item endpoint, so one failed item does not stop the others. The response reports every item's outcome in request order.
+         * @description Applies one operation to 1 to 200 existing Users in a single request. Each item runs on its own, with the same authorization, audit, mail and retry behavior as the matching single-item endpoint, so one failed item does not stop the others. The response reports every item's outcome in request order. A direct `user.disable` batch also records one audit entry with its overall outcome.
          *     Item keys must be unique within the request; repeated keys fail those items with `request.invalid`. An item that would make the same change as another item in the request fails with `onboarding_batch.duplicate`. Role Binding operations, `user.enable`, `user.disable` and `user_sessions.revoke` also need a strong, recent Session.
          */
         readonly post: operations["runAcademicAdministrationBatch"];
@@ -146,7 +146,7 @@ export interface paths {
         };
         /**
          * List or search Academic Periods visible through authorized owner scopes
-         * @description Lists the Academic Periods the caller can see through permissions on the Institution or on Academic Units, ordered by start time, then name, then identifier. An Academic Period is a span of academic time, such as a year or semester. Seeing one gives no access to its Classes or students.
+         * @description Lists the Academic Periods the caller can see through permissions on the Institution or on Academic Units, ordered by `sort` and `dir`: by default by start time, then name, then identifier, oldest first. An Academic Period is a span of academic time, such as a year or semester. Seeing one gives no access to its Classes or students. Each item carries `class_count`, the active Classes of the Period that you hold class.view on, counted up to 10,000, with `class_count_is_lower_bound`; both are omitted if you hold class.view nowhere.
          */
         readonly get: operations["listAcademicPeriods"];
         readonly put?: never;
@@ -475,7 +475,7 @@ export interface paths {
         };
         /**
          * Summarise administration work waiting on the caller
-         * @description Returns the counts shown as badges in administration navigation. `pending_invitations` counts pending Invitations that have not expired. `failed_jobs` counts operator-visible Jobs that failed in the last seven days. `failed_mail_deliveries` counts mail deliveries that ended in the `failed` state. Suppressed and canceled deliveries are not failures. `open_onboarding_imports` counts unexpired administrative onboarding imports that are still uploading, parsing, waiting to be committed or running, not counting student progressions. Each count applies the same permission and visibility checks as its resource's own list, and records the permission decision the same way, so it counts only what the caller could list. A count the caller may not list is left out, together with its `_is_lower_bound` flag. If a count can't be read, the request fails rather than reporting zero. Counting stops at 1,000: the count is then 1,000 and its flag is true. Only an interactive Session may read the counts.
+         * @description Returns the counts shown as badges in administration navigation. `pending_invitations` counts pending Invitations that have not expired. `failed_jobs` counts operator-visible Jobs that failed in the last seven days. `failed_mail_deliveries` counts mail deliveries that ended in the `failed` state. Suppressed and canceled deliveries are not failures. `open_onboarding_imports` counts unexpired administrative onboarding imports that are still uploading, parsing, waiting to be committed or running, not counting student progressions. `open_sittings` counts the Institution's Sittings under way (open, paused or closing), for a holder of Institution-wide desktop_compatibility_policy.manage, so they can see what a maintenance window would interrupt. The other counts apply the same permission and visibility checks as their resource lists, and record permission decisions the same way. A count the caller may not list is left out, together with its `_is_lower_bound` flag. If a count can't be read, the request fails rather than reporting zero. Counting stops at 1,000: the count is then 1,000 and its flag is true. Only an interactive Session may read the counts.
          */
         readonly get: operations["getAdministrationCounts"];
         readonly put?: never;
@@ -588,6 +588,66 @@ export interface paths {
          * @description Lists the audit Events you can see through Institution-wide or Academic Unit audit permissions, newest first unless `order=asc` asks for oldest first. Events never include the raw request parameters, earlier state, results, credentials, protected content or internal error details. The first page (read without a cursor) also has `total`, the number of matching Events across all pages. It is exact up to 10,000. Above that it shows 10,000 and `total_is_lower_bound` is true. Later pages have no total, so keep the one from the first page. Each Event also has a `summary` sentence, written from its codes, in the language `Accept-Language` picks. It falls back to the installation language and then English. It names the actor, the User the Event is about, and a User, Academic Unit or Class resource by their current names only if you could see that record now, through `user.view` or `class.members.view`, `academic_unit.view` or `class.view`. Otherwise it uses a general phrase such as "a user" or "a class". For an Academic Unit auditor the summary names only the action, never the recorded operation or the User the Event is about.
          */
         readonly get: operations["listAuditEvents"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/audits/exports": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Export the audit history to a file
+         * @description Queues a CSV or JSON Lines file of the audit Events the audit listing would show you for the same filters. Your audit visibility is frozen when you ask: with Institution-wide `audit.view` the file has every matching Event, and an Academic Unit auditor's file has the same redacted Events their listing shows. Events written after the request aren't included. The file has the listing's fields under the listing's names, except `summary`, `actor` and `repeat`. Both formats flatten `resource` into `resource_type` and `resource_id`. It never has raw request parameters, earlier state or results. At most 100,000 Events fit in one export, and a larger selection is refused, so narrow the filters. The policy's export lifetime must be set to 1 to 7 days, and the expiry counts from the request. The request is audited. Poll the export to see when it is ready. Job viewers can also observe `job.changed` for `job_id`.
+         */
+        readonly post: operations["createAuditExport"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/audits/exports/{audit_export_id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Get an audit export
+         * @description Only the User who asked for the export can read it, and only while they still hold the audit visibility it was made with. Another User's export is not found. The state is `queued`, `ready`, `failed` or `expired`. An expired export never returns its hash. The expiry stays fixed even if the policy changes later. A change to the academic ownership hierarchy invalidates exports made with academic subtree visibility.
+         */
+        readonly get: operations["getAuditExport"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/audits/exports/{audit_export_id}/download": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Download an audit export
+         * @description Only the User who asked for the export can download it, while it is ready and unexpired and they still hold the audit visibility it was made with. The response is a `text/csv` or `application/jsonl` attachment with private, no-store caching and a file name that carries only the export ID. CSV cells a spreadsheet would read as a formula start with an apostrophe. The `ETag` header and the `sha256` field give the file's SHA-256. Expiry blocks new downloads but doesn't cut off one already in progress.
+         */
+        readonly get: operations["downloadAuditExport"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -1559,7 +1619,7 @@ export interface paths {
         };
         /**
          * Get a Class using exact Class scope authorization
-         * @description Returns one active Class. Proctor checks the caller's permission on this Class itself. Being able to list Classes elsewhere is not enough. The response names its Programme Level and Academic Period and does not include its students.
+         * @description Returns one active Class. Proctor checks the caller's permission on this Class itself. Being able to list Classes elsewhere is not enough. The response names its Programme Level and Academic Period and does not include its students. A caller who holds class.members.view on the Class also gets its first three teachers.
          */
         readonly get: operations["getClass"];
         readonly put?: never;
@@ -1646,6 +1706,26 @@ export interface paths {
          * @description Replaces the whole policy. Send the `revision` you read as `expected_revision`. If the policy has changed since, the request fails and nothing changes. The request needs a recent, strongly authenticated interactive system administrator Session and an Idempotency-Key, and it fails if the change can't be audited. Revoked build IDs and the administrator message are left out of ordinary audit records.
          */
         readonly put: operations["replaceDesktopCompatibilityPolicy"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/desktop-releases": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List the Proctor Desktop builds this server verifies
+         * @description Lists the verified Proctor Desktop builds compiled into this server release, newest release first, with when each was released and which is the newest for its platform and architecture. The Desktop Compatibility Policy can only narrow this list. It needs access_policy.view on the Institution, as reading the policy does. It is empty until signed releases exist.
+         */
+        readonly get: operations["listDesktopReleases"];
+        readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -2824,6 +2904,26 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exam-sittings": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List Sittings across the Exams you can see
+         * @description Lists the Sittings of every Exam where you hold exam.sitting.view, earliest start first. An ordinary grant reaches the Exams you manage in a unit you belong to; an override grant reaches every Exam under it. Each row names its Exam and Class. An open or paused Sitting also carries its candidate board's counts, without you, and needs_attention_count: its candidates who are suspended, fail an enforced native check, or have unresolved integrity attention. Bounded and cursor-paged.
+         */
+        readonly get: operations["listExamSittingsAcrossExams"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exam-sittings/{exam_sitting_id}/security-policy": {
         readonly parameters: {
             readonly query?: never;
@@ -2836,7 +2936,7 @@ export interface paths {
         };
         /**
          * Read the policy for the readiness overview
-         * @description Resolves the Sitting's current native policy, under the same eligibility checks as preparing a preflight, for the overview a candidate's Desktop shows before Start: the capabilities it activates, the rules it checks, the recorder switch and the disclosure. It creates no preflight, records nothing and grants nothing, so the overview may hold it for as long as it is open. At Start, compare readiness_digest with the one the prepared preflight returns; if they differ, refresh the overview.
+         * @description Resolves the Sitting's current native policy, under the same eligibility checks as preparing a preflight, for the overview a candidate's Desktop shows before Start: the capabilities it activates, the rules it checks, the recorder switch and the disclosure. It creates no preflight, records nothing and grants nothing, so the overview may hold it for as long as it is open. At Start, compare readiness_digest with the one the prepared preflight returns; if they differ, refresh the overview. It works on an open Sitting, and on a scheduled one from its join_opens_at until its scheduled start, so a candidate who joined early can prepare while the Attempt itself waits for the start.
          */
         readonly get: operations["getSecurityPolicyOverview"];
         readonly put?: never;
@@ -2861,7 +2961,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Prepare a secure Desktop admission challenge
-         * @description Requires an eligible registered Desktop Session and an exact admitted build, capability registry and configuration manifest. Stores one pending 120-second challenge per Session and Sitting; a successor supersedes it. Does not create an Attempt, Workspace or Participation. Ready rejoin returns frozen configuration; active and suspended Attempts cannot obtain a replacement preflight. Unavailable Institution catalogs, or a family enforced where the release does not certify enforcement on the candidate's platform, fail closed.
+         * @description Requires an eligible registered Desktop Session and an exact admitted build, capability registry and configuration manifest. Stores one pending 120-second challenge per Session and Sitting; a successor supersedes it. Does not create an Attempt, Workspace or Participation. Ready rejoin returns frozen configuration; active and suspended Attempts cannot obtain a replacement preflight. Unavailable Institution catalogs, or a family enforced where the release does not certify enforcement on the candidate's platform, fail closed. During a Sitting's early-join phase, from join_opens_at until its scheduled start, a candidate can prepare and report a preflight to check their machine; Connect stays closed until the Sitting opens, so prepare again then.
          */
         readonly post: operations["prepareSecurityPreflight"];
         readonly delete?: never;
@@ -2940,6 +3040,29 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exams/{exam_id}/copy": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Create a new Exam from a copy of another Exam's current Draft
+         * @description Creates a new Exam in the given Academic Unit whose Draft copies the source's current Draft: its instructions, every integrity, execution and assistant rule, its browser rules, its Resources and its Starter Workspace. An archived Exam can be copied too. You become the new Exam's owner and only Manager. Revisions, Sittings, Submissions, other Managers and retention holds are never copied. You must be able to manage the source and be allowed to create Exams in the target Academic Unit. The copy is recorded in the audit history of both Exams. Send an Idempotency-Key: retrying with the same key and body returns the original copy.
+         */
+        readonly post: operations["copyExam"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exams/{exam_id}/draft": {
         readonly parameters: {
             readonly query?: never;
@@ -3002,6 +3125,29 @@ export interface paths {
          * @description Replaces the whole Browser Policy on the Draft. The change is made only if expected_revision still matches the Draft's current revision. A disabled policy has no rules. An enabled policy lists the sites candidates may open, and Proctor matches pages against them by host and path in a fixed order.
          */
         readonly put: operations["configureExamDraftBrowserPolicy"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/draft/check": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List every reason the current Draft can't be published
+         * @description Runs the checks publishing runs on the current Draft and lists every one it fails, instead of stopping at the first. Nothing is published or changed. When publishable is true, publishing with expected_revision set to draft_revision succeeds unless the Draft or the installation changes first. Needs the same permission as publishing.
+         */
+        readonly get: operations["checkExamDraft"];
+        readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -3484,6 +3630,135 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/content": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * Read the title, instructions and policies a Revision froze
+         * @description Returns the title, instructions, integrity rules and browser rules exactly as the Revision froze them, in the same shape as the Draft, so you can compare a Revision with the Draft or with another Revision. Read-only. Needs the same permission as reading the Draft.
+         */
+        readonly get: operations["getExamRevisionContent"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/resources": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List the Resources a Revision froze
+         * @description Returns every Resource the Revision froze, in order, with its name, description, content revision, media type, size and SHA-256 digest, like the Draft's Resource list. It does not return file content; read that through the Resource's content operation.
+         */
+        readonly get: operations["listExamRevisionResources"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/resources/{exam_resource_id}/content": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+                /** @description The Exam Resource identifier. */
+                readonly exam_resource_id: components["parameters"]["ExamResourceID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * Render a Resource as a Revision froze it
+         * @description Returns the Resource's content as the Revision froze it, for display inside the application, after checking your access. It is not a public link and not a download or export.
+         */
+        readonly get: operations["getExamRevisionResourceContent"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/starter-workspace": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List the Starter Workspace a Revision froze
+         * @description Returns every file and directory of the Starter Workspace the Revision froze, in path order, with each file's content version, media type, size and SHA-256 digest. It does not return file content.
+         */
+        readonly get: operations["listExamRevisionStarterWorkspace"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/starter-workspace/files/{starter_workspace_entry_id}/content": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+                /** @description The ID of a file or directory in the Draft's Starter Workspace. */
+                readonly starter_workspace_entry_id: components["parameters"]["StarterWorkspaceEntryID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * Read a Starter Workspace file as a Revision froze it
+         * @description Returns one Starter Workspace file's bytes as the Revision froze them, for display inside the application. A directory has no content and is not found.
+         */
+        readonly get: operations["getExamRevisionStarterWorkspaceFileContent"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exams/{exam_id}/sittings": {
         readonly parameters: {
             readonly query?: never;
@@ -3673,6 +3948,89 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/integrity-flags": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List a running Attempt's integrity Flags
+         * @description Lists the Attempt's integrity Flags opened in the window, in the shape the Submission's Flag read uses. Read-only and scoped to one Attempt of the Sitting, while it runs or after. Needs exam.sitting.manage and submission.view on the Sitting, with the manager relationship; both decisions are recorded, as an evidence read is. You never read evidence about yourself. complete is true once the Attempt is sealed or its integrity data is retired; as_of is the database time the page is current as of.
+         */
+        readonly get: operations["listLiveAttemptIntegrityFlags"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/integrity-flags/{integrity_flag_id}/evidence": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The Integrity Flag identifier. */
+                readonly integrity_flag_id: components["parameters"]["IntegrityFlagID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List one Flag's evidence on a running Attempt
+         * @description Lists the evidence of one of the Attempt's Flags observed in the window, in the shape the Submission's evidence read uses. Read-only and scoped to one Attempt of the Sitting, while it runs or after. Needs exam.sitting.manage and submission.view on the Sitting, with the manager relationship; both decisions are recorded, as an evidence read is. You never read evidence about yourself. complete is true once the Attempt is sealed or its integrity data is retired; as_of is the database time the page is current as of.
+         */
+        readonly get: operations["listLiveAttemptIntegrityEvidence"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/native-conditions": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List a running Attempt's native condition records
+         * @description Lists the Attempt's native condition records whose rule changed in the window, in the shape the Submission's native condition read uses. Read-only and scoped to one Attempt of the Sitting, while it runs or after. Needs exam.sitting.manage and submission.view on the Sitting, with the manager relationship; both decisions are recorded, as an evidence read is. You never read evidence about yourself. complete is true once the Attempt is sealed or its integrity data is retired; as_of is the database time the page is current as of.
+         */
+        readonly get: operations["listLiveAttemptNativeConditions"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/reallow": {
         readonly parameters: {
             readonly query?: never;
@@ -3716,7 +4074,7 @@ export interface paths {
         };
         /**
          * List an Attempt's screen clips
-         * @description Lists, newest first, every clip requested for the Attempt, manager and incident alike, with its state: requested, recording the future part of its range, uploading, ready or failed. Managers' reasons are never returned.
+         * @description Lists, newest first, every clip requested for the Attempt, manager and incident alike, with its state: requested, recording the future part of its range, uploading, ready or failed. An incident clip names its integrity Flag and a manager clip names who asked for it. A Sitting manager with submission view can read clips before or after submission and sees the private reason. A reviewer of a submitted Attempt can read the clips without the reason. The candidate cannot use this endpoint for their own Attempt.
          */
         readonly get: operations["listExamAttemptScreenClips"];
         readonly put?: never;
@@ -3749,7 +4107,7 @@ export interface paths {
         };
         /**
          * Play a ready screen clip
-         * @description Streams a ready clip to one of the Sitting's Exam Managers, or once the Attempt is submitted to someone allowed to review its Submission, whole or by one byte range so a player can seek. Each playback, a request from the clip's first byte, is audited. Multiple ranges, or a range past the clip's end, are refused.
+         * @description Streams a ready clip to a Sitting manager with submission view or, once the Attempt is submitted, a reviewer of its Submission. The candidate cannot use this endpoint for their own Attempt. It supports a single byte range so a player can seek. Each playback, a request from the clip's first byte, is audited. Multiple ranges, or a range past the clip's end, are refused.
          */
         readonly get: operations["playExamAttemptScreenClip"];
         readonly put?: never;
@@ -3870,6 +4228,33 @@ export interface paths {
          * @description Lets an Exam Manager suspend an Attempt at once. It ends the active Participation Generation as kicked, closes its open Connection and opens one manual Suspension, with no Integrity Flag. While suspended, the Attempt refuses connections, Workspace and Exam material access, and Submission until someone allowed to re-allows it. The candidate sees only the reason manager_suspended. The manager's private reason is kept only in the Suspension record. Database time decides the outcome. Once the Sitting's scheduled end has passed, the request fails with exam.attempt.sitting_not_open. If the Participation Lease had already run out, the server records that Connection Loss (Integrity Flag, evidence and policy Suspension) and fails with exam.attempt.connection_lost instead.
          */
         readonly post: operations["suspendExamAttempt"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/timeline": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List a running Attempt's Flags, evidence and native conditions in time order
+         * @description Merges the Attempt's Flags (by when they opened), evidence (by when it was observed) and native condition records (by when their rule changed) in time order; each entry holds the record its kind names. Read-only and scoped to one Attempt of the Sitting, while it runs or after. Needs exam.sitting.manage and submission.view on the Sitting, with the manager relationship; both decisions are recorded, as an evidence read is. You never read evidence about yourself. complete is true once the Attempt is sealed or its integrity data is retired; as_of is the database time the page is current as of.
+         */
+        readonly get: operations["listLiveAttemptTimeline"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -4160,6 +4545,31 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/result-releases": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Release many results of one Sitting
+         * @description Releases the results of the named Submissions, or of every finalized, withheld Submission of the Sitting with all_finalized (at most 200 at a time). Needs submission.release on the Sitting; then each Submission goes through the same checks, audit, notice and events as a single release and commits on its own, and one more audit entry records the batch. Each item reports released, already_released, not_finalized, denied, or failed with an error code. Replaying the same Idempotency-Key returns the original selection and outcomes. Reusing it with a different request conflicts. A request still being processed returns an in-progress conflict.
+         */
+        readonly post: operations["releaseExamSittingResults"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/resume": {
         readonly parameters: {
             readonly query?: never;
@@ -4179,6 +4589,31 @@ export interface paths {
          * @description Resumes a paused Sitting. Send the Sitting's current revision; the request fails if it changed since you read it. The server checks the Exam and the delivery window again first. Resuming does not renew candidate Participation credentials that expired during the pause. Those candidates reconnect, or are re-allowed, as usual.
          */
         readonly post: operations["resumeExamSitting"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/submissions": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List a Sitting's Submissions with their flags and reviews
+         * @description Lists the Sitting's sealed Submissions, other than your own, with each candidate, the receipt code, the number of integrity Flags and the integrity standing. Needs submission.view on the Sitting. Each row's review appears only when you also hold submission.review there, and filtering by review_state or release_state without it is refused. The first page counts the whole Sitting, whatever the filters.
+         */
+        readonly get: operations["listExamSittingSubmissions"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -5012,6 +5447,26 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/permissions": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List the permissions a Role can hold
+         * @description Lists every permission a custom Role can hold, sorted by `name`, with its title and description in the request's language, the area it belongs to, and the scopes a Role Binding can grant it at. The list is the same for every Institution and changes only with the server version. An override permission names the permission it widens in `override_of`. Permissions kept for the protected System Administrator role, and capabilities that come only from a person's relationships, are not listed. Requires role.view.
+         */
+        readonly get: operations["listPermissions"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/plugins": {
         readonly parameters: {
             readonly query?: never;
@@ -5219,6 +5674,26 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/retention/holds": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List the Institution's Retention Holds
+         * @description Lists every Retention Hold of the Institution by ID, each with its Exam and who placed it. Released holds are left out unless `include_released=true`. The caller needs `retention_policy.view`. Private reasons stay on the Exam's own hold listing. A hold whose `until` has passed shows `due_for_review: true` and still protects its records.
+         */
+        readonly get: operations["listInstitutionRetentionHolds"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/retention/previews": {
         readonly parameters: {
             readonly query?: never;
@@ -5268,9 +5743,29 @@ export interface paths {
         };
         /**
          * List retention eligibility and retirement status
-         * @description Lists the retention status of each Submission's records. The caller needs `retention_policy.view`. File names, answers, evidence and remarks are never included. `limit` counts Submissions, and each Submission adds four items: work, integrity, Browser Activity and security operational. The cursor only works with this listing. A retired category stays retired even after its detailed receipt expires. `purge_verified` counts come from a separate check that the stored objects are gone from current storage. They don't certify secure erasure of the storage media, or removal from backups, earlier object versions or downloads already in progress.
+         * @description Lists the retention status of each Submission's records. The caller needs `retention_policy.view`. File names, answers, evidence and remarks are never included. By default, `limit` counts Submissions, and each Submission adds four items covering work, integrity, Browser Activity and security operational records. Set `group_by=exam` to count records by category for each Exam. In that mode, `limit` counts Exams and the response orders them by Exam ID. A cursor continues only the grouping that issued it. A retired category stays retired even after its detailed receipt expires. `purge_verified` counts come from a separate check that the stored objects are gone from current storage. They don't certify secure erasure of the storage media, or removal from backups, earlier object versions or downloads already in progress.
          */
         readonly get: operations["listRetentionRecords"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/retention/records/export": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Download every retention record as CSV
+         * @description Returns every retention record of the Institution as CSV, one row per category of each Submission, with the Exam's title, the eligibility each page was read at (`as_of`) and the policy revision. It holds no content. The caller needs `retention_policy.view`. An Institution with more than 50,000 Submissions is refused with `retention.invalid`; page the records listing instead. Values a spreadsheet would read as a formula start with an apostrophe. Each export is audited.
+         */
+        readonly get: operations["exportRetentionRecords"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -5533,6 +6028,26 @@ export interface paths {
          * @description Downloads the report for one progression preview or result as CSV. Values a spreadsheet would run as formulas are neutralized, so they show as plain text. The report holds the progression's rows and no internal Job data, credentials or database selectors.
          */
         readonly get: operations["downloadStudentProgressionReport"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/submissions": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List Submissions across the Exams you can see
+         * @description Lists sealed Submissions, other than your own, across every Exam where you hold submission.view, each with its Exam. A row's review appears, and review_state and release_state match it, only where you also hold submission.review on its Exam; so review_state=none&review_state=draft lists what is waiting for your review. Bounded and cursor-paged; there are no counts. Restart without a cursor if its anchor is unavailable.
+         */
+        readonly get: operations["listSubmissions"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -5819,6 +6334,29 @@ export interface paths {
          * @description Releases the result of a finalized Review to the candidate. The candidate sees only the remarks you approved. Manager notes, rationales, Flags, evidence, Discrepancies and other private review data stay hidden.
          */
         readonly post: operations["releaseStudentExamResult"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/submissions/{submission_id}/review/reopen": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Submission identifier. */
+                readonly submission_id: components["parameters"]["SubmissionID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Return a finalized Review to draft so its decisions can be revised
+         * @description Returns a finalized Review to draft, keeping every decision, so a manager can revise it and finalize it again. The reason is kept privately with the Review and is never shown to the candidate. A Review whose result is released can't be reopened, because release is final. Needs the same permission as reviewing.
+         */
+        readonly post: operations["reopenExamIntegrityReview"];
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -6555,6 +7093,29 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/users/{user_id}/memberships": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The User identifier. */
+                readonly user_id: components["parameters"]["UserID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * List what a User is a current member of
+         * @description Lists the User's current Academic Unit memberships, then their current Class enrolments, each oldest first. You need to see the User, as for reading their profile, and are refused as that read refuses. Each entry appears only if you can view that unit's members (academic_unit.members.view) or that Class's members (class.members.view). Entries you can't see are left out entirely, so a page never hints at them. Memberships of archived units, and enrolments in archived Classes, levels or programmes, are not listed.
+         */
+        readonly get: operations["listUserMemberships"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/users/{user_id}/mfa/reset": {
         readonly parameters: {
             readonly query?: never;
@@ -6792,6 +7353,8 @@ export interface components {
              * @enum {string}
              */
             readonly operation: "affiliation.add" | "affiliation.end" | "academic_unit_member.add" | "academic_unit_member.end" | "class.enroll" | "class.end" | "class.transfer" | "role_binding.create" | "role_binding.end" | "user.enable" | "user.disable" | "user_sessions.revoke";
+            /** @description Why the accounts are disabled, given once for the whole batch. Only `user.disable` takes it; any other operation is refused with `request.invalid` on `reason`. It has the limits of a single disable: leading and trailing spaces are removed, up to 500 characters, no control characters, and not only spaces. An empty string means no reason. It is written to every disabled User's audit record. */
+            readonly reason?: string;
             /** @description The Institution, Academic Unit or Class the batch runs in. */
             readonly scope_id: components["schemas"]["ID"];
             /**
@@ -6841,6 +7404,11 @@ export interface components {
              * @description Keep Users whose last account activity is before this instant. It must be later than `last_active_after`. Needs Institution-wide user.view.
              */
             readonly last_active_before?: string;
+            /**
+             * @description Keep Users whose account has two-step verification on (`enabled`) or off (`disabled`), as the User directory's `mfa` filter does. Needs Institution-wide user.view or user.mfa.reset.
+             * @enum {string}
+             */
+            readonly mfa?: "enabled" | "disabled";
             /** @description When true, keep Users who have never signed in. Needs Institution-wide user.view, and cannot be combined with `last_active_after` or `last_active_before`. */
             readonly never_signed_in?: boolean;
             /** @description Text matched, without regard to case, anywhere in the User directory fields you can see. */
@@ -6873,6 +7441,8 @@ export interface components {
             readonly filter: components["schemas"]["AcademicAdministrationPreviewFilter"];
             /** @description The operation to apply to every matching User. */
             readonly operation: components["schemas"]["AcademicAdministrationPreviewOperation"];
+            /** @description Why the accounts are disabled, given once for the whole preview. Only `user.disable` takes it; any other operation is refused with `request.invalid` on `reason`. It has the limits of a single disable: leading and trailing spaces are removed, up to 500 characters, no control characters, and not only spaces. An empty string means no reason. It is written to every disabled User's audit record and to the batch's. */
+            readonly reason?: string;
             /** @description The Role to bind or unbind. Required for `role_binding.create` and `role_binding.end`, and not allowed for other operations. */
             readonly role_id?: components["schemas"]["ID"];
             /** @description The Institution, Academic Unit or Class the operation runs in. */
@@ -6932,6 +7502,8 @@ export interface components {
             readonly preview_expires_at?: string;
             /** @description The Job that resolves the filter and builds the rows. */
             readonly preview_job_id: components["schemas"]["ID"];
+            /** @description The reason a `user.disable` preview was given. Omitted when none was. */
+            readonly reason?: string;
             /**
              * Format: int64
              * @description The preview's revision, which goes up each time it changes. Send it back as `expected_revision` to commit.
@@ -7023,7 +7595,7 @@ export interface components {
             /** @description Rows the operation will change. */
             readonly will_change: number;
         };
-        /** @description One page of Academic Periods, ordered by start time, then name, then identifier. */
+        /** @description One page of Academic Periods in the requested sort order and direction. */
         readonly AcademicPeriodListResponse: {
             /** @description The Academic Periods on this page. */
             readonly items: readonly components["schemas"]["AcademicPeriodResponse"][];
@@ -7035,6 +7607,10 @@ export interface components {
              * @description When the Academic Period was archived. Omitted while it is active.
              */
             readonly archived_at?: string;
+            /** @description On a listed Academic Period only: how many of its active Classes you hold class.view on. Absent if you hold class.view nowhere. It is exact below 10,000; at 10,000 counting stops and `class_count_is_lower_bound` is true. */
+            readonly class_count?: number;
+            /** @description True when `class_count` stopped at 10,000. Present with `class_count`. */
+            readonly class_count_is_lower_bound?: boolean;
             /**
              * Format: date-time
              * @description When the Academic Period was created.
@@ -7076,6 +7652,22 @@ export interface components {
              */
             readonly updated_at: string;
         };
+        /** @description How many of the Academic Unit's current members hold each current Affiliation kind. A person can hold several kinds, so these don't add up to `member_count`. Each is exact below 10,000; at 10,000 counting stops and its `_is_lower_bound` flag is true. Present with `member_count`. */
+        readonly AcademicUnitAffiliationCounts: {
+            readonly external: number;
+            readonly external_is_lower_bound: boolean;
+            readonly staff: number;
+            readonly staff_is_lower_bound: boolean;
+            readonly student: number;
+            readonly student_is_lower_bound: boolean;
+            readonly teacher: number;
+            readonly teacher_is_lower_bound: boolean;
+        };
+        /**
+         * @description What kind of Academic Unit this is, for people reading the tree. It is only a label: it changes no rule about what the Academic Unit may contain.
+         * @enum {string}
+         */
+        readonly AcademicUnitKind: "faculty" | "school" | "department" | "office" | "other";
         /** @description One page of Academic Units, ordered by name and then by identifier. */
         readonly AcademicUnitListResponse: {
             /** @description The Academic Units on this page. */
@@ -7097,6 +7689,11 @@ export interface components {
              */
             readonly created_at: string;
             /**
+             * Format: email
+             * @description The member's email address. Present only with Institution-wide user.view.
+             */
+            readonly email?: string;
+            /**
              * Format: date-time
              * @description When the membership stops being in effect. The membership is no longer in effect at this instant. Omitted while it has no end.
              */
@@ -7117,8 +7714,8 @@ export interface components {
              * @description When the membership last changed, for example when it was ended.
              */
             readonly updated_at: string;
-            /** @description Who the member is. */
-            readonly user: components["schemas"]["AcademicUnitMemberUser"];
+            /** @description Who the member is. Username and profile picture follow directory visibility. */
+            readonly user: components["schemas"]["PersonRef"];
             /** @description The member. */
             readonly user_id: components["schemas"]["ID"];
         };
@@ -7172,19 +7769,11 @@ export interface components {
             /** @description The ID of the Role. */
             readonly role_id: components["schemas"]["ID"];
         };
-        /** @description Who the member is. Anyone who can see the Academic Unit's members sees the display name and username. `email` is present only if you hold Institution-wide user.view. */
-        readonly AcademicUnitMemberUser: {
-            /** @description The member's display name. */
-            readonly display_name: string;
-            /**
-             * Format: email
-             * @description The member's email address. Present only if you hold Institution-wide user.view.
-             */
-            readonly email?: string;
-            /** @description The member's username. */
-            readonly username: string;
-        };
         readonly AcademicUnitResponse: {
+            /** @description Up to three people who administer this Academic Unit: each holds a current Role Binding scoped exactly to it, of a Role that grants academic_unit.manage. Earliest first. Present, possibly empty, only if you hold role_binding.view on the Academic Unit. */
+            readonly administrators?: readonly components["schemas"]["PersonRef"][];
+            /** @description How many more administrators there are than `administrators` lists. Present with `administrators`. */
+            readonly administrators_more?: number;
             /**
              * Format: date-time
              * @description When the Academic Unit was archived. Omitted while it is active.
@@ -7203,6 +7792,12 @@ export interface components {
             readonly id: components["schemas"]["ID"];
             /** @description The Institution the Academic Unit belongs to. */
             readonly institution_id: components["schemas"]["ID"];
+            readonly kind: components["schemas"]["AcademicUnitKind"];
+            /** @description How many people are members of this Academic Unit now. Present only if you hold academic_unit.members.view on it. It is exact below 10,000; at 10,000 counting stops and `member_count_is_lower_bound` is true. */
+            readonly member_count?: number;
+            /** @description True when `member_count` stopped at 10,000. Present with `member_count`. */
+            readonly member_count_is_lower_bound?: boolean;
+            readonly member_counts_by_affiliation?: components["schemas"]["AcademicUnitAffiliationCounts"];
             /** @description Machine name: lowercase letters, digits, hyphens and underscores, at most 64 characters. Unique among the Institution's active Academic Units. */
             readonly name: string;
             /** @description The Academic Unit this one sits directly under. Omitted for a top-level Academic Unit. */
@@ -7348,6 +7943,8 @@ export interface components {
         };
         /** @description A summary of one applied change to the Access Policy. A recorded change can't be edited. */
         readonly AccessPolicyTransitionResponse: {
+            /** @description The User who made the change, named. */
+            readonly actor?: components["schemas"]["PersonRef"];
             /** @description The User who made the change. */
             readonly actor_user_id: components["schemas"]["ID"];
             /**
@@ -7367,6 +7964,8 @@ export interface components {
              * @constant
              */
             readonly outcome: "applied";
+            /** @description One sentence in the request's language naming who changed which settings. */
+            readonly summary: string;
             /**
              * Format: int64
              * @description The policy revision the change produced.
@@ -7431,6 +8030,10 @@ export interface components {
             readonly open_onboarding_imports?: number;
             /** @description True when `open_onboarding_imports` reached 1,000 and there may be more. Present with `open_onboarding_imports`. */
             readonly open_onboarding_imports_is_lower_bound?: boolean;
+            /** @description The Institution's Sittings that have opened and not yet closed. Present only for a holder of Institution-wide desktop_compatibility_policy.manage. */
+            readonly open_sittings?: number;
+            /** @description True when `open_sittings` reached 1,000 and there may be more. Present with `open_sittings`. */
+            readonly open_sittings_is_lower_bound?: boolean;
             /** @description Pending, unexpired Invitations within the caller's Invitation visibility. */
             readonly pending_invitations?: number;
             /** @description True when `pending_invitations` reached 1,000 and there may be more. Present with `pending_invitations`. */
@@ -7940,6 +8543,8 @@ export interface components {
         readonly AuditEventResponse: {
             /** @description The action that was attempted, named like a permission, such as `class.members.manage`. */
             readonly action: string | components["schemas"]["AuditAction"];
+            /** @description The User who performed the action, named for every reader of the Event. Omitted with `actor_id`. */
+            readonly actor?: components["schemas"]["PersonRef"];
             /** @description The User who performed the action. Omitted for actions the system took on its own. */
             readonly actor_id?: string;
             /** @description How the actor signed in, such as `password`. Omitted for Academic Unit auditors. */
@@ -7960,6 +8565,7 @@ export interface components {
             readonly node_id?: string;
             /** @description Reason given when an account was disabled. Present only on that Event, only when a reason was given, and only for Institution-wide audit readers. */
             readonly reason?: string;
+            readonly repeat?: components["schemas"]["AuditRepeat"];
             /** @description ID of the request that caused the action, when it came in over HTTP or WebSocket. Omitted for Academic Unit auditors. */
             readonly request_id?: string;
             /** @description The record the action was about. */
@@ -7987,6 +8593,49 @@ export interface components {
             /** @description The client's User-Agent header, up to 512 characters. Omitted for Academic Unit auditors. */
             readonly user_agent?: string;
         };
+        /** @description A request for a temporary file of audit Events, and its state. */
+        readonly AuditExportResponse: {
+            /**
+             * Format: date-time
+             * @description Time the export was requested. The expiry counts from this time.
+             */
+            readonly created_at: string;
+            /** @description Number of Events matched when the export was requested, and once it is ready, the number in the file. */
+            readonly event_count: number;
+            /**
+             * Format: date-time
+             * @description Time after which the file can't be downloaded. It is fixed when the export is requested.
+             */
+            readonly expires_at: string;
+            /**
+             * @description Format of the file.
+             * @enum {string}
+             */
+            readonly format: "csv" | "jsonl";
+            /** @description ID of the export. */
+            readonly id: components["schemas"]["ID"];
+            /** @description The background Job that builds the file. Job viewers can observe its `job.changed` events. */
+            readonly job_id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description Time the file became ready. Present only while the export is ready.
+             */
+            readonly ready_at?: string;
+            /** @description True for an Academic Unit auditor's export, whose Events carry the same redacted fields as their listing. */
+            readonly redacted: boolean;
+            /** @description SHA-256 of the file, in lowercase hexadecimal. Present only while the export is ready. */
+            readonly sha256?: string;
+            /**
+             * Format: int64
+             * @description Size of the file, in bytes. Present only while the export is ready.
+             */
+            readonly size_bytes?: number;
+            /**
+             * @description `queued` while the file is being built, `ready` when it can be downloaded, `failed` if building failed, and `expired` after `expires_at`.
+             * @enum {string}
+             */
+            readonly state: "queued" | "ready" | "failed" | "expired";
+        };
         /** @description One page of audit Events you can see. */
         readonly AuditListResponse: {
             /** @description The Events on this page. */
@@ -7997,6 +8646,12 @@ export interface components {
             readonly total?: number;
             /** @description True when `total` reached 10,000 and there may be more. Sent with `total`. */
             readonly total_is_lower_bound?: boolean;
+        };
+        /** @description Present when the same actor did the same action to the same resource more than once in the ten minutes up to and including this event. It counts only events you can see in this listing, this one included, and stops at 100. */
+        readonly AuditRepeat: {
+            readonly count: number;
+            /** @enum {integer} */
+            readonly window_seconds: 600;
         };
         readonly AuthenticationMethodResponse: {
             /** @description Whether the User has a local password. */
@@ -8549,6 +9204,8 @@ export interface components {
             readonly host_match: "exact" | "exact_and_subdomains";
             /** @description Set to true only for an HTTP rule whose host and explicit port are the same as this installation's own HTTPS origin. It must be false for HTTPS rules. It never allows credentials to be sent over HTTP. */
             readonly institution_http_exception: boolean;
+            /** @description An optional short name for the site that staff and candidates read in place of the origin, such as "PostgreSQL documentation". Plain text of at most 400 characters. Surrounding spaces and invisible or bidirectional characters are removed when you save, and a label that is then empty is left out. Control characters are rejected. It is frozen with the revision and plays no part in matching. */
+            readonly label?: string;
             /**
              * Format: uri
              * @description The scheme, host and optional port of the site, in ASCII. Use HTTPS. HTTP is accepted only with institution_http_exception. Leave out the default port (443 for HTTPS, 80 for HTTP). The host must be DNS labels or an IPv4 address. Internationalized names, punycode, IPv6, a trailing dot, credentials, a query, a fragment and any path other than / are rejected. A port is a decimal number from 1 to 65535 with no leading zeros. An IP address works only with exact host matching.
@@ -8816,6 +9473,20 @@ export interface components {
             /** @constant */
             readonly enabled?: true;
         });
+        /** @description One site the Exam browser opens, as the candidate is told it. */
+        readonly CandidateBrowserSite: {
+            /** @description The rule's label, when the Exam gives one. */
+            readonly label?: string;
+            /**
+             * Format: uri
+             * @description The scheme, host and optional port of the site.
+             */
+            readonly origin: string;
+            /** @description The path the site covers, and everything below it. */
+            readonly path_prefix: string;
+            /** @description True for the page the Exam browser opens first. */
+            readonly start: boolean;
+        };
         /**
          * @description A group of candidate operations that a live correction can hold back until it is acknowledged. `browser` covers the exam browser, `submission` covers submitting the Attempt, and `workspace` covers changing the Workspace.
          * @enum {string}
@@ -8865,18 +9536,33 @@ export interface components {
             readonly waiting_since?: string;
         };
         /**
-         * @description Whether the candidate can enter now, and if not, why. `joinable` and `resumable` mean they can start or continue. `sitting_paused` means the Sitting is paused, and `await_reallow` means the Attempt is suspended until a manager lets the candidate back in. `blocked_by_other_attempt` means another unfinished Attempt is in the way, and `not_eligible` means the candidate can't take part, for example because they left the Class or manage the Exam. `not_open`, `submitted`, `result_available` and `ended` follow the Sitting and Submission.
+         * @description Whether the candidate can enter now, and if not, why. `joinable` and `resumable` mean they can start or continue. `sitting_paused` means the Sitting is paused, and `await_reallow` means the Attempt is suspended until a manager lets the candidate back in. `blocked_by_other_attempt` means another unfinished Attempt is in the way, and `not_eligible` means the candidate can't take part, for example because they left the Class or manage the Exam. `waiting` means the Sitting's join window is open but the Sitting has not started: the candidate can run the readiness checks and read the instructions, and the Attempt starts at the scheduled start. `join_closed` means the join window has closed before they started. `not_open`, `submitted`, `result_available` and `ended` follow the Sitting and Submission.
          * @enum {string}
          */
-        readonly CandidateExamAccessState: "not_open" | "joinable" | "resumable" | "sitting_paused" | "await_reallow" | "blocked_by_other_attempt" | "not_eligible" | "submitted" | "result_available" | "ended";
+        readonly CandidateExamAccessState: "not_open" | "waiting" | "joinable" | "join_closed" | "resumable" | "sitting_paused" | "await_reallow" | "blocked_by_other_attempt" | "not_eligible" | "submitted" | "result_available" | "ended";
         /** @description The candidate's Attempt in this Sitting. */
         readonly CandidateExamActivityAttemptResponse: {
             readonly id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the workspace last acknowledged a change, from any Proctor Desktop the candidate used. Absent until the first change.
+             */
+            readonly last_saved_at?: string;
+            /**
+             * Format: date-time
+             * @description When an invigilator last let the candidate back in. Absent until that happens.
+             */
+            readonly reallowed_at?: string;
             /**
              * @description Current state of the Attempt.
              * @enum {string}
              */
             readonly state: "ready" | "active" | "suspended" | "submitted";
+            /**
+             * Format: date-time
+             * @description When the current suspension began, or the latest one if the candidate was let back in. Absent when the Attempt was never suspended.
+             */
+            readonly suspended_at?: string;
             /**
              * @description Why the Attempt is suspended, or null when it is not suspended.
              * @enum {string|null}
@@ -8899,6 +9585,8 @@ export interface components {
             readonly exam_id: components["schemas"]["ID"];
             /** @description The Sitting. */
             readonly exam_sitting_id: components["schemas"]["ID"];
+            /** @description The join window, when either bound is set. */
+            readonly join_window?: components["schemas"]["ExamSittingJoinWindow"];
             /** @description The released result, or null until it is released. */
             readonly result: components["schemas"]["CandidateExamActivityResultResponse"] | null;
             /**
@@ -8954,6 +9642,8 @@ export interface components {
         readonly CandidateExamActivitySubmissionResponse: {
             readonly id: components["schemas"]["ID"];
             readonly provenance: components["schemas"]["ExamSubmissionProvenance"];
+            /** @description The Submission's receipt code, the same value returned when it was submitted, in groups of four separated by hyphens. */
+            readonly receipt_code: string;
             /**
              * Format: date-time
              * @description Time the Submission was made.
@@ -9059,6 +9749,26 @@ export interface components {
             readonly workspace_cursor: number;
             /** @description ID of the Attempt Workspace. */
             readonly workspace_id: components["schemas"]["ID"];
+        };
+        /** @description The Exam's focus-loss rule as the candidate is told it before starting, from the Exam Revision the Sitting delivers. count and window_seconds are present only when the rule is on. */
+        readonly CandidateFocusLossRule: {
+            /** @description How many times leaving the exam window within window_seconds leads to the outcome. */
+            readonly count?: number;
+            /**
+             * @description The same value as the policy's focus_loss_mode.
+             * @enum {string}
+             */
+            readonly mode: "disabled" | "observe" | "enforce";
+            /**
+             * @description What the candidate experiences when the rule trips: nothing visible, a warning, or the Attempt is stopped until a manager lets them back in.
+             * @enum {string}
+             */
+            readonly outcome: "none" | "warning" | "suspension";
+            /**
+             * Format: int64
+             * @description The length of the rolling window, in whole seconds. A window with a fraction of a second is rounded up, so it is never shorter than the one that counts.
+             */
+            readonly window_seconds?: number;
         };
         /** @description One live correction published to the Sitting while the Attempt is in progress. */
         readonly CandidateLiveCorrection: {
@@ -9275,13 +9985,52 @@ export interface components {
              */
             readonly email: string;
         };
+        /** @description One Class. It includes the Class's teachers when the caller holds class.members.view on that Class. */
+        readonly ClassDetailResponse: {
+            /** @description The Academic Period the Class runs in. */
+            readonly academic_period_id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the Class was archived. Omitted while it is active.
+             */
+            readonly archived_at?: string;
+            /**
+             * Format: date-time
+             * @description When the Class was created.
+             */
+            readonly created_at: string;
+            /** @description Longer text shown to people, up to 1,024 characters. Empty when none was given. */
+            readonly description: string;
+            /** @description Name shown to people, up to 128 characters. */
+            readonly display_name: string;
+            /** @description The Class identifier. */
+            readonly id: components["schemas"]["ID"];
+            /** @description Machine name: lowercase letters, digits, hyphens and underscores, at most 64 characters. Unique among active Classes with the same Programme Level and Academic Period. */
+            readonly name: string;
+            /** @description The Programme Level the Class belongs to. */
+            readonly programme_level_id: components["schemas"]["ID"];
+            /**
+             * Format: int64
+             * @description Starts at 1 and goes up with every change. Send it as `expected_revision` on an update or archive so the change fails if someone else changed the Class first.
+             */
+            readonly revision: number;
+            /** @description Up to three of the Class's teachers, by name: the people holding a current Role Binding at the Class itself. Present only when the caller holds class.members.view on this Class, as an empty list when the Class has none. */
+            readonly teachers?: readonly components["schemas"]["PersonRef"][];
+            /** @description How many more teachers the Class has beyond `teachers`. Present with `teachers`. */
+            readonly teachers_more?: number;
+            /**
+             * Format: date-time
+             * @description When the Class last changed.
+             */
+            readonly updated_at: string;
+        };
         readonly ClassEnrollmentResponse: {
             /** @description The new enrollment. */
             readonly membership: components["schemas"]["ClassMemberResponse"];
             /** @description The student's earlier enrollment in the same Academic Period that this request ended, for a transfer or progression. Omitted when there was none. */
             readonly previous?: components["schemas"]["ClassMemberResponse"];
         };
-        /** @description One Class in a Class listing. It includes the current student count when the caller holds class.members.view on that Class. */
+        /** @description One Class in a Class listing. It includes the current student count and the teachers when the caller holds class.members.view on that Class. */
         readonly ClassListItemResponse: {
             /** @description The Academic Period the Class runs in. */
             readonly academic_period_id: components["schemas"]["ID"];
@@ -9314,6 +10063,10 @@ export interface components {
             readonly student_count?: number;
             /** @description True when `student_count` reached 10,000. Present with `student_count`. */
             readonly student_count_is_lower_bound?: boolean;
+            /** @description Up to three of the Class's teachers, by name: the people holding a current Role Binding at the Class itself. Present only when the caller holds class.members.view on this Class, as an empty list when the Class has none. */
+            readonly teachers?: readonly components["schemas"]["PersonRef"][];
+            /** @description How many more teachers the Class has beyond `teachers`. Present with `teachers`. */
+            readonly teachers_more?: number;
             /**
              * Format: date-time
              * @description When the Class last changed.
@@ -9330,10 +10083,54 @@ export interface components {
             /** @description True when `total` reached 10,000 and there may be more. Present with `total`. */
             readonly total_is_lower_bound?: boolean;
         };
+        /** @description One enrollment, who the student is, and, when its end moves the student to another Class, that transfer. */
+        readonly ClassMemberListItemResponse: {
+            /** @description The Academic Period of the Class, which the enrollment belongs to. */
+            readonly academic_period_id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the enrollment was archived. Omitted unless archived.
+             */
+            readonly archived_at?: string;
+            /** @description The Class the student is enrolled in. */
+            readonly class_id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the enrollment was created.
+             */
+            readonly created_at: string;
+            /**
+             * Format: email
+             * @description The student email, present with Institution-wide user.view.
+             */
+            readonly email?: string;
+            /**
+             * Format: date-time
+             * @description When the enrollment stops being in effect. Omitted while it has no end.
+             */
+            readonly end_at?: string;
+            /** @description The ID of the enrollment. */
+            readonly id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the enrollment takes effect.
+             */
+            readonly start_at: string;
+            readonly transfer?: components["schemas"]["ClassMemberTransfer"];
+            /**
+             * Format: date-time
+             * @description When the enrollment last changed, for example when it was ended.
+             */
+            readonly updated_at: string;
+            /** @description The enrolled student. Directory visibility controls the username and profile picture. */
+            readonly user: components["schemas"]["PersonRef"];
+            /** @description The enrolled student. */
+            readonly user_id: components["schemas"]["ID"];
+        };
         /** @description One page of enrollments in the requested order. Only the first page carries `total`. */
         readonly ClassMemberListResponse: {
             /** @description The enrollments on this page. */
-            readonly items: readonly components["schemas"]["ClassMemberResponse"][];
+            readonly items: readonly components["schemas"]["ClassMemberListItemResponse"][];
             readonly next_cursor?: components["schemas"]["NextCursor"];
             /** @description How many enrollments match the instant or history filter across all pages. Present only on the first page. Counting stops at 10,000, and then `total_is_lower_bound` is true. */
             readonly total?: number;
@@ -9374,6 +10171,21 @@ export interface components {
             readonly updated_at: string;
             /** @description The enrolled student. */
             readonly user_id: components["schemas"]["ID"];
+        };
+        /** @description The transfer that ends this enrollment: the student's enrollment in another Class starts exactly when this one ends. Omitted when the end is not a transfer. */
+        readonly ClassMemberTransfer: {
+            /**
+             * Format: date-time
+             * @description When the student moves, which is this enrollment's `end_at`.
+             */
+            readonly at: string;
+            /** @description The Class the student moves to, when visible to the reader. */
+            readonly to_class: components["schemas"]["ClassRef"];
+        };
+        readonly ClassRef: {
+            /** @description The Class's display name. */
+            readonly display_name: string;
+            readonly id: components["schemas"]["ID"];
         };
         readonly ClassResponse: {
             /** @description The Academic Period the Class runs in. */
@@ -9486,6 +10298,12 @@ export interface components {
              */
             readonly outcome: "flag_and_suspend";
         };
+        readonly CopyExamRequest: {
+            /** @description The Academic Unit that will own the copy. */
+            readonly academic_unit_id: components["schemas"]["ID"];
+            /** @description The copy's Draft title, up to 200 characters. Leading and trailing spaces are removed. */
+            readonly title: string;
+        };
         /** @description The candidate operations a correction affects, in sorted order. Changing the Browser Policy requires `browser`. Changing the instructions or resources requires `submission` and `workspace`. You may list more than the minimum. Listing capabilities without changing any content is rejected. The list is required even when `acknowledgement_required` is false. */
         readonly CorrectionCapabilitySelection: readonly components["schemas"]["CandidateCapability"][];
         /** @description The owner, display fields and time span for a new Academic Period. */
@@ -9528,6 +10346,8 @@ export interface components {
             readonly description?: string;
             /** @description Name shown to people, 1 to 128 characters. */
             readonly display_name: string;
+            /** @description Optional. The kind of Academic Unit. Omitted or empty means `other`. */
+            readonly kind?: string | components["schemas"]["AcademicUnitKind"] | "";
             /** @description Machine name: lowercase letters, digits, hyphens and underscores, starting with a letter or digit, at most 64 characters. It must be unique among the Institution's active Academic Units. */
             readonly name: string;
         };
@@ -9544,6 +10364,50 @@ export interface components {
              * @description When the Affiliation starts. Omit it to start now.
              */
             readonly start_at?: string;
+        };
+        /** @description Filters for a new audit export, and its format. */
+        readonly CreateAuditExportRequest: {
+            /** @description Include only Events with one of these actions. */
+            readonly action?: readonly components["schemas"]["AuditAction"][];
+            /** @description Include only Events where this User performed the action. */
+            readonly actor_id?: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description Include only Events at or after this time.
+             */
+            readonly created_after?: string;
+            /**
+             * Format: date-time
+             * @description Include only Events before this time. A later time, or none, means the time of the request.
+             */
+            readonly created_before?: string;
+            /**
+             * @description `csv` for a spreadsheet, with a header row, or `jsonl` for one JSON object per line.
+             * @enum {string}
+             */
+            readonly format: "csv" | "jsonl";
+            /**
+             * @description Include only reads or only changes.
+             * @enum {string}
+             */
+            readonly kind?: "read" | "change";
+            /**
+             * @description Order of the Events in the file, newest first unless `asc`.
+             * @default desc
+             * @enum {string}
+             */
+            readonly order: "asc" | "desc";
+            /** @description Include only Events on this resource. Send it with `resource_type`. */
+            readonly resource_id?: string;
+            /** @description Include only Events on this resource. Send it with `resource_id`. */
+            readonly resource_type?: string;
+            /**
+             * @description Include only Events with this status.
+             * @enum {string}
+             */
+            readonly status?: "attempt" | "success" | "fail";
+            /** @description Include only Events about this User. */
+            readonly subject_user_id?: components["schemas"]["ID"];
         };
         /** @description The Academic Period and display fields for a new Class. */
         readonly CreateClassRequest: {
@@ -9606,6 +10470,8 @@ export interface components {
             readonly description?: string;
             /** @description Name shown to people, 1 to 128 characters. */
             readonly display_name: string;
+            /** @description Optional. The kind of Programme. Omitted or empty means `other`. */
+            readonly kind?: string | components["schemas"]["ProgrammeKind"] | "";
             /** @description Machine name: lowercase letters, digits, hyphens and underscores, starting with a letter or digit, at most 64 characters. It must be unique among the Academic Unit's active Programmes. */
             readonly name: string;
         };
@@ -9622,6 +10488,11 @@ export interface components {
             readonly reason_code: "institution_request" | "integrity_review" | "records_review" | "review_not_required" | "case_closed" | "mistake" | "other";
             /** @description Submission to hold. Needs `exam_sitting_id`. */
             readonly submission_id?: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description Optional. When the hold is due for review, which must be in the future. When it passes the hold shows `due_for_review: true` and stays in force until a person releases it. Null is rejected.
+             */
+            readonly until?: string;
         };
         /** @description The Role grant to create. */
         readonly CreateRoleBindingRequest: {
@@ -10131,6 +11002,37 @@ export interface components {
             /** @description The state value the Desktop sent when it started this authorization. */
             readonly state: string;
         };
+        readonly DesktopBuildRevocation: {
+            /**
+             * @description The build's architecture. Omitted for a build this server's catalogue doesn't list.
+             * @enum {string}
+             */
+            readonly architecture?: "arm64" | "x64";
+            /** @description The refused Desktop build ID. */
+            readonly build_id: string;
+            /**
+             * @description The build's platform. Omitted for a build this server's catalogue doesn't list.
+             * @enum {string}
+             */
+            readonly platform?: "darwin" | "win32" | "linux";
+            /** @description Why the build is refused. */
+            readonly reason: string;
+            /** @description The build's release. Omitted for a build this server's catalogue doesn't list. */
+            readonly release?: string;
+            /**
+             * Format: date-time
+             * @description When the build was revoked for this reason.
+             */
+            readonly revoked_at: string;
+            /** @description Who revoked it. */
+            readonly revoked_by: components["schemas"]["PersonRef"];
+        };
+        readonly DesktopBuildRevocationRequest: {
+            /** @description The Desktop build ID to refuse. */
+            readonly build_id: string;
+            /** @description Why the build is refused, shown to administrators, up to 500 characters. Leading and trailing spaces are removed, and control characters are rejected. */
+            readonly reason: string;
+        };
         readonly DesktopCompatibilityPolicyRequest: {
             /** @description Plain text, up to 500 characters, that the server sends to Proctor Desktop with its compatibility status. Leading and trailing spaces are removed, and control characters are rejected. Send an empty string for no message. */
             readonly administrator_message: string;
@@ -10151,8 +11053,8 @@ export interface components {
              * @description Optional. When Proctor Desktop should try again during maintenance. Leave it out for no retry time, and always leave it out while `availability` is `ready`. Null is rejected.
              */
             readonly retry_at?: string;
-            /** @description Desktop build IDs to refuse even though this server release lists them as verified. Send an empty list to revoke none. */
-            readonly revoked_desktop_build_ids: readonly string[];
+            /** @description Desktop builds to refuse even though this server release lists them as verified, each build at most once. Send an empty list to revoke none. A build that stays revoked for the same reason keeps who revoked it and when; a new build, or a new reason, is recorded as revoked by you now. */
+            readonly revoked_desktop_builds: readonly components["schemas"]["DesktopBuildRevocationRequest"][];
         };
         readonly DesktopCompatibilityPolicyResponse: {
             /** @description Plain text the server sends to Proctor Desktop with its compatibility status. Empty when there is no message. */
@@ -10179,8 +11081,8 @@ export interface components {
              * @description Goes up with every change. Send it as `expected_revision` when you replace the policy.
              */
             readonly revision: number;
-            /** @description Desktop build IDs refused even though this server release lists them as verified. */
-            readonly revoked_desktop_build_ids: readonly string[];
+            /** @description Desktop builds refused even though this server release lists them as verified, ordered by build ID. */
+            readonly revoked_desktop_builds: readonly components["schemas"]["DesktopBuildRevocation"][];
             /**
              * Format: date-time
              * @description When the policy last changed.
@@ -10307,6 +11209,28 @@ export interface components {
              * @enum {string}
              */
             readonly status: "active" | "revoked";
+        };
+        readonly DesktopRelease: {
+            /** @enum {string} */
+            readonly architecture: "arm64" | "x64";
+            /** @description The build ID, as `revoked_desktop_builds` names it. */
+            readonly build_id: string;
+            /** @description True for the highest release this server verifies for the build's platform and architecture. */
+            readonly newest: boolean;
+            /** @enum {string} */
+            readonly platform: "darwin" | "win32" | "linux";
+            /** @description The release, a plain semantic version such as `1.4.0`. */
+            readonly release: string;
+            /**
+             * Format: date-time
+             * @description When the release was published.
+             */
+            readonly released_at: string;
+        };
+        /** @description One page of the Proctor Desktop builds this server release verifies, newest release first. The list is compiled into the server, so its pages never change while it runs. It is empty until signed releases exist. */
+        readonly DesktopReleaseListResponse: {
+            readonly items: readonly components["schemas"]["DesktopRelease"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
         };
         /** @description Optional details for disabling a User. */
         readonly DisableUserRequest: {
@@ -10635,7 +11559,7 @@ export interface components {
          * @description Machine-readable error code. Later versions may add values. Show your own label for each value, and a general message for one you don't recognize.
          * @enum {string}
          */
-        readonly ErrorCode: "academic_administration_preview.authorization_lost" | "academic_administration_preview.conflict" | "academic_administration_preview.expired" | "academic_administration_preview.target_conflict" | "academic_administration_preview.too_many_users" | "academic_period.conflict" | "academic_period.invalid" | "academic_unit.conflict" | "academic_unit.invalid" | "academic_unit_member.conflict" | "academic_unit_member.invalid" | "access_policy.blocked" | "access_policy.invalid" | "access_policy.revision_conflict" | "access_policy.unavailable" | "administration.unavailable" | "administrator_recovery.invalid" | "administrator_recovery.unavailable" | "affiliation.conflict" | "affiliation.invalid" | "affiliation.student_has_active_enrollment" | "assistant_profile.invalid" | "assistant_profile.limit_reached" | "assistant_profile.name_in_use" | "assistant_profile.not_found" | "assistant_profile.unavailable" | "audit.internal" | "audit.query.invalid" | "audit.unavailable" | "authentication.account_recovery.unavailable" | "authentication.account_token.invalid" | "authentication.client_type.invalid" | "authentication.credential_ambiguous" | "authentication.credentials_invalid" | "authentication.csrf.invalid" | "authentication.desktop_authorization.account_session_locked" | "authentication.desktop_authorization.disabled" | "authentication.desktop_authorization.incompatible" | "authentication.desktop_authorization.invalid" | "authentication.desktop_authorization.rejected" | "authentication.desktop_authorization.unavailable" | "authentication.desktop_reauthentication.denied" | "authentication.desktop_reauthentication.invalid" | "authentication.dpop.invalid" | "authentication.dpop.replayed" | "authentication.dpop.unavailable" | "authentication.dpop.use_nonce" | "authentication.email_change_undo.conflict" | "authentication.external.account_conflict" | "authentication.external.account_not_linked" | "authentication.external.invalid" | "authentication.external.provider_not_found" | "authentication.external.rejected" | "authentication.external.request.invalid" | "authentication.external.second_factor_expired" | "authentication.external.unavailable" | "authentication.internal" | "authentication.method.conflict" | "authentication.method.disabled" | "authentication.method.last_usable" | "authentication.method.not_found" | "authentication.method.provider_conflict" | "authentication.method.unavailable" | "authentication.mfa.code_invalid" | "authentication.mfa.conflict" | "authentication.mfa.disabled" | "authentication.mfa.enrollment_required" | "authentication.mfa.not_found" | "authentication.mfa.rekey.conflict" | "authentication.mfa.rekey.invalid" | "authentication.mfa.required" | "authentication.mfa.reset_invalid" | "authentication.mfa.unavailable" | "authentication.password.common_invalid" | "authentication.password.identity_invalid" | "authentication.password.invalid" | "authentication.password.pattern_invalid" | "authentication.password.reused" | "authentication.rate_limit_unavailable" | "authentication.rate_limited" | "authentication.reauthentication_method_required" | "authentication.reauthentication_required" | "authentication.registration.invalid" | "authentication.registration.invitation_required" | "authentication.registration.unavailable" | "authentication.required" | "authentication.session.invalid" | "authentication.session_required" | "authentication.sessions.maximum_reached" | "authentication.strong_required" | "authentication.token_invalid" | "authentication.user.conflict" | "authentication.user.invalid" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "class.conflict" | "class.enrollment_conflict" | "class.invalid" | "class_member.invalid" | "class_member.student_affiliation_required" | "desktop_compatibility_policy.invalid" | "desktop_compatibility_policy.revision_conflict" | "desktop_compatibility_policy.unavailable" | "desktop_registration.invalid" | "desktop_registration.revoked" | "desktop_registration.unavailable" | "environment_profile.invalid" | "environment_profile.limit_reached" | "environment_profile.name_in_use" | "environment_profile.not_found" | "environment_profile.unavailable" | "exam.archived" | "exam.assistant.disabled" | "exam.assistant.profile_unusable" | "exam.attempt.already_connected" | "exam.attempt.assistant_approval_conflict" | "exam.attempt.assistant_approval_not_found" | "exam.attempt.assistant_budget_exhausted" | "exam.attempt.assistant_busy" | "exam.attempt.assistant_disabled" | "exam.attempt.assistant_session_limit" | "exam.attempt.assistant_session_not_found" | "exam.attempt.assistant_turn_not_found" | "exam.attempt.assistant_unavailable" | "exam.attempt.browser_activity_conflict" | "exam.attempt.configuration_frozen" | "exam.attempt.configuration_required" | "exam.attempt.configuration_stale" | "exam.attempt.configuration_unsupported" | "exam.attempt.conflict" | "exam.attempt.connection_closed" | "exam.attempt.connection_lost" | "exam.attempt.continuity_invalid" | "exam.attempt.correction_conflict" | "exam.attempt.desktop_incompatible" | "exam.attempt.environment_changed" | "exam.attempt.environment_ended" | "exam.attempt.environment_not_found" | "exam.attempt.environment_not_running" | "exam.attempt.environment_unavailable" | "exam.attempt.focus_loss_conflict" | "exam.attempt.invalid" | "exam.attempt.management_authority_conflict" | "exam.attempt.not_found" | "exam.attempt.preview_connection_ended" | "exam.attempt.preview_limit_reached" | "exam.attempt.preview_not_allowed" | "exam.attempt.preview_port_closed" | "exam.attempt.registered_desktop_required" | "exam.attempt.renewal_conflict" | "exam.attempt.revision_conflict" | "exam.attempt.screen_clip_incomplete" | "exam.attempt.screen_clip_limit_reached" | "exam.attempt.screen_clip_too_large" | "exam.attempt.screen_recording_off" | "exam.attempt.sitting_not_open" | "exam.attempt.state_conflict" | "exam.attempt.suspension_conflict" | "exam.attempt.terminal_exited" | "exam.attempt.terminal_limit_reached" | "exam.attempt.terminal_not_found" | "exam.attempt.unavailable" | "exam.attempt.workspace.content_conflict" | "exam.attempt.workspace.cursor_conflict" | "exam.attempt.workspace.directory_not_empty" | "exam.attempt.workspace.entry_conflict" | "exam.attempt.workspace.entry_limit" | "exam.attempt.workspace.object_conflict" | "exam.attempt.workspace.path_conflict" | "exam.attempt.workspace.rate_limited" | "exam.attempt.workspace.size_limit" | "exam.browser.source_budget_exhausted" | "exam.conflict" | "exam.delivery.append_rate_limited" | "exam.delivery.batch_conflict" | "exam.delivery.control_rate_limited" | "exam.delivery.declaration_conflict" | "exam.delivery.detail_budget_exhausted" | "exam.delivery.metadata_capacity" | "exam.delivery.pending_capacity" | "exam.delivery.replay_window_exceeded" | "exam.delivery.sequence_limit" | "exam.delivery.summary_rate_limited" | "exam.delivery.upload_expired" | "exam.draft.no_changes" | "exam.draft.revision_conflict" | "exam.execution.disabled" | "exam.execution.profile_unusable" | "exam.export.claim_lost" | "exam.export.conflict" | "exam.export.expired" | "exam.export.limit" | "exam.export.not_found" | "exam.export.not_ready" | "exam.export.policy_unconfigured" | "exam.export.scope_changed" | "exam.export.source_retired" | "exam.export.unavailable" | "exam.integrity_review.incomplete" | "exam.integrity_review.invalid" | "exam.integrity_review.not_found" | "exam.integrity_review.revision_conflict" | "exam.integrity_review.state_conflict" | "exam.integrity_review.too_large" | "exam.integrity_review.unavailable" | "exam.invalid" | "exam.manager.candidate_conflict" | "exam.manager.exists" | "exam.manager.ineligible" | "exam.manager.not_found" | "exam.manager.owner_protected" | "exam.not_found" | "exam.owner.no_changes" | "exam.resource.conflict" | "exam.resource.content_invalid" | "exam.resource.invalid" | "exam.resource.limit" | "exam.resource.no_changes" | "exam.resource.not_found" | "exam.resource.order_invalid" | "exam.resource.revision_conflict" | "exam.resource.unavailable" | "exam.resource.upload_invalid" | "exam.revision.capacity_exceeded" | "exam.revision.no_changes" | "exam.revision_conflict" | "exam.security.attempt_not_ready" | "exam.security.catalog_missing" | "exam.security.configuration_unsupported" | "exam.security.control_conflict" | "exam.security.interaction_blocked" | "exam.security.policy_changed" | "exam.security.preflight_consumed" | "exam.security.preflight_expired" | "exam.security.preflight_rate_limited" | "exam.security.preflight_report_changed" | "exam.security.preflight_required" | "exam.security.preflight_superseded" | "exam.security.readiness_unmet" | "exam.security.resume_required" | "exam.security.session_changed" | "exam.security.unsupported_capability" | "exam.sitting.class_ineligible" | "exam.sitting.conflict" | "exam.sitting.correction.conflict" | "exam.sitting.correction.content_invalid" | "exam.sitting.correction.invalid" | "exam.sitting.correction.limit" | "exam.sitting.correction.manifest_conflict" | "exam.sitting.correction.no_changes" | "exam.sitting.correction.not_found" | "exam.sitting.correction.stage_conflict" | "exam.sitting.correction.unavailable" | "exam.sitting.deadline_reached" | "exam.sitting.extension_not_later" | "exam.sitting.invalid" | "exam.sitting.no_changes" | "exam.sitting.not_found" | "exam.sitting.revision_conflict" | "exam.sitting.schedule_not_future" | "exam.sitting.schedule_outside_period" | "exam.sitting.state_conflict" | "exam.sitting.unavailable" | "exam.starter_workspace.conflict" | "exam.starter_workspace.content_conflict" | "exam.starter_workspace.directory_not_empty" | "exam.starter_workspace.entry_kind" | "exam.starter_workspace.entry_limit" | "exam.starter_workspace.invalid" | "exam.starter_workspace.move_conflict" | "exam.starter_workspace.no_changes" | "exam.starter_workspace.not_found" | "exam.starter_workspace.object_conflict" | "exam.starter_workspace.parent_not_found" | "exam.starter_workspace.path_conflict" | "exam.starter_workspace.total_size_limit" | "exam.starter_workspace.unavailable" | "exam.starter_workspace.upload_expired" | "exam.unavailable" | "health.not_live" | "health.not_ready" | "idempotency.conflict" | "idempotency.in_progress" | "idempotency.key_invalid" | "idempotency.key_required" | "idempotency.not_supported" | "installation.already_initialized" | "installation.bootstrap_denied" | "installation.unavailable" | "institution.conflict" | "institution.invalid" | "invitation.class_period_conflict" | "invitation.conflict" | "invitation.invalid" | "invitation.mail_unavailable" | "invitation.query.invalid" | "invitation.role_not_delegable" | "invitation.unavailable" | "invitation.user_invalid" | "job.cancel.unsupported" | "job.conflict" | "job.query.invalid" | "job.retry.unsupported" | "job.unavailable" | "mail.conflict" | "mail.query.invalid" | "mail.recipient_ineligible" | "mail.recipient_unverified" | "mail.rekey.conflict" | "mail.rekey.invalid" | "mail.test.rate_limited" | "mail.unavailable" | "mfa.required_by_policy" | "onboarding_batch.duplicate" | "onboarding_import.conflict" | "onboarding_import.file_invalid" | "onboarding_import.unavailable" | "personal_access_token.invalid" | "personal_access_token.maximum_reached" | "personal_access_token.unavailable" | "plugin.invalid" | "plugin.not_found" | "plugin.required" | "plugin.revision_conflict" | "plugin.unavailable" | "profile_picture.invalid" | "profile_picture.unavailable" | "programme.conflict" | "programme.invalid" | "programme_level.conflict" | "programme_level.invalid" | "request.invalid" | "request.too_large" | "resource.not_found" | "retention.conflict" | "retention.invalid" | "retention.unavailable" | "retention_policy.invalid" | "retention_policy.revision_conflict" | "retention_policy.unavailable" | "role.built_in.protected" | "role.conflict" | "role.invalid" | "role.permission.invalid" | "role_binding.conflict" | "role_binding.invalid" | "role_binding.last_system_admin" | "role_binding.system_admin_scope_invalid" | "route.method_not_allowed" | "route.not_found" | "search.query.invalid" | "server.internal" | "service.busy" | "session.desktop_named_by_registration" | "session.id.invalid" | "session.invalid" | "session.not_found" | "student_progression.conflict" | "student_progression.effective_date_conflict" | "student_progression.lineage_conflict" | "student_progression.roster_too_large" | "student_progression.target_conflict" | "student_progression.unavailable" | "user.conflict" | "user.invalid" | "user.last_system_admin" | "user_settings.format_unsupported" | "user_settings.invalid" | "user_settings.revision_conflict" | "user_settings.unavailable" | "websocket.action.unknown" | "websocket.internal" | "websocket.origin.invalid" | "websocket.rate_limited" | "websocket.request.invalid" | "websocket.subscription.invalid" | "websocket.subscription.limit" | "websocket.unavailable";
+        readonly ErrorCode: "academic_administration_preview.authorization_lost" | "academic_administration_preview.conflict" | "academic_administration_preview.expired" | "academic_administration_preview.target_conflict" | "academic_administration_preview.too_many_users" | "academic_period.conflict" | "academic_period.invalid" | "academic_unit.conflict" | "academic_unit.invalid" | "academic_unit_member.conflict" | "academic_unit_member.invalid" | "access_policy.blocked" | "access_policy.invalid" | "access_policy.revision_conflict" | "access_policy.unavailable" | "administration.unavailable" | "administrator_recovery.invalid" | "administrator_recovery.unavailable" | "affiliation.conflict" | "affiliation.invalid" | "affiliation.student_has_active_enrollment" | "assistant_profile.invalid" | "assistant_profile.limit_reached" | "assistant_profile.name_in_use" | "assistant_profile.not_found" | "assistant_profile.unavailable" | "audit.export.expired" | "audit.export.limit" | "audit.export.not_found" | "audit.export.not_ready" | "audit.export.policy_unconfigured" | "audit.export.unavailable" | "audit.internal" | "audit.query.invalid" | "audit.unavailable" | "authentication.account_recovery.unavailable" | "authentication.account_token.invalid" | "authentication.client_type.invalid" | "authentication.credential_ambiguous" | "authentication.credentials_invalid" | "authentication.csrf.invalid" | "authentication.desktop_authorization.account_session_locked" | "authentication.desktop_authorization.disabled" | "authentication.desktop_authorization.incompatible" | "authentication.desktop_authorization.invalid" | "authentication.desktop_authorization.rejected" | "authentication.desktop_authorization.unavailable" | "authentication.desktop_reauthentication.denied" | "authentication.desktop_reauthentication.invalid" | "authentication.dpop.invalid" | "authentication.dpop.replayed" | "authentication.dpop.unavailable" | "authentication.dpop.use_nonce" | "authentication.email_change_undo.conflict" | "authentication.external.account_conflict" | "authentication.external.account_not_linked" | "authentication.external.invalid" | "authentication.external.provider_not_found" | "authentication.external.rejected" | "authentication.external.request.invalid" | "authentication.external.second_factor_expired" | "authentication.external.unavailable" | "authentication.internal" | "authentication.method.conflict" | "authentication.method.disabled" | "authentication.method.last_usable" | "authentication.method.not_found" | "authentication.method.provider_conflict" | "authentication.method.unavailable" | "authentication.mfa.code_invalid" | "authentication.mfa.conflict" | "authentication.mfa.disabled" | "authentication.mfa.enrollment_required" | "authentication.mfa.not_found" | "authentication.mfa.rekey.conflict" | "authentication.mfa.rekey.invalid" | "authentication.mfa.required" | "authentication.mfa.reset_invalid" | "authentication.mfa.unavailable" | "authentication.password.common_invalid" | "authentication.password.identity_invalid" | "authentication.password.invalid" | "authentication.password.pattern_invalid" | "authentication.password.reused" | "authentication.rate_limit_unavailable" | "authentication.rate_limited" | "authentication.reauthentication_method_required" | "authentication.reauthentication_required" | "authentication.registration.invalid" | "authentication.registration.invitation_required" | "authentication.registration.unavailable" | "authentication.required" | "authentication.session.invalid" | "authentication.session_required" | "authentication.sessions.maximum_reached" | "authentication.strong_required" | "authentication.token_invalid" | "authentication.user.conflict" | "authentication.user.invalid" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "class.conflict" | "class.enrollment_conflict" | "class.invalid" | "class_member.invalid" | "class_member.student_affiliation_required" | "desktop_compatibility_policy.invalid" | "desktop_compatibility_policy.revision_conflict" | "desktop_compatibility_policy.unavailable" | "desktop_registration.invalid" | "desktop_registration.revoked" | "desktop_registration.unavailable" | "environment_profile.invalid" | "environment_profile.limit_reached" | "environment_profile.name_in_use" | "environment_profile.not_found" | "environment_profile.unavailable" | "exam.archived" | "exam.assistant.disabled" | "exam.assistant.profile_unusable" | "exam.attempt.already_connected" | "exam.attempt.assistant_approval_conflict" | "exam.attempt.assistant_approval_not_found" | "exam.attempt.assistant_budget_exhausted" | "exam.attempt.assistant_busy" | "exam.attempt.assistant_disabled" | "exam.attempt.assistant_session_limit" | "exam.attempt.assistant_session_not_found" | "exam.attempt.assistant_turn_not_found" | "exam.attempt.assistant_unavailable" | "exam.attempt.browser_activity_conflict" | "exam.attempt.configuration_frozen" | "exam.attempt.configuration_required" | "exam.attempt.configuration_stale" | "exam.attempt.configuration_unsupported" | "exam.attempt.conflict" | "exam.attempt.connection_closed" | "exam.attempt.connection_lost" | "exam.attempt.continuity_invalid" | "exam.attempt.correction_conflict" | "exam.attempt.desktop_incompatible" | "exam.attempt.environment_changed" | "exam.attempt.environment_ended" | "exam.attempt.environment_not_found" | "exam.attempt.environment_not_running" | "exam.attempt.environment_unavailable" | "exam.attempt.focus_loss_conflict" | "exam.attempt.invalid" | "exam.attempt.join_closed" | "exam.attempt.management_authority_conflict" | "exam.attempt.not_found" | "exam.attempt.preview_connection_ended" | "exam.attempt.preview_limit_reached" | "exam.attempt.preview_not_allowed" | "exam.attempt.preview_port_closed" | "exam.attempt.registered_desktop_required" | "exam.attempt.renewal_conflict" | "exam.attempt.revision_conflict" | "exam.attempt.screen_clip_incomplete" | "exam.attempt.screen_clip_limit_reached" | "exam.attempt.screen_clip_too_large" | "exam.attempt.screen_recording_off" | "exam.attempt.sitting_not_open" | "exam.attempt.state_conflict" | "exam.attempt.suspension_conflict" | "exam.attempt.terminal_exited" | "exam.attempt.terminal_limit_reached" | "exam.attempt.terminal_not_found" | "exam.attempt.unavailable" | "exam.attempt.workspace.content_conflict" | "exam.attempt.workspace.cursor_conflict" | "exam.attempt.workspace.directory_not_empty" | "exam.attempt.workspace.entry_conflict" | "exam.attempt.workspace.entry_limit" | "exam.attempt.workspace.object_conflict" | "exam.attempt.workspace.path_conflict" | "exam.attempt.workspace.rate_limited" | "exam.attempt.workspace.size_limit" | "exam.browser.source_budget_exhausted" | "exam.conflict" | "exam.delivery.append_rate_limited" | "exam.delivery.batch_conflict" | "exam.delivery.control_rate_limited" | "exam.delivery.declaration_conflict" | "exam.delivery.detail_budget_exhausted" | "exam.delivery.metadata_capacity" | "exam.delivery.pending_capacity" | "exam.delivery.replay_window_exceeded" | "exam.delivery.sequence_limit" | "exam.delivery.summary_rate_limited" | "exam.delivery.upload_expired" | "exam.draft.no_changes" | "exam.draft.revision_conflict" | "exam.execution.disabled" | "exam.execution.profile_unusable" | "exam.export.claim_lost" | "exam.export.conflict" | "exam.export.expired" | "exam.export.limit" | "exam.export.not_found" | "exam.export.not_ready" | "exam.export.policy_unconfigured" | "exam.export.scope_changed" | "exam.export.source_retired" | "exam.export.unavailable" | "exam.integrity_review.incomplete" | "exam.integrity_review.invalid" | "exam.integrity_review.not_found" | "exam.integrity_review.result_released" | "exam.integrity_review.revision_conflict" | "exam.integrity_review.state_conflict" | "exam.integrity_review.too_large" | "exam.integrity_review.unavailable" | "exam.invalid" | "exam.manager.candidate_conflict" | "exam.manager.exists" | "exam.manager.ineligible" | "exam.manager.not_found" | "exam.manager.owner_protected" | "exam.not_found" | "exam.owner.no_changes" | "exam.resource.conflict" | "exam.resource.content_invalid" | "exam.resource.invalid" | "exam.resource.limit" | "exam.resource.no_changes" | "exam.resource.not_found" | "exam.resource.order_invalid" | "exam.resource.revision_conflict" | "exam.resource.unavailable" | "exam.resource.upload_invalid" | "exam.revision.capacity_exceeded" | "exam.revision.no_changes" | "exam.revision_conflict" | "exam.security.attempt_not_ready" | "exam.security.catalog_missing" | "exam.security.configuration_unsupported" | "exam.security.control_conflict" | "exam.security.interaction_blocked" | "exam.security.policy_changed" | "exam.security.preflight_consumed" | "exam.security.preflight_expired" | "exam.security.preflight_rate_limited" | "exam.security.preflight_report_changed" | "exam.security.preflight_required" | "exam.security.preflight_superseded" | "exam.security.readiness_unmet" | "exam.security.resume_required" | "exam.security.session_changed" | "exam.security.unsupported_capability" | "exam.sitting.class_ineligible" | "exam.sitting.conflict" | "exam.sitting.correction.conflict" | "exam.sitting.correction.content_invalid" | "exam.sitting.correction.invalid" | "exam.sitting.correction.limit" | "exam.sitting.correction.manifest_conflict" | "exam.sitting.correction.no_changes" | "exam.sitting.correction.not_found" | "exam.sitting.correction.stage_conflict" | "exam.sitting.correction.unavailable" | "exam.sitting.deadline_reached" | "exam.sitting.extension_not_later" | "exam.sitting.invalid" | "exam.sitting.no_changes" | "exam.sitting.not_found" | "exam.sitting.revision_conflict" | "exam.sitting.schedule_not_future" | "exam.sitting.schedule_outside_period" | "exam.sitting.state_conflict" | "exam.sitting.unavailable" | "exam.starter_workspace.conflict" | "exam.starter_workspace.content_conflict" | "exam.starter_workspace.directory_not_empty" | "exam.starter_workspace.entry_kind" | "exam.starter_workspace.entry_limit" | "exam.starter_workspace.invalid" | "exam.starter_workspace.move_conflict" | "exam.starter_workspace.no_changes" | "exam.starter_workspace.not_found" | "exam.starter_workspace.object_conflict" | "exam.starter_workspace.parent_not_found" | "exam.starter_workspace.path_conflict" | "exam.starter_workspace.total_size_limit" | "exam.starter_workspace.unavailable" | "exam.starter_workspace.upload_expired" | "exam.unavailable" | "health.not_live" | "health.not_ready" | "idempotency.conflict" | "idempotency.in_progress" | "idempotency.key_invalid" | "idempotency.key_required" | "idempotency.not_supported" | "installation.already_initialized" | "installation.bootstrap_denied" | "installation.unavailable" | "institution.conflict" | "institution.invalid" | "invitation.class_period_conflict" | "invitation.conflict" | "invitation.invalid" | "invitation.mail_unavailable" | "invitation.query.invalid" | "invitation.role_not_delegable" | "invitation.unavailable" | "invitation.user_invalid" | "job.cancel.unsupported" | "job.conflict" | "job.query.invalid" | "job.retry.unsupported" | "job.unavailable" | "mail.conflict" | "mail.query.invalid" | "mail.recipient_ineligible" | "mail.recipient_unverified" | "mail.rekey.conflict" | "mail.rekey.invalid" | "mail.test.rate_limited" | "mail.unavailable" | "mfa.required_by_policy" | "onboarding_batch.duplicate" | "onboarding_import.conflict" | "onboarding_import.file_invalid" | "onboarding_import.unavailable" | "personal_access_token.invalid" | "personal_access_token.maximum_reached" | "personal_access_token.unavailable" | "plugin.invalid" | "plugin.not_found" | "plugin.required" | "plugin.revision_conflict" | "plugin.unavailable" | "profile_picture.invalid" | "profile_picture.unavailable" | "programme.conflict" | "programme.invalid" | "programme_level.conflict" | "programme_level.invalid" | "request.invalid" | "request.too_large" | "resource.not_found" | "retention.conflict" | "retention.invalid" | "retention.unavailable" | "retention_policy.invalid" | "retention_policy.revision_conflict" | "retention_policy.unavailable" | "role.built_in.protected" | "role.conflict" | "role.invalid" | "role.permission.invalid" | "role_binding.conflict" | "role_binding.invalid" | "role_binding.last_system_admin" | "role_binding.system_admin_scope_invalid" | "route.method_not_allowed" | "route.not_found" | "search.query.invalid" | "server.internal" | "service.busy" | "session.desktop_named_by_registration" | "session.id.invalid" | "session.invalid" | "session.not_found" | "student_progression.conflict" | "student_progression.effective_date_conflict" | "student_progression.lineage_conflict" | "student_progression.roster_too_large" | "student_progression.target_conflict" | "student_progression.unavailable" | "user.conflict" | "user.invalid" | "user.last_system_admin" | "user_settings.format_unsupported" | "user_settings.invalid" | "user_settings.revision_conflict" | "user_settings.unavailable" | "websocket.action.unknown" | "websocket.internal" | "websocket.origin.invalid" | "websocket.rate_limited" | "websocket.request.invalid" | "websocket.subscription.invalid" | "websocket.subscription.limit" | "websocket.unavailable";
         /** @description An Attempt Connection. */
         readonly ExamAttemptConnectionResponse: {
             /** @description Why the Connection closed. Present only when state is closed. */
@@ -10677,6 +11601,12 @@ export interface components {
             readonly created_at: string;
             /** @description The open Connection. Omitted when no Connection is open. */
             readonly current_connection?: components["schemas"]["ExamAttemptConnectionResponse"];
+            /** @description The manager's private reason for ending the Attempt. Present with ended_by_user_id. */
+            readonly end_reason_text?: string;
+            /** @description The manager who ended the Attempt, named. Present with ended_by_user_id. */
+            readonly ended_by?: components["schemas"]["PersonRef"];
+            /** @description The manager who ended the Attempt. Present only when a manager ended it, and only for callers who may manage the Sitting. */
+            readonly ended_by_user_id?: components["schemas"]["ID"];
             /** @description ID of the Exam. */
             readonly exam_id: components["schemas"]["ID"];
             /** @description ID of the Exam Sitting. */
@@ -10903,6 +11833,29 @@ export interface components {
              */
             readonly workspace_maximum_total_bytes: number;
         };
+        /** @description The result of running the publication checks on the current Draft. */
+        readonly ExamDraftCheckResponse: {
+            /**
+             * Format: int64
+             * @description The Draft revision that was checked. Send it as expected_revision when you publish.
+             */
+            readonly draft_revision: number;
+            /** @description Every check the Draft fails, in the order publishing checks them. Publishing fails with the first. */
+            readonly problems: readonly components["schemas"]["ExamDraftProblem"][];
+            /** @description True when the Draft fails no check, so problems is empty. */
+            readonly publishable: boolean;
+        };
+        /** @description One reason the Draft can't be published. */
+        readonly ExamDraftProblem: {
+            /** @description The error code publishing returns for this problem, such as exam.revision.capacity_exceeded or exam.execution.disabled. */
+            readonly code: string;
+            /** @description The part of the Draft at fault, such as policy.execution, resources.size_bytes or starter_workspace.total_bytes. */
+            readonly field: string;
+            /** @description A sentence explaining the problem to the author, in the request's language. */
+            readonly message: string;
+            /** @description The Resource at fault. Present only when field is resources.size_bytes. */
+            readonly resource_id?: components["schemas"]["ID"];
+        };
         /** @description The Exam's single editable Draft. Publishing copies it into a new Revision. Editing it afterwards never changes a Revision that is already published. */
         readonly ExamDraftResponse: {
             /** @description The Revision most recently published from this Draft. Omitted until the Draft is first published. */
@@ -10933,6 +11886,10 @@ export interface components {
              * @description When the Draft last changed.
              */
             readonly updated_at: string;
+            /** @description The User who made the Draft's latest change, named. */
+            readonly updated_by?: components["schemas"]["PersonRef"];
+            /** @description The User who made the Draft's latest change, including a Resource or Starter Workspace change and publishing. */
+            readonly updated_by_user_id: components["schemas"]["ID"];
         };
         /** @description A request for a temporary export archive, and its state. */
         readonly ExamExportResponse: {
@@ -11007,12 +11964,16 @@ export interface components {
              * @description When the Exam was created.
              */
             readonly created_at: string;
+            /** @description The User who created the Exam, named. */
+            readonly creator?: components["schemas"]["PersonRef"];
             /** @description The User who created the Exam. This never changes. */
             readonly creator_user_id: components["schemas"]["ID"];
             /** @description The most recently published Revision of this Exam. Omitted until the Exam is first published. */
             readonly default_revision_id?: components["schemas"]["ID"];
             /** @description The Exam ID. */
             readonly id: components["schemas"]["ID"];
+            /** @description The Exam's owner, named. */
+            readonly owner?: components["schemas"]["PersonRef"];
             /** @description The User who currently owns the Exam. It starts as the creator and changes only by an ownership transfer. */
             readonly owner_user_id: components["schemas"]["ID"];
             /**
@@ -11203,6 +12164,8 @@ export interface components {
              * @enum {string}
              */
             readonly state: "open" | "closed";
+            /** @description One sentence, in the request's language, saying what the policy saw and how often, counting evidence beyond what was kept. A browser rule uses its frozen label if available and otherwise its identifier. Desktop check identifiers may appear. Application names stay in the Desktop catalogue. */
+            readonly summary: string;
             /**
              * Format: int64
              * @description The number of missing signals in the sequence that were still missing when collection ended.
@@ -11211,6 +12174,8 @@ export interface components {
         };
         /** @description The current private decision on one integrity Flag. */
         readonly ExamIntegrityReviewDecisionResponse: {
+            /** @description Who made the decision, named. */
+            readonly actor?: components["schemas"]["PersonRef"];
             /** @description The manager who made the current decision. */
             readonly actor_user_id: components["schemas"]["ID"];
             /**
@@ -11276,6 +12241,8 @@ export interface components {
              * @enum {string}
              */
             readonly integrity_state: "settled" | "gapped";
+            /** @description The latest private reopening reason. Only shown with permission to manage the Sitting. */
+            readonly latest_reopening_reason?: string;
             /** @description The count and digest of native condition records kept for the Attempt. */
             readonly native_conditions: components["schemas"]["NativeConditionInventory"];
             /** @description The Review. Omitted until a manager creates one. */
@@ -11293,6 +12260,10 @@ export interface components {
             readonly items: readonly components["schemas"]["ExamSummaryResponse"][];
             /** @description Send this back as cursor to get the next page. Omitted on the last page. */
             readonly next_cursor?: string;
+            /** @description Number of Exams, across all pages, that match the filters and that you may see. Present only on the first page. Counting stops at 10,000, and then total_is_lower_bound is true. */
+            readonly total?: number;
+            /** @description True when counting stopped at its bound, so total is "at least". Present with total. */
+            readonly total_is_lower_bound?: boolean;
         };
         /** @description The result of adding a Manager, removing one, or transferring ownership. */
         readonly ExamManagerChangeResponse: {
@@ -11314,12 +12285,16 @@ export interface components {
              * @description When this User became a Manager.
              */
             readonly granted_at: string;
+            /** @description Who added this manager, named. */
+            readonly granted_by?: components["schemas"]["PersonRef"];
             /** @description The User who made this person a Manager. For the creator, this is the creator. */
             readonly granted_by_user_id: components["schemas"]["ID"];
             /** @description True when this User created the Exam. This never changes, even after an ownership transfer. */
             readonly is_creator: boolean;
             /** @description True when this User currently owns the Exam. In the response to a removal, it is always false, because the User no longer manages the Exam. */
             readonly is_owner: boolean;
+            /** @description The manager, named. */
+            readonly user?: components["schemas"]["PersonRef"];
             /** @description The User who manages the Exam. */
             readonly user_id: components["schemas"]["ID"];
         };
@@ -11388,6 +12363,11 @@ export interface components {
              * @description Number of Submissions in the Sitting.
              */
             readonly submission_count: number;
+        };
+        readonly ExamRef: {
+            /** @description The Exam title. */
+            readonly display_name: string;
+            readonly id: components["schemas"]["ID"];
         };
         /** @description The metadata part of a Resource content replacement. */
         readonly ExamResourceContentReplacementMetadata: {
@@ -11501,11 +12481,59 @@ export interface components {
             /** @description The User who currently owns the Exam. This is the same value as exam.owner_user_id. */
             readonly owner_user_id: components["schemas"]["ID"];
         };
+        /** @description What a Revision froze besides its files, in the same shape as the Draft. */
+        readonly ExamRevisionContentResponse: {
+            /** @description The browser rules the Revision froze. */
+            readonly browser_policy: components["schemas"]["BrowserPolicy"];
+            /** @description The Exam the Revision belongs to. */
+            readonly exam_id: components["schemas"]["ID"];
+            /** @description The instructions the Revision froze, as Markdown. Empty when there are none. */
+            readonly instructions_markdown: string;
+            /**
+             * Format: int64
+             * @description The Revision's number within its Exam, starting at 1.
+             */
+            readonly number: number;
+            /** @description The integrity rules the Revision froze. */
+            readonly policy: components["schemas"]["ExamPolicySet"];
+            /** @description The Revision. */
+            readonly revision_id: components["schemas"]["ID"];
+            /** @description The title the Revision froze. */
+            readonly title: string;
+        };
         readonly ExamRevisionListResponse: {
             /** @description The Revisions on this page, newest first. */
             readonly items: readonly components["schemas"]["ExamRevisionResponse"][];
             /** @description Send this back as cursor to get the next page. Omitted on the last page. */
             readonly next_cursor?: string;
+        };
+        readonly ExamRevisionResourceListResponse: {
+            /** @description The Resources on this page, in Revision order. */
+            readonly items: readonly components["schemas"]["ExamRevisionResourceResponse"][];
+            /** @description Send this back as cursor to get the next page. Omitted on the last page. */
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description One Resource as a Revision froze it. */
+        readonly ExamRevisionResourceResponse: {
+            /** @description The content the Revision froze. A different id means different content. */
+            readonly content_revision_id: components["schemas"]["ID"];
+            /** @description The description candidates see, as Markdown. Empty when there is none. */
+            readonly description_markdown: string;
+            /** @description The name candidates see. */
+            readonly display_name: string;
+            /** @description The Resource. The same Resource keeps its id across the Draft and every Revision. */
+            readonly id: components["schemas"]["ID"];
+            /** @description The content's media type. */
+            readonly media_type: string;
+            /** @description The Resource's place in the list, starting at 0. */
+            readonly position: number;
+            /** @description The SHA-256 digest of the content, in lowercase hex. */
+            readonly sha256: string;
+            /**
+             * Format: int64
+             * @description The content's size in bytes.
+             */
+            readonly size: number;
         };
         /** @description A summary of one published Revision. A Revision is a copy of the Draft taken at publication, and it can't change. */
         readonly ExamRevisionResponse: {
@@ -11541,6 +12569,8 @@ export interface components {
              * @description When the Revision was published.
              */
             readonly published_at: string;
+            /** @description Who published the Revision, named. */
+            readonly published_by?: components["schemas"]["PersonRef"];
             /** @description The User who published the Revision. */
             readonly published_by_user_id: components["schemas"]["ID"];
             /** @description How many Resources the Revision includes. */
@@ -11562,8 +12592,69 @@ export interface components {
             /** @description The Exam title at publication. */
             readonly title: string;
         };
+        /** @description One Starter Workspace file or directory as a Revision froze it. */
+        readonly ExamRevisionStarterWorkspaceEntryResponse: {
+            /** @description The file's content version. A different value means different bytes. Omitted for a directory. */
+            readonly content_version?: string;
+            /** @description The entry. The same entry keeps its id across the Draft and every Revision. */
+            readonly id: components["schemas"]["ID"];
+            /**
+             * @description Whether the entry is a file or a directory.
+             * @enum {string}
+             */
+            readonly kind: "file" | "directory";
+            /** @description The file's media type. Omitted for a directory. */
+            readonly media_type?: string;
+            /** @description The entry's path, with / between parts. */
+            readonly path: string;
+            /** @description The SHA-256 digest of the file, in lowercase hex. Omitted for a directory. */
+            readonly sha256?: string;
+            /**
+             * Format: int64
+             * @description The file's size in bytes. Omitted for a directory.
+             */
+            readonly size?: number;
+        };
+        readonly ExamRevisionStarterWorkspaceListResponse: {
+            /** @description The entries on this page, in path order. */
+            readonly items: readonly components["schemas"]["ExamRevisionStarterWorkspaceEntryResponse"][];
+            /** @description Send this back as cursor to get the next page. Omitted on the last page. */
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        readonly ExamSittingAcrossItemResponse: {
+            /** @description The Academic Unit that owns the Exam. */
+            readonly academic_unit_id: components["schemas"]["ID"];
+            readonly class: components["schemas"]["ClassRef"];
+            /** @description The candidate board's counts, for an open or paused Sitting only. */
+            readonly counts?: components["schemas"]["SittingCandidateStatusCounts"];
+            readonly exam: components["schemas"]["ExamRef"];
+            readonly id: components["schemas"]["ID"];
+            /**
+             * Format: int64
+             * @description Exact count within one open or paused Sitting. Includes candidates who are suspended, fail an enforced native check, or have unresolved integrity attention.
+             */
+            readonly needs_attention_count?: number;
+            /** Format: int64 */
+            readonly revision: number;
+            /** Format: date-time */
+            readonly scheduled_end_at: string;
+            /** Format: date-time */
+            readonly scheduled_start_at: string;
+            readonly state: components["schemas"]["ExamSittingState"];
+        };
+        readonly ExamSittingAcrossListResponse: {
+            readonly items: readonly components["schemas"]["ExamSittingAcrossItemResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+            /**
+             * Format: date-time
+             * @description Server time the counts were worked out at.
+             */
+            readonly server_time: string;
+        };
         /** @description One page of the candidate-status board for a Sitting. */
         readonly ExamSittingCandidateStatusesResponse: {
+            /** @description Counts of the whole board at server_time, on the first page only. The filters do not apply to them. */
+            readonly counts?: components["schemas"]["SittingCandidateStatusCounts"];
             /**
              * Format: int64
              * @description How many of the Sitting's execution environments wait for a host with room, across every page.
@@ -11682,6 +12773,59 @@ export interface components {
             /** @description The Sitting's state after the correction, either `open` or `paused`. */
             readonly sitting_state: components["schemas"]["ExamSittingState"];
         };
+        /** @description One live correction and how many of the candidates it applies to have acknowledged it. */
+        readonly ExamSittingCorrectionSummary: {
+            /** @description How many candidates have acknowledged it. */
+            readonly acknowledged_count: number;
+            /** @description Whether candidates must acknowledge the correction. */
+            readonly acknowledgement_required: boolean;
+            /**
+             * Format: date-time
+             * @description When the correction took effect.
+             */
+            readonly effective_at: string;
+            /**
+             * Format: int64
+             * @description The correction Revision's number.
+             */
+            readonly number: number;
+            /** @description How many candidates must acknowledge it: those admitted before it who had not submitted when it took effect. Zero when no acknowledgement is required. */
+            readonly required_count: number;
+            /** @description The correction's Revision. */
+            readonly revision_id: components["schemas"]["ID"];
+        };
+        /** @description One manager action on a Sitting and the manager's private reason. */
+        readonly ExamSittingHistoryEntry: {
+            /** @description The manager who acted, named. */
+            readonly actor?: components["schemas"]["PersonRef"];
+            /** @description The manager who acted. */
+            readonly actor_user_id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When.
+             */
+            readonly at: string;
+            /**
+             * @description What the manager did.
+             * @enum {string}
+             */
+            readonly kind: "canceled" | "paused" | "resumed" | "extended" | "closed";
+            /** @description The manager's private reason, in their words. */
+            readonly reason: string;
+        };
+        /** @description When candidates may join. Leave a bound out for none. From opens_at, at or before the start, candidates can run the readiness checks and read the instructions; Attempts still start when the Sitting opens at the scheduled start. closes_at, after the start and at or before the deadline, refuses first entry from then on with exam.attempt.join_closed, while candidates who already started carry on. The window is frozen once the Sitting opens. */
+        readonly ExamSittingJoinWindow: {
+            /**
+             * Format: date-time
+             * @description When candidates who have not started can no longer join.
+             */
+            readonly closes_at?: string;
+            /**
+             * Format: date-time
+             * @description When candidates can join early to prepare.
+             */
+            readonly opens_at?: string;
+        };
         /** @description One page of Sittings, latest scheduled start first. */
         readonly ExamSittingListResponse: {
             /** @description The Sittings on this page, at most `limit`. */
@@ -11708,21 +12852,32 @@ export interface components {
         };
         /** @description A candidate who was in the Class when the Sitting opened and never started an Attempt. */
         readonly ExamSittingNoShowResponse: {
+            /** @description The candidate, in the same shape the candidate statuses use. */
+            readonly candidate: components["schemas"]["PersonRef"];
             /** @description The candidate's user ID. */
             readonly candidate_user_id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the class membership the candidate held as the Sitting opened began.
+             */
+            readonly class_member_since: string;
         };
         /**
          * @description Why the Sitting was canceled or closed. `manager_canceled`, `schedule_elapsed` and `academic_structure_invalid` explain a cancellation. `manager_closed` and `scheduled_end_reached` explain a closure. The code never contains the manager's private reason.
          * @enum {string}
          */
         readonly ExamSittingReasonCode: "manager_canceled" | "schedule_elapsed" | "academic_structure_invalid" | "manager_closed" | "scheduled_end_reached";
-        /** @description One Sitting as a manager sees it. It never includes candidate credentials, private manager reasons, answers or integrity evidence. */
+        /** @description One Sitting as a manager sees it. It never includes candidate credentials, answers or integrity evidence. Managers' private reasons appear only in history, only to those who may manage the Sitting. */
         readonly ExamSittingResponse: {
             /**
              * Format: date-time
              * @description When the Sitting was canceled. Omitted unless it was canceled.
              */
             readonly canceled_at?: string;
+            /** @description How many candidates the Sitting's board lists: everyone with an Attempt and the Class members it admits. Present on reads, not on the result of a change. Counting stops at 10,000. */
+            readonly candidate_count?: number;
+            /** @description True when counting stopped at its bound, so candidate_count is "at least". Present with candidate_count. */
+            readonly candidate_count_is_lower_bound?: boolean;
             /** @description The Class whose members can take this Sitting. */
             readonly class_id: components["schemas"]["ID"];
             /**
@@ -11735,6 +12890,8 @@ export interface components {
              * @description When closing began. Omitted until the Sitting starts closing.
              */
             readonly closing_at?: string;
+            /** @description The Sitting's live corrections, oldest first, with how many candidates have acknowledged each. Present when reading one Sitting. */
+            readonly corrections?: readonly components["schemas"]["ExamSittingCorrectionSummary"][];
             /**
              * Format: date-time
              * @description When the Sitting was scheduled.
@@ -11744,8 +12901,12 @@ export interface components {
             readonly exam_id: components["schemas"]["ID"];
             /** @description The Exam Revision candidates receive. A live correction replaces it with the corrected Revision. */
             readonly exam_revision_id: components["schemas"]["ID"];
+            /** @description Manager actions on the Sitting with the manager's private reason, newest first. Present only when reading one Sitting as someone who may manage it; never shown to candidates. */
+            readonly history?: readonly components["schemas"]["ExamSittingHistoryEntry"][];
             /** @description The Sitting's ID. */
             readonly id: components["schemas"]["ID"];
+            /** @description The join window, when either bound is set. */
+            readonly join_window?: components["schemas"]["ExamSittingJoinWindow"];
             /**
              * Format: date-time
              * @description When the Sitting opened. Omitted until it opens.
@@ -11770,7 +12931,7 @@ export interface components {
             readonly scheduled_end_at: string;
             /**
              * Format: date-time
-             * @description When the Sitting is scheduled to open.
+             * @description When the Sitting opens and every Attempt can start, whether or not candidates joined early.
              */
             readonly scheduled_start_at: string;
             readonly state: components["schemas"]["ExamSittingState"];
@@ -11974,6 +13135,8 @@ export interface components {
              * @description The total size of all sealed files, in bytes.
              */
             readonly manifest_total_file_bytes: number;
+            /** @description The receipt code the candidate was given when the Submission sealed, in groups of four, so a manager can match the code a candidate reads out. */
+            readonly receipt_code: string;
             /** @description The Submission's ID. */
             readonly submission_id: components["schemas"]["ID"];
             /**
@@ -12083,6 +13246,8 @@ export interface components {
              * @description When the Review was created.
              */
             readonly created_at: string;
+            /** @description Who started the review, named. */
+            readonly created_by?: components["schemas"]["PersonRef"];
             /** @description The manager who created the Review. */
             readonly created_by_user_id: components["schemas"]["ID"];
             /** @description The number of Discrepancies covered at finalization. 0 while the Review is a draft. */
@@ -12096,6 +13261,8 @@ export interface components {
              * @description When the Review was finalized. Present only once it is finalized.
              */
             readonly finalized_at?: string;
+            /** @description Who finalized the review, named. Omitted until it is finalized. */
+            readonly finalized_by?: components["schemas"]["PersonRef"];
             /** @description The manager who finalized the Review. Present only once it is finalized. */
             readonly finalized_by_user_id?: components["schemas"]["ID"];
             /** @description The number of Flags covered at finalization. 0 while the Review is a draft. */
@@ -12114,6 +13281,8 @@ export interface components {
              * @description When the result was released. Present only once it is released.
              */
             readonly released_at?: string;
+            /** @description Who released the result, named. Omitted until it is released. */
+            readonly released_by?: components["schemas"]["PersonRef"];
             /** @description The manager who released the result. Present only once it is released. */
             readonly released_by_user_id?: components["schemas"]["ID"];
             /**
@@ -12147,6 +13316,8 @@ export interface components {
              * @description When the Exam was archived. Omitted while the Exam is active.
              */
             readonly archived_at?: string;
+            /** @description The User who created the Exam, named. */
+            readonly creator?: components["schemas"]["PersonRef"];
             /** @description The User who created the Exam. */
             readonly creator_user_id: components["schemas"]["ID"];
             /** @description The Exam ID. */
@@ -12155,8 +13326,18 @@ export interface components {
             readonly manager_count: number;
             /** @description How many of the Exam's Sittings match the Sitting filters. Without Sitting filters, this equals sitting_count. */
             readonly matching_sitting_count: number;
+            /** @description How many candidates of the Exam's open and paused Sittings need a manager: suspended, failing a check or with unresolved integrity attention. Present only when you may view the Exam's Sittings. Counting stops at 10,000. */
+            readonly needs_attention_count?: number;
+            /** @description True when counting stopped at its bound. Present with needs_attention_count. */
+            readonly needs_attention_count_is_lower_bound?: boolean;
+            /** @description The Exam's owner, named. */
+            readonly owner?: components["schemas"]["PersonRef"];
             /** @description The User who currently owns the Exam. */
             readonly owner_user_id: components["schemas"]["ID"];
+            /** @description How many of the Exam's Submissions have no finalized review, excluding your own. Present only when you may view and review the Exam's Submissions. Counting stops at 10,000. */
+            readonly pending_review_count?: number;
+            /** @description True when counting stopped at its bound. Present with pending_review_count. */
+            readonly pending_review_count_is_lower_bound?: boolean;
             /**
              * Format: int64
              * @description The Exam's current revision number. Send it as expected_revision when you archive the Exam or change its Managers or owner.
@@ -12505,6 +13686,8 @@ export interface components {
             readonly expires_at: string;
             /** @description The ID of the Invitation. */
             readonly id: components["schemas"]["ID"];
+            /** @description The User who issued the Invitation, named. For an imported Invitation, this is the importer. */
+            readonly inviter?: components["schemas"]["PersonRef"];
             /** @description The User who issued the Invitation. */
             readonly inviter_user_id: components["schemas"]["ID"];
             /**
@@ -12517,10 +13700,14 @@ export interface components {
              * @description The Invitation's revision, which goes up each time it changes. Send it as `expected_revision` to resend, revoke or replace the Invitation.
              */
             readonly revision: number;
+            /** @description The Role granted, with its display name. */
+            readonly role?: components["schemas"]["RoleRef"];
             /** @description The actions the Role allowed when the Invitation was issued, as recorded in the Invitation. */
             readonly role_actions?: readonly string[];
             /** @description The Role the Invitation grants. Present for every purpose except `student_class`. */
             readonly role_id?: components["schemas"]["ID"];
+            /** @description Where the grant applies. */
+            readonly scope: components["schemas"]["ScopeRef"];
             /**
              * Format: date-time
              * @description When the relationship the Invitation grants starts. When the issuer gave no start, a student Class Invitation starts with its Academic Period and every other Invitation starts when it was issued.
@@ -12596,6 +13783,8 @@ export interface components {
             readonly status: "succeeded" | "no_op" | "failed";
         };
         readonly InvitationBatchRequest: {
+            /** @description How many whole days every new Invitation in the batch can be accepted for, from 1 to 30, given once for the batch. Omit it or send null for the default lifetime. Only the `.create` operations take it; on `resend` or `revoke`, or outside the range, the whole batch is refused with `request.invalid` on `expires_in_days`. */
+            readonly expires_in_days?: number | null;
             /** @description The items to process, from 1 to 200. */
             readonly items: readonly components["schemas"]["InvitationBatchItemRequest"][];
             /**
@@ -12839,7 +14028,7 @@ export interface components {
          * @description Public reason a Job or Job Attempt failed. It never carries internal error detail. The server only uses the values listed here, but later releases may add more. Clients choose their own labels and should show an unknown value in a generic way.
          * @enum {string}
          */
-        readonly JobErrorCode: "academic_administration_preview.authorization_lost" | "academic_administration_preview.target_conflict" | "academic_administration_preview.too_many_users" | "database.unavailable" | "dependency.unavailable" | "exam.export.expired" | "exam.export.unavailable" | "file.backend_unavailable" | "job.canceled" | "job.checkpoint.invalid" | "job.command.invalid" | "job.invariant_failed" | "mail.delivery.conflict" | "mail.delivery.failed" | "mail.delivery.not_found" | "mail.delivery.unavailable" | "mail.message.invalid" | "mail.payload.unavailable" | "mail.rekey.fenced" | "mail.rekey.incomplete" | "mail.rekey.invariant_failed" | "mail.rekey.payload_unavailable" | "mail.rekey.primary_mismatch" | "mail.sitting.bundle_unavailable" | "mail.sitting.invalid" | "mail.sitting.recipient_unavailable" | "mail.sitting.unavailable" | "mail.transport.acceptance_uncertain" | "mail.transport.permanent" | "mail.transport.temporary" | "mail.transport.unknown" | "mfa.rekey.fenced" | "mfa.rekey.incomplete" | "mfa.rekey.invariant_failed" | "mfa.rekey.primary_mismatch" | "mfa.rekey.secret_unavailable" | "onboarding_import.authorization_lost" | "onboarding_import.file_invalid" | "retention.unavailable" | "student_progression.authorization_lost" | "student_progression.effective_date_conflict" | "student_progression.lineage_conflict" | "student_progression.roster_too_large" | "student_progression.target_conflict" | "user.not_found";
+        readonly JobErrorCode: "academic_administration_preview.authorization_lost" | "academic_administration_preview.target_conflict" | "academic_administration_preview.too_many_users" | "audit.export.expired" | "audit.export.unavailable" | "database.unavailable" | "dependency.unavailable" | "exam.export.expired" | "exam.export.unavailable" | "file.backend_unavailable" | "job.canceled" | "job.checkpoint.invalid" | "job.command.invalid" | "job.invariant_failed" | "mail.delivery.conflict" | "mail.delivery.failed" | "mail.delivery.not_found" | "mail.delivery.unavailable" | "mail.message.invalid" | "mail.payload.unavailable" | "mail.rekey.fenced" | "mail.rekey.incomplete" | "mail.rekey.invariant_failed" | "mail.rekey.payload_unavailable" | "mail.rekey.primary_mismatch" | "mail.sitting.bundle_unavailable" | "mail.sitting.invalid" | "mail.sitting.recipient_unavailable" | "mail.sitting.unavailable" | "mail.transport.acceptance_uncertain" | "mail.transport.permanent" | "mail.transport.temporary" | "mail.transport.unknown" | "mfa.rekey.fenced" | "mfa.rekey.incomplete" | "mfa.rekey.invariant_failed" | "mfa.rekey.primary_mismatch" | "mfa.rekey.secret_unavailable" | "onboarding_import.authorization_lost" | "onboarding_import.file_invalid" | "retention.unavailable" | "student_progression.authorization_lost" | "student_progression.effective_date_conflict" | "student_progression.lineage_conflict" | "student_progression.roster_too_large" | "student_progression.target_conflict" | "user.not_found";
         /** @description One page of Jobs. */
         readonly JobListResponse: {
             /** @description Jobs on this page, in the requested order. */
@@ -12933,7 +14122,53 @@ export interface components {
          * @description Type of a background Job. The server only uses the values listed here, but later releases may add more. Clients choose their own labels and should show an unknown value in a generic way.
          * @enum {string}
          */
-        readonly JobType: "academic_administration_preview.resolve" | "audit.attempt_sweep" | "command_outcome.cleanup" | "domain_event.dispatch" | "exam_export.build" | "exam_export.cleanup" | "exam_sitting.lifecycle" | "exam_sitting.lifecycle_recovery" | "exam_sitting.sealing" | "file.purge_expired_content" | "invitation.maintenance" | "job.cleanup" | "mail.cleanup" | "mail.deliver" | "mail.deliver_credential" | "mail.expand_sitting" | "mail.rekey" | "mfa.rekey" | "onboarding_import.execute" | "onboarding_import.parse" | "profile_picture.generate_default" | "profile_picture.reconcile_defaults" | "retention.expire" | "retention.notices" | "retention.purge" | "retention.reconcile" | "session.purge_retired" | "student_progression.preview";
+        readonly JobType: "academic_administration_preview.resolve" | "audit.attempt_sweep" | "audit_export.build" | "audit_export.cleanup" | "command_outcome.cleanup" | "domain_event.dispatch" | "exam_export.build" | "exam_export.cleanup" | "exam_sitting.lifecycle" | "exam_sitting.lifecycle_recovery" | "exam_sitting.sealing" | "file.purge_expired_content" | "invitation.maintenance" | "job.cleanup" | "mail.cleanup" | "mail.deliver" | "mail.deliver_credential" | "mail.expand_sitting" | "mail.rekey" | "mfa.rekey" | "onboarding_import.execute" | "onboarding_import.parse" | "profile_picture.generate_default" | "profile_picture.reconcile_defaults" | "retention.expire" | "retention.notices" | "retention.purge" | "retention.reconcile" | "session.purge_retired" | "student_progression.preview";
+        /** @description One timeline entry. Exactly the member its kind names is present. */
+        readonly LiveAttemptTimelineItem: {
+            /** Format: date-time */
+            readonly at: string;
+            readonly evidence?: components["schemas"]["ExamIntegrityEvidenceResponse"];
+            readonly flag?: components["schemas"]["ExamIntegrityFlagResponse"];
+            /** @enum {string} */
+            readonly kind: "flag" | "evidence" | "native_condition";
+            readonly native_condition?: components["schemas"]["NativeConditionEvidence"];
+        };
+        /** @description One page of an Attempt's timeline. */
+        readonly LiveAttemptTimelineResponse: {
+            /** Format: date-time */
+            readonly as_of: string;
+            /** @description True once the Attempt is sealed or its integrity data is retired. */
+            readonly complete: boolean;
+            readonly items: readonly components["schemas"]["LiveAttemptTimelineItem"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description One page of a Flag's evidence. */
+        readonly LiveIntegrityEvidenceListResponse: {
+            /** Format: date-time */
+            readonly as_of: string;
+            /** @description True once the Attempt is sealed or its integrity data is retired. */
+            readonly complete: boolean;
+            readonly items: readonly components["schemas"]["ExamIntegrityEvidenceResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description One page of a running Attempt's Flags. */
+        readonly LiveIntegrityFlagListResponse: {
+            /** Format: date-time */
+            readonly as_of: string;
+            /** @description True once the Attempt is sealed or its integrity data is retired. */
+            readonly complete: boolean;
+            readonly items: readonly components["schemas"]["ExamIntegrityFlagResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description One page of native condition records. */
+        readonly LiveNativeConditionListResponse: {
+            /** Format: date-time */
+            readonly as_of: string;
+            /** @description True once the Attempt is sealed or its integrity data is retired. */
+            readonly complete: boolean;
+            readonly items: readonly components["schemas"]["NativeConditionEvidence"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly LoginRequest: {
             /**
              * @description The kind of client the new Session is for. It decides whether credentials come back as cookies (web, desktop) or in the body (cli).
@@ -13297,6 +14532,11 @@ export interface components {
              * @description Number of stored encrypted mail payloads that are still encrypted with this key.
              */
             readonly active_references: number;
+            /**
+             * Format: date-time
+             * @description When this key's current use began: the first payload it encrypted since it last encrypted none. The server has no rotation policy, so it suggests no rotation date.
+             */
+            readonly in_use_since: string;
             /** @description ID of the key, a 128-bit value in lowercase hexadecimal. It isn't secret. */
             readonly key_id: string;
         };
@@ -13429,6 +14669,56 @@ export interface components {
          * @enum {string}
          */
         readonly MailTemplateKey: "academic.academic_unit_assigned" | "academic.academic_unit_assignment_ended" | "academic.class_enrolled" | "academic.class_enrollment_ended" | "academic.class_transferred" | "access.academic_unit_role_invitation" | "access.institution_role_invitation" | "access.invitation_accepted" | "access.invitation_revoked" | "access.student_class_invitation" | "access.teacher_academic_unit_invitation" | "authorization.institution_role_assigned" | "authorization.institution_role_ended" | "authorization.scoped_role_assigned" | "authorization.scoped_role_ended" | "exam.manager_added" | "exam.manager_removed" | "exam.ownership_transferred_from_you" | "exam.ownership_transferred_to_you" | "exam.result_released" | "exam.retention_scheduled" | "exam.sitting_assignment_removed" | "exam.sitting_canceled" | "exam.sitting_rescheduled" | "exam.sitting_scheduled" | "exam.submission_automatically_sealed" | "exam.submission_manager_ended" | "exam.submission_received" | "identity.account_disabled" | "identity.account_enabled" | "identity.email_change_verify_new" | "identity.email_change_warning_old" | "identity.email_verified_by_admin" | "identity.mfa_disabled" | "identity.mfa_enabled" | "identity.mfa_recovery_codes_regenerated" | "identity.mfa_reset" | "identity.password_changed" | "identity.password_reset" | "identity.personal_access_token_created" | "identity.personal_access_token_disabled" | "identity.personal_access_token_enabled" | "identity.personal_access_token_revoked" | "identity.sessions_revoked_by_admin" | "identity.verify_email" | "system.mail_test";
+        /** @description One page of the collection in its stable order. */
+        readonly ManagedScreenClipListResponse: {
+            readonly items: readonly components["schemas"]["ManagedScreenClipResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description A screen clip as the Attempt's managers and reviewers list it. */
+        readonly ManagedScreenClipResponse: {
+            /** @description Attempt that requested or captured the clip. */
+            readonly exam_attempt_id: components["schemas"]["ID"];
+            /**
+             * @description Why the clip failed; present only when state is failed.
+             * @enum {string}
+             */
+            readonly failure?: "attempt_ended" | "not_recorded" | "upload_deadline" | "rejected";
+            /** @description ID of the clip. */
+            readonly id: components["schemas"]["ID"];
+            /** @description The integrity Flag an incident clip was taken for. Absent for a manager clip. */
+            readonly integrity_flag_id?: components["schemas"]["ID"];
+            /** @description Time range requested from the screen recorder. */
+            readonly range: components["schemas"]["ScreenClipRange"];
+            /** @description The manager's private reason for a manager clip. Present only for a caller who manages the Sitting. */
+            readonly reason?: string;
+            /**
+             * Format: date-time
+             * @description When the clip was requested.
+             */
+            readonly requested_at: string;
+            /** @description The manager who asked for a manager clip. Absent for an incident clip. */
+            readonly requested_by?: components["schemas"]["PersonRef"];
+            /**
+             * Format: int64
+             * @description Monotonic revision of the clip.
+             */
+            readonly revision: number;
+            /**
+             * @description Whether a manager or an integrity incident requested the clip.
+             * @enum {string}
+             */
+            readonly source: "manager" | "incident";
+            /**
+             * @description Current recording and upload state.
+             * @enum {string}
+             */
+            readonly state: "requested" | "recording" | "uploading" | "ready" | "failed";
+            /**
+             * Format: date-time
+             * @description When the clip state last changed.
+             */
+            readonly updated_at: string;
+        };
         readonly MoveExamStarterWorkspaceEntryRequest: {
             /**
              * Format: int64
@@ -13856,6 +15146,13 @@ export interface components {
             readonly items: readonly components["schemas"]["OnboardingImportResponse"][];
             readonly next_cursor?: components["schemas"]["NextCursor"];
         };
+        /** @description The person as the file named them, read from the row's own values. Omitted when the row holds no name or address, as for a student progression. */
+        readonly OnboardingImportPerson: {
+            /** @description The file's display name, or its first and last names. Omitted when the file gave none. */
+            readonly display_name?: string;
+            /** @description The file's email address masked the way mail deliveries mask a recipient, such as `a***@example.edu`. Omitted when the row holds no address. */
+            readonly email_masked?: string;
+        };
         /**
          * @description Why a preview row is invalid, a duplicate, or carries a note. Examples are a malformed or repeated CSV row, a target that can't be found, a student who can't progress or is already enrolled in the destination, or an academic administration row that will be skipped or changes nothing. Later versions may add values. Show your own label for each value, and a general message for one you don't recognize.
          * @enum {string}
@@ -13873,6 +15170,8 @@ export interface components {
              * @description Time the import was created.
              */
             readonly created_at: string;
+            /** @description Who uploaded the import or started the student progression. */
+            readonly created_by?: components["schemas"]["PersonRef"];
             /** @description Class students progress into. Student progressions only. */
             readonly destination_class_id?: components["schemas"]["ID"];
             /** @description Display name of the destination Class, present only on student progression reads and listings. */
@@ -13959,7 +15258,7 @@ export interface components {
          * @enum {string}
          */
         readonly OnboardingImportRowCode: "academic_administration_preview.system_administrator" | "academic_unit_member.conflict" | "academic_unit_member.invalid" | "administration.unavailable" | "affiliation.conflict" | "affiliation.invalid" | "affiliation.student_has_active_enrollment" | "audit.unavailable" | "authentication.reauthentication_required" | "authentication.strong_required" | "authentication.token_invalid" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "class.enrollment_conflict" | "class_member.invalid" | "class_member.student_affiliation_required" | "idempotency.conflict" | "idempotency.in_progress" | "invitation.class_period_conflict" | "invitation.conflict" | "invitation.invalid" | "invitation.mail_unavailable" | "invitation.role_not_delegable" | "invitation.unavailable" | "mail.unavailable" | "onboarding_batch.duplicate" | "request.invalid" | "resource.not_found" | "role_binding.conflict" | "role_binding.invalid" | "role_binding.last_system_admin" | "role_binding.system_admin_scope_invalid" | "session.not_found" | "student_progression.conflict" | "student_progression.target_conflict" | "user.conflict" | "user.invalid" | "user.last_system_admin";
-        /** @description One row of an import: where it sits, what it does and how it ended. It never repeats the email address or names the row holds. */
+        /** @description One row of an import: where it sits, what it does, how it ended and who it is about. It never repeats the email address the row holds: `person` shows only a masked form of it. */
         readonly OnboardingImportRowResponse: {
             /** @description The Invitation the row created, for rows that invite someone. */
             readonly invitation_id?: components["schemas"]["ID"];
@@ -13968,6 +15267,7 @@ export interface components {
              * @enum {string}
              */
             readonly operation: "student_class.create" | "teacher_academic_unit.create" | "academic_unit_role.create" | "institution_role.create" | "affiliation.add" | "affiliation.end" | "academic_unit_member.add" | "academic_unit_member.end" | "class.enroll" | "class.end" | "class.transfer" | "role_binding.create" | "role_binding.end" | "user.enable" | "user.disable" | "user_sessions.revoke";
+            readonly person?: components["schemas"]["OnboardingImportPerson"];
             /** @description Why the preview marked the row invalid or duplicate, or a note about it. Omitted when there is none. */
             readonly preview_code?: string | components["schemas"]["OnboardingImportPreviewCode"];
             /** @description Why the row failed when the import ran. Present only on a `failed` row. */
@@ -13983,6 +15283,8 @@ export interface components {
              * @enum {string}
              */
             readonly status: "valid" | "invalid" | "duplicate" | "pending" | "succeeded" | "no_op" | "failed" | "skipped" | "canceled";
+            /** @description The account the row was matched to. Omitted until the row is matched to one. */
+            readonly user?: components["schemas"]["PersonRef"];
         };
         readonly OpenCandidateTerminalRequest: {
             /** @description Columns; supply it with rows. */
@@ -14006,6 +15308,49 @@ export interface components {
              * @description The email address of the account whose password should be reset.
              */
             readonly email: string;
+        };
+        /**
+         * @description A group of permissions. The server owns the grouping.
+         * @enum {string}
+         */
+        readonly PermissionArea: "exams" | "sittings" | "submissions" | "records" | "people" | "structure" | "access" | "operations";
+        /** @description One group of permissions. */
+        readonly PermissionAreaResponse: {
+            readonly area: components["schemas"]["PermissionArea"];
+            /** @description The area's title in the request's language. */
+            readonly title: string;
+        };
+        /** @description Every permission a custom Role can hold, and the areas that group them. */
+        readonly PermissionCatalogueResponse: {
+            /** @description Every area, in the order a role editor shows them. */
+            readonly areas: readonly components["schemas"]["PermissionAreaResponse"][];
+            /** @description The permissions, sorted by `name`. */
+            readonly permissions: readonly components["schemas"]["PermissionResponse"][];
+        };
+        /** @description One permission a custom Role can hold. */
+        readonly PermissionResponse: {
+            readonly area: components["schemas"]["PermissionArea"];
+            /** @description One sentence on what the permission allows, in the request's language. */
+            readonly description: string;
+            /** @description The permission's name, as a Role's `permissions` lists it. */
+            readonly name: string;
+            /** @description For an override permission, the permission it widens through the audited administrator path. Omitted otherwise. */
+            readonly override_of?: string;
+            /** @description The scopes a Role Binding can grant this permission at. A Binding at an Academic Unit also covers the Exams, Sittings, Programmes and Classes under it. */
+            readonly scope_types: readonly ("institution" | "academic_unit" | "class")[];
+            /** @description A short title in the request's language. */
+            readonly title: string;
+        };
+        /** @description A person a record refers to, such as who granted a Role or who paused a Sitting. Anyone who can read the record gets the person's display name when one is set. A username can fill in for an unset display name only when the reader can see that User in the directory. The same visibility controls the username and profile picture fields. */
+        readonly PersonRef: {
+            /** @description The person's presented name, if the account has a visible one. */
+            readonly display_name?: string;
+            /** @description The User's ID. It is kept after the account is removed. */
+            readonly id: components["schemas"]["ID"];
+            /** @description Same-origin path of the User's profile picture. Omitted unless the reader can see this User. */
+            readonly profile_picture_url?: string;
+            /** @description The username. Omitted unless the reader can see this User in the directory. */
+            readonly username?: string;
         };
         readonly PersonalAccessTokenCreationResponse: {
             /** @description The secret token value to send as a Bearer token. Store it safely now, because Proctor never shows it again. */
@@ -14223,6 +15568,11 @@ export interface components {
          * @enum {string}
          */
         readonly ProfilePictureKind: "custom" | "default";
+        /**
+         * @description What kind of Programme this is, for people reading the structure. It is only a label: it changes no rule about the Programme's levels.
+         * @enum {string}
+         */
+        readonly ProgrammeKind: "undergraduate" | "postgraduate" | "other";
         /** @description One page of Programme Levels, ordered by name and then by identifier. Only the first page carries the total. */
         readonly ProgrammeLevelListResponse: {
             /** @description The Programme Levels on this page. */
@@ -14239,6 +15589,10 @@ export interface components {
              * @description When the Programme Level was archived. Omitted while it is active.
              */
             readonly archived_at?: string;
+            /** @description How many active Classes the Programme Level has, counting only the Classes you hold class.view on. Absent if you hold class.view nowhere. It is exact below 10,000; at 10,000 counting stops and `class_count_is_lower_bound` is true. */
+            readonly class_count?: number;
+            /** @description True when `class_count` stopped at 10,000. Present with `class_count`. */
+            readonly class_count_is_lower_bound?: boolean;
             /**
              * Format: date-time
              * @description When the Programme Level was created.
@@ -14259,6 +15613,10 @@ export interface components {
              * @description Starts at 1 and goes up with every change. Send it as `expected_revision` on an update or archive so the change fails if someone else changed the Programme Level first.
              */
             readonly revision: number;
+            /** @description How many students the Programme Level has now, counting the distinct Users currently enrolled in the Classes you hold class.members.view on, as a Class's `student_count` does. Absent if you hold class.members.view nowhere. It is exact below 10,000; at 10,000 counting stops and `student_count_is_lower_bound` is true. */
+            readonly student_count?: number;
+            /** @description True when `student_count` stopped at 10,000. Present with `student_count`. */
+            readonly student_count_is_lower_bound?: boolean;
             /**
              * Format: date-time
              * @description When the Programme Level last changed.
@@ -14283,6 +15641,10 @@ export interface components {
              * @description When the Programme was archived. Omitted while it is active.
              */
             readonly archived_at?: string;
+            /** @description How many active Classes the Programme has, counting only the Classes you hold class.view on. Absent if you hold class.view nowhere. It is exact below 10,000; at 10,000 counting stops and `class_count_is_lower_bound` is true. */
+            readonly class_count?: number;
+            /** @description True when `class_count` stopped at 10,000. Present with `class_count`. */
+            readonly class_count_is_lower_bound?: boolean;
             /**
              * Format: date-time
              * @description When the Programme was created.
@@ -14294,6 +15656,11 @@ export interface components {
             readonly display_name: string;
             /** @description The Programme identifier. */
             readonly id: components["schemas"]["ID"];
+            readonly kind: components["schemas"]["ProgrammeKind"];
+            /** @description How many active Programme Levels the Programme has. Present only if you hold programme_level.view on its Academic Unit.  It is exact below 10,000; at 10,000 counting stops and `level_count_is_lower_bound` is true. */
+            readonly level_count?: number;
+            /** @description True when `level_count` stopped at 10,000. Present with `level_count`. */
+            readonly level_count_is_lower_bound?: boolean;
             /** @description Machine name: lowercase letters, digits, hyphens and underscores, at most 64 characters. Unique among the Academic Unit's active Programmes. */
             readonly name: string;
             /**
@@ -14301,6 +15668,10 @@ export interface components {
              * @description Starts at 1 and goes up with every change. Send it as `expected_revision` on an update or archive so the change fails if someone else changed the Programme first.
              */
             readonly revision: number;
+            /** @description How many students the Programme has now, counting the distinct Users currently enrolled in the Classes you hold class.members.view on, as a Class's `student_count` does. Absent if you hold class.members.view nowhere. It is exact below 10,000; at 10,000 counting stops and `student_count_is_lower_bound` is true. */
+            readonly student_count?: number;
+            /** @description True when `student_count` stopped at 10,000. Present with `student_count`. */
+            readonly student_count_is_lower_bound?: boolean;
             /**
              * Format: date-time
              * @description When the Programme last changed.
@@ -14434,6 +15805,12 @@ export interface components {
             /** @description Submission the hold was created on, if any. */
             readonly submission_id?: components["schemas"]["ID"];
         };
+        /** @description Give submission_ids or all_finalized, not both. */
+        readonly ReleaseSittingResultsRequest: {
+            /** @description true releases every finalized, withheld Submission of the Sitting, at most 200. */
+            readonly all_finalized?: boolean;
+            readonly submission_ids?: readonly components["schemas"]["ID"][];
+        };
         readonly RemoveExamManagerRequest: {
             /**
              * Format: int64
@@ -14467,6 +15844,18 @@ export interface components {
         readonly RenameSessionRequest: {
             /** @description The new name. Surrounding whitespace is removed before the length is checked. */
             readonly device_name: string;
+        };
+        /** @description The Review to reopen, its current revision and why. */
+        readonly ReopenExamIntegrityReviewRequest: {
+            /**
+             * Format: int64
+             * @description The Review's current revision, as last read. The request fails with a conflict if the Review has changed since.
+             */
+            readonly expected_revision: number;
+            /** @description Why the Review is reopened, in the manager's words. Kept privately; never shown to the candidate. */
+            readonly reason: string;
+            /** @description The Review's ID. */
+            readonly submission_review_id: components["schemas"]["ID"];
         };
         readonly ReorderExamResourcesRequest: {
             /**
@@ -14573,7 +15962,17 @@ export interface components {
          * @description Type of a resource in permission checks and audit records. Later versions may add values. Show your own label for each value, and a general message for one you don't recognize.
          * @enum {string}
          */
-        readonly ResourceType: "academic_period" | "academic_unit" | "class" | "exam" | "exam_sitting" | "institution" | "mail_delivery" | "programme" | "programme_level" | "submission" | "user";
+        readonly ResourceType: "academic_period" | "academic_unit" | "class" | "exam" | "exam_attempt" | "exam_sitting" | "institution" | "mail_delivery" | "programme" | "programme_level" | "submission" | "user";
+        readonly ResultReleaseBatchResponse: {
+            readonly items: readonly components["schemas"]["ResultReleaseItemResponse"][];
+        };
+        readonly ResultReleaseItemResponse: {
+            /** @description Why a failed item could not be released now; it may be retried. */
+            readonly error_code?: string;
+            /** @enum {string} */
+            readonly outcome: "released" | "already_released" | "not_finalized" | "denied" | "failed";
+            readonly submission_id: components["schemas"]["ID"];
+        };
         /** @description A change to the cleanup control. */
         readonly RetentionControlRequest: {
             /**
@@ -14618,6 +16017,23 @@ export interface components {
              * @description Time the control last changed.
              */
             readonly updated_at: string;
+        };
+        /** @description One page of the Exams that have records, by Exam ID. In each, `eligible_exams` is 1 when the Exam has an eligible record in that category. */
+        readonly RetentionExamSummariesResponse: {
+            /** Format: date-time */
+            readonly as_of: string;
+            readonly items: readonly components["schemas"]["RetentionExamSummary"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+            /** Format: int64 */
+            readonly policy_revision: number;
+        };
+        /** @description One Exam's retention records, counted by category as a preview counts them. */
+        readonly RetentionExamSummary: {
+            readonly browser_activity: components["schemas"]["RetentionPreviewCounts"];
+            readonly exam: components["schemas"]["ExamRef"];
+            readonly integrity: components["schemas"]["RetentionPreviewCounts"];
+            readonly security_operational: components["schemas"]["RetentionPreviewCounts"];
+            readonly work: components["schemas"]["RetentionPreviewCounts"];
         };
         /** @description Counts for audit records or retirement receipts. Each record is counted once, under the first reason that applies, so the other counts add up to `total`. */
         readonly RetentionExpiryCounts: {
@@ -14667,6 +16083,38 @@ export interface components {
              */
             readonly unfinished: number;
         };
+        /** @description One Retention Hold of the Institution. It carries the reason codes but never the private reasons, which stay on the Exam's own hold listing. */
+        readonly RetentionHoldListItem: {
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly created_by?: components["schemas"]["PersonRef"];
+            /** @description True when the hold is unreleased and `until` has passed. It still protects its records. */
+            readonly due_for_review: boolean;
+            readonly exam: components["schemas"]["ExamRef"];
+            /** @description Held Sitting, or the Sitting of the held Submission. Omitted for an Exam hold. */
+            readonly exam_sitting_id?: components["schemas"]["ID"];
+            readonly id: components["schemas"]["ID"];
+            /** @enum {string} */
+            readonly reason_code: "institution_request" | "integrity_review" | "records_review" | "review_not_required" | "case_closed" | "mistake" | "other";
+            /** @enum {string} */
+            readonly release_reason_code?: "institution_request" | "integrity_review" | "records_review" | "review_not_required" | "case_closed" | "mistake" | "other";
+            /** Format: date-time */
+            readonly released_at?: string;
+            readonly released_by?: components["schemas"]["PersonRef"];
+            /** Format: int64 */
+            readonly revision: number;
+            /** @description Held Submission. Present only for a Submission hold. */
+            readonly submission_id?: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the hold is due for review. Omitted when none was set.
+             */
+            readonly until?: string;
+        };
+        readonly RetentionHoldListResponse: {
+            readonly items: readonly components["schemas"]["RetentionHoldListItem"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         /** @description One page of Retention Holds. */
         readonly RetentionHoldPageResponse: {
             /** @description Holds on this page. */
@@ -14681,8 +16129,12 @@ export interface components {
              * @description Time the hold was created.
              */
             readonly created_at: string;
+            /** @description Who placed the hold, named. */
+            readonly created_by?: components["schemas"]["PersonRef"];
             /** @description User who created the hold. */
             readonly created_by_user_id: components["schemas"]["ID"];
+            /** @description True when the hold is unreleased and `until` has passed. The hold still protects its records. */
+            readonly due_for_review: boolean;
             /** @description Exam the hold is on, or that contains the held Sitting or Submission. */
             readonly exam_id: components["schemas"]["ID"];
             /** @description Held Sitting, or the Sitting of the held Submission. Omitted for an Exam hold. */
@@ -14713,6 +16165,8 @@ export interface components {
              * @description Time the hold was released. Omitted while it is active.
              */
             readonly released_at?: string;
+            /** @description Who released the hold, named. Omitted while it is held. */
+            readonly released_by?: components["schemas"]["PersonRef"];
             /** @description User who released the hold. Omitted while it is active. */
             readonly released_by_user_id?: components["schemas"]["ID"];
             /**
@@ -14722,6 +16176,11 @@ export interface components {
             readonly revision: number;
             /** @description Held Submission. Present only for a Submission hold. */
             readonly submission_id?: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description When the hold is due for review. Omitted when none was set. It never releases the hold: only a person does.
+             */
+            readonly until?: string;
             /**
              * Format: int64
              * @description Number of Submissions in the hold's scope whose work was already retired when the hold was created. The hold can't restore them.
@@ -14865,6 +16324,11 @@ export interface components {
             readonly eligible: number;
             /**
              * Format: int64
+             * @description How many distinct Exams have at least one `eligible` record in this category.
+             */
+            readonly eligible_exams: number;
+            /**
+             * Format: int64
              * @description Records protected because an export that includes them is being built.
              */
             readonly export_protected: number;
@@ -14906,6 +16370,7 @@ export interface components {
              * @description The current policy revision to assess. The request fails if the policy changed since.
              */
             readonly expected_revision: number;
+            readonly proposed_policy?: components["schemas"]["RetentionProposedPolicy"];
         };
         /** @description A one-hour Retention Preview of one policy revision. It holds counts only, never content. */
         readonly RetentionPreviewResponse: {
@@ -14932,12 +16397,25 @@ export interface components {
              * @description Policy revision the preview assessed.
              */
             readonly policy_revision: number;
+            /** @description True when the preview counted unsaved settings from `proposed_policy` against this revision's records. A proposed preview shows what a change would do and can't be used to approve cleanup. */
+            readonly proposed: boolean;
             /** @description Counts for Record Retirement receipts. */
             readonly receipts: components["schemas"]["RetentionExpiryCounts"];
             /** @description Counts for security operational data. */
             readonly security_operational: components["schemas"]["RetentionPreviewCounts"];
             /** @description Counts for Submission work. */
             readonly work: components["schemas"]["RetentionPreviewCounts"];
+        };
+        /** @description Optional settings to preview before saving them, with the same members as the Retention Policy PUT body except `expected_revision`. Every member must be present and not null, or the request is refused with `request.invalid`. The preview counts the current records under these settings and is marked `proposed`. */
+        readonly RetentionProposedPolicy: {
+            readonly audit_retention_days: number;
+            readonly browser_activity_retention_days: number;
+            readonly candidate_notices: boolean;
+            readonly deletion_grace_days: number;
+            readonly export_retention_days: number;
+            readonly integrity_retention_days: number;
+            readonly security_operational_retention_days: number;
+            readonly submission_retention_days: number;
         };
         /** @description Retention status of one category of one Submission's records. It contains no content. */
         readonly RetentionRecord: {
@@ -14968,6 +16446,7 @@ export interface components {
              * @description Time the retention period ends and the records become eligible. Omitted when no period applies.
              */
             readonly eligible_at?: string;
+            readonly exam: components["schemas"]["ExamRef"];
             /** @description Exam the records belong to. */
             readonly exam_id: components["schemas"]["ID"];
             /** @description Sitting the records belong to. */
@@ -15099,9 +16578,20 @@ export interface components {
              * @description Time the grant stops. Omitted for a grant with no end.
              */
             readonly end_at?: string;
+            /** @description Who granted the Role: the person who made a manual grant, or the inviter of an invitation, who is the importer for an imported invitation. For a direct CSV grant, this is the importer. Omitted only for the grant made at installation. */
+            readonly granted_by?: components["schemas"]["PersonRef"];
+            /**
+             * @description How the grant was made: by a person directly (`manual`), by accepting an invitation (`invitation`), through a CSV import (`import`), or at installation (`bootstrap`).
+             * @enum {string}
+             */
+            readonly granted_via: "manual" | "invitation" | "import" | "bootstrap";
             readonly id: components["schemas"]["ID"];
+            /** @description The Role granted, with its display name. */
+            readonly role: components["schemas"]["RoleRef"];
             /** @description The Role granted. */
             readonly role_id: components["schemas"]["ID"];
+            /** @description Where the grant applies. */
+            readonly scope: components["schemas"]["ScopeRef"];
             /** @description The Institution, Academic Unit or Class the grant applies to. */
             readonly scope_id: components["schemas"]["ID"];
             /** @description Kind of scope the grant applies to, `institution`, `academic_unit` or `class`. */
@@ -15140,6 +16630,11 @@ export interface components {
             readonly items: readonly components["schemas"]["RoleResponse"][];
             readonly next_cursor?: components["schemas"]["NextCursor"];
         };
+        readonly RoleRef: {
+            /** @description The Role's display name, localized for the protected System Administrator role. */
+            readonly display_name?: string;
+            readonly id: components["schemas"]["ID"];
+        };
         /** @description A named set of permissions. A Role grants nothing by itself. A User gets its permissions only through a Role Binding at a scope. */
         readonly RoleResponse: {
             /**
@@ -15170,6 +16665,8 @@ export interface components {
              * @description Time of the latest change to the Role.
              */
             readonly updated_at: string;
+            /** @description Who last created, changed or archived this custom Role. Omitted for a built-in Role. */
+            readonly updated_by?: components["schemas"]["PersonRef"];
         };
         /** @description A SHA-256 digest as 64 lowercase hexadecimal characters. */
         readonly SHA256: string;
@@ -15201,6 +16698,7 @@ export interface components {
             readonly class_id: components["schemas"]["ID"];
             /** @description The published Exam Revision to deliver. It must belong to this Exam. */
             readonly exam_revision_id: components["schemas"]["ID"];
+            readonly join_window?: components["schemas"]["ExamSittingJoinWindow"];
             /**
              * Format: date-time
              * @description The Sitting's deadline. It must be after the start and inside the Class's Academic Period.
@@ -15211,6 +16709,13 @@ export interface components {
              * @description When the Sitting opens. It must be in the future and inside the Class's Academic Period.
              */
             readonly scheduled_start_at: string;
+        };
+        readonly ScopeRef: {
+            /** @description The scope's display name, if available. */
+            readonly display_name?: string;
+            readonly id: components["schemas"]["ID"];
+            /** @enum {string} */
+            readonly type: "institution" | "academic_unit" | "class";
         };
         readonly ScreenClipChunkResponse: {
             readonly chunk: number;
@@ -15359,9 +16864,14 @@ export interface components {
         };
         readonly SecurityPolicyOverviewResponse: {
             readonly browser_activity_disclosure: components["schemas"]["BrowserActivityDisclosure"];
+            /** @description The sites the Exam browser opens, from the Exam Revision the Sitting delivers. Empty when the Exam browser is off. Exactly one is the start page when it is on. */
+            readonly browser_sites: readonly components["schemas"]["CandidateBrowserSite"][];
             /** @description SHA-256 of the exact signed bytes of the release's certification document. */
             readonly capability_matrix_digest: string;
             readonly catalog_bindings: readonly components["schemas"]["SecurityCatalogBinding"][];
+            readonly focus_loss: components["schemas"]["CandidateFocusLossRule"];
+            /** @description The Exam's instructions from the Revision the Sitting delivers, in Markdown cleaned of unsafe content, so a candidate who joined early can read them while they wait. Can be empty. */
+            readonly instructions_markdown: string;
             readonly policy: components["schemas"]["EffectiveExamSecurityPolicy"];
             readonly readiness_digest: components["schemas"]["ReadinessDigest"];
             /** @description The recorder notice to show before Start; null when the Exam does not record the screen. */
@@ -15747,6 +17257,21 @@ export interface components {
              */
             readonly updated_at: string;
         };
+        /** @description A candidate's Desktop readiness before the Sitting opens, from their newest Desktop registration. It never names the device or the build. */
+        readonly SittingCandidateDesktopSetupResponse: {
+            /**
+             * @description The registration's platform. Omitted when not set up.
+             * @enum {string}
+             */
+            readonly platform?: "darwin" | "win32" | "linux";
+            /** @description The registration's Desktop release. Omitted when not set up. */
+            readonly release?: string;
+            /**
+             * @description ready: the registered release would be admitted. not_set_up: the candidate has no Desktop registration. blocked_release: the registered release would be refused, so they must update.
+             * @enum {string}
+             */
+            readonly state: "ready" | "not_set_up" | "blocked_release";
+        };
         /** @description The candidate's execution environment, present once the Attempt has one. Incarnation counts the machines it has had; a manager names it to replace the current one. */
         readonly SittingCandidateEnvironmentResponse: {
             readonly desired: components["schemas"]["AttemptEnvironmentDesired"];
@@ -15759,14 +17284,22 @@ export interface components {
              */
             readonly waiting_since?: string;
         };
-        /** @description The candidate User. */
-        readonly SittingCandidateIdentityResponse: {
-            /** @description Display name of the candidate. */
-            readonly display_name: string;
-            /** @description ID of the candidate User. */
-            readonly user_id: components["schemas"]["ID"];
-            /** @description Username of the candidate. */
-            readonly username: string;
+        /** @description Candidates in each presence state. */
+        readonly SittingCandidatePresenceCounts: {
+            /** Format: int64 */
+            readonly connected: number;
+            /** Format: int64 */
+            readonly lease_expired: number;
+            /** Format: int64 */
+            readonly not_started: number;
+            /** Format: int64 */
+            readonly ready: number;
+            /** Format: int64 */
+            readonly reconnecting: number;
+            /** Format: int64 */
+            readonly submitted: number;
+            /** Format: int64 */
+            readonly suspended: number;
         };
         /** @description The candidate's presence, worked out at server_time. */
         readonly SittingCandidatePresenceResponse: {
@@ -15788,15 +17321,54 @@ export interface components {
          * @enum {string}
          */
         readonly SittingCandidatePresenceState: "not_started" | "ready" | "connected" | "reconnecting" | "lease_expired" | "suspended" | "submitted";
+        /** @description A Sitting's candidates, other than the reader, counted exactly at one instant. */
+        readonly SittingCandidateStatusCounts: {
+            /** @description Candidates in each presence state. Every state is present. */
+            readonly by_presence_state: components["schemas"]["SittingCandidatePresenceCounts"];
+            /**
+             * Format: int64
+             * @description Exact number of candidates in the Sitting visible on this board, before filters.
+             */
+            readonly total: number;
+            /**
+             * Format: int64
+             * @description Candidates with unresolved integrity attention.
+             */
+            readonly with_attention: number;
+            /**
+             * Format: int64
+             * @description Candidates whose live participation fails an enforced native rule.
+             */
+            readonly with_failed_checks: number;
+        };
         /** @description One candidate's row on the status board. */
         readonly SittingCandidateStatusItemResponse: {
+            /**
+             * Format: date-time
+             * @description When the candidate acknowledged the Sitting's current live correction. Omitted when the current Revision is not a correction or they have not acknowledged it.
+             */
+            readonly acknowledged_at?: string;
             /** @description The candidate's Attempt. Null when the candidate has not started. */
             readonly attempt: components["schemas"]["SittingCandidateAttemptResponse"] | null;
             /** @description The candidate User. */
-            readonly candidate: components["schemas"]["SittingCandidateIdentityResponse"];
+            readonly candidate: components["schemas"]["PersonRef"];
+            /**
+             * Format: int64
+             * @description How many workspace files the candidate added, changed or removed against the Starter Workspace. Only for callers who may manage the Sitting.
+             */
+            readonly changed_file_count?: number;
             /** @description Whether the candidate is still a member of the Sitting's Class. */
             readonly current_class_membership: boolean;
+            /** @description Whether the candidate's Desktop is ready. Present only before the Sitting opens. */
+            readonly desktop_setup?: components["schemas"]["SittingCandidateDesktopSetupResponse"];
+            /** @description The name the candidate gave the Desktop they last joined from. Only for callers who may manage the Sitting; omitted when it has none. */
+            readonly device_name?: string;
             readonly environment?: components["schemas"]["SittingCandidateEnvironmentResponse"];
+            /**
+             * Format: int64
+             * @description How many times Desktop reported the candidate leaving the exam, across every participation. Only for callers who may manage the Sitting.
+             */
+            readonly focus_loss_count?: number;
             /**
              * Format: int64
              * @description Number of integrity issues on the Attempt that still need attention, such as discrepancies not covered by a finalized Submission Review or gaps in the delivered integrity data. Zero when there is no Attempt.
@@ -15861,6 +17433,8 @@ export interface components {
         readonly StudentExamResultResponse: {
             /** @description The candidate's Attempt. */
             readonly exam_attempt_id: components["schemas"]["ID"];
+            /** @description The Submission's receipt code, the same value the candidate got when they submitted, in groups of four separated by hyphens. */
+            readonly receipt_code: string;
             /**
              * Format: date-time
              * @description When the result was released.
@@ -15909,6 +17483,83 @@ export interface components {
             /** @description True when counting stopped at 10,000 and there may be more. Present with `total`. */
             readonly total_is_lower_bound?: boolean;
         };
+        /** @description Exact counts within this Sitting, excluding your own Submission and independent of the filters. */
+        readonly SubmissionListCounts: {
+            /**
+             * Format: int64
+             * @description Submissions with at least one integrity Flag.
+             */
+            readonly flagged_submissions: number;
+            /**
+             * Format: int64
+             * @description Integrity Flags across all of them.
+             */
+            readonly flags: number;
+            /**
+             * Format: int64
+             * @description Submissions whose result is released. Present only with submission.review.
+             */
+            readonly released?: number;
+            /**
+             * Format: int64
+             * @description Submissions whose review is finalized. Present only with submission.review.
+             */
+            readonly reviewed?: number;
+            /** Format: int64 */
+            readonly total: number;
+        };
+        /** @description One sealed Submission. A Flag marks something for review; it is not a finding of guilt. */
+        readonly SubmissionListItemResponse: {
+            /** @description The candidate, as the Sitting's candidate board names them. */
+            readonly candidate: components["schemas"]["PersonRef"];
+            /** @description The Submission's Exam. Present on the list across Exams. */
+            readonly exam?: components["schemas"]["ExamRef"];
+            readonly exam_attempt_id: components["schemas"]["ID"];
+            readonly exam_id: components["schemas"]["ID"];
+            readonly exam_sitting_id: components["schemas"]["ID"];
+            /**
+             * Format: int64
+             * @description Integrity Flags raised on the Attempt.
+             */
+            readonly flag_count: number;
+            /** @enum {string} */
+            readonly integrity_state: "settled" | "gapped" | "retired";
+            /** @description The receipt code the candidate was given, in groups of four. */
+            readonly receipt_code: string;
+            /** @description The review, present only where you hold submission.review. */
+            readonly review?: components["schemas"]["SubmissionListReviewResponse"];
+            readonly submission_id: components["schemas"]["ID"];
+            /** Format: date-time */
+            readonly submitted_at: string;
+            /**
+             * Format: int64
+             * @description Missing signals still unresolved when collection ended; 0 once integrity data is retired.
+             */
+            readonly unresolved_integrity_count: number;
+        };
+        /** @description One page of Submissions. */
+        readonly SubmissionListResponse: {
+            /** @description Counts of the whole Sitting list, on its first page only. */
+            readonly counts?: components["schemas"]["SubmissionListCounts"];
+            readonly items: readonly components["schemas"]["SubmissionListItemResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description Where a Submission's review stands. state is none until a manager opens one. */
+        readonly SubmissionListReviewResponse: {
+            /** Format: date-time */
+            readonly finalized_at?: string;
+            readonly finalized_by?: components["schemas"]["PersonRef"];
+            readonly finalized_by_user_id?: components["schemas"]["ID"];
+            readonly id?: components["schemas"]["ID"];
+            /** @enum {string} */
+            readonly release_state: "withheld" | "released";
+            /** Format: date-time */
+            readonly released_at?: string;
+            /** Format: int64 */
+            readonly revision?: number;
+            /** @enum {string} */
+            readonly state: "none" | "draft" | "finalized";
+        };
         /** @description Wrapper for a Submission's Review waiver. */
         readonly SubmissionReviewWaiverEnvelope: {
             /** @description The recorded waiver, or null when none exists. */
@@ -15916,6 +17567,8 @@ export interface components {
         };
         /** @description A recorded decision that a Submission's current inventory needs no finalized Review. */
         readonly SubmissionReviewWaiverResponse: {
+            /** @description Who recorded the waiver, named. */
+            readonly actor?: components["schemas"]["PersonRef"];
             /** @description User who recorded the waiver. */
             readonly actor_user_id: components["schemas"]["ID"];
             /**
@@ -16112,6 +17765,11 @@ export interface components {
              * @description Optional. The `revision` from your last read. If the Academic Unit has changed since, the request fails with `academic_unit.conflict` and nothing changes. Without it, the change applies whatever the current revision. Null is rejected.
              */
             readonly expected_revision?: number;
+            /**
+             * @description The new kind of Academic Unit. Omitted or null leaves it unchanged.
+             * @enum {string|null}
+             */
+            readonly kind?: "faculty" | "school" | "department" | "office" | "other" | null;
             /** @description New machine name: lowercase letters, digits, hyphens and underscores, at most 64 characters. Omitted or null leaves it unchanged. An empty string is checked like any other value, so it is rejected. */
             readonly name?: string | null;
             /** @description The Academic Unit to move this one under. An empty string makes it top-level. Omitted or null leaves the parent unchanged. */
@@ -16160,6 +17818,8 @@ export interface components {
              * @description The Sitting's current revision, as last read. The request fails with a conflict if the Sitting has changed since.
              */
             readonly expected_revision: number;
+            /** @description A new join window, replacing the whole current one; {} removes it. Left out, the current window is kept and checked against the new times. */
+            readonly join_window?: components["schemas"]["ExamSittingJoinWindow"];
             /**
              * Format: date-time
              * @description A new deadline. It must be after the start and inside the Class's Academic Period.
@@ -16170,7 +17830,7 @@ export interface components {
              * @description A new opening time. It must be in the future and inside the Class's Academic Period.
              */
             readonly scheduled_start_at?: string;
-        } | unknown | unknown | unknown | unknown;
+        } | unknown | unknown | unknown | unknown | unknown;
         /** @description The Institution fields you can change. Fields you leave out or send as null stay as they are. */
         readonly UpdateInstitutionRequest: {
             /** @description New longer text, up to 1,024 characters. Omitted or null leaves it unchanged. An empty string clears it. */
@@ -16227,6 +17887,11 @@ export interface components {
              * @description Optional. The `revision` from your last read. If the Programme has changed since, the request fails with `programme.conflict` and nothing changes. Without it, the change applies whatever the current revision. Null is rejected.
              */
             readonly expected_revision?: number;
+            /**
+             * @description The new kind of Programme. Omitted or null leaves it unchanged.
+             * @enum {string|null}
+             */
+            readonly kind?: "undergraduate" | "postgraduate" | "other" | null;
             /** @description New machine name: lowercase letters, digits, hyphens and underscores, at most 64 characters. It must be unique among the Academic Unit's active Programmes. Omitted or null leaves it unchanged. An empty string is rejected. */
             readonly name?: string | null;
         };
@@ -16289,6 +17954,10 @@ export interface components {
              * @description Time the account was disabled. Omitted while it is enabled.
              */
             readonly disabled_at?: string;
+            /** @description Who disabled the account, for the disable in force. Present only while the account is disabled, when the disable named a person, and only for readers of the full profile: the User themselves or an institution-wide user.view holder. `GET /users/{user_id}` answers only for an active account, so a disabled account is read through the User directory. */
+            readonly disabled_by?: components["schemas"]["PersonRef"];
+            /** @description The reason given when the account was disabled. Present with the same rule as `disabled_by`, and only when a reason was given. */
+            readonly disabled_reason?: string;
             /** @description Name shown to other people. It can be empty. */
             readonly display_name: string;
             /**
@@ -16315,6 +17984,7 @@ export interface components {
             readonly last_name: string;
             /** @description Preferred language tag, such as `en`. */
             readonly locale?: string;
+            readonly mfa?: components["schemas"]["UserMFAResponse"];
             /**
              * Format: date-time
              * @description Time of the latest upload or removal. It does not tell you whether a custom picture exists. Use `profile_picture_kind` for that.
@@ -16368,6 +18038,57 @@ export interface components {
             /** @description The User. */
             readonly id: components["schemas"]["ID"];
         };
+        /** @description Whether the User's account has two-step verification on: an active Proctor authenticator app. It belongs to the account; how strongly a sign-in was proved belongs to each Session. A second factor an external sign-in provider checks does not turn it on. It is present only if you hold Institution-wide user.view or user.mfa.reset, and never says "off" to anyone else: for them it is left out. It never shows recovery codes or a setup that has not been finished. */
+        readonly UserMFAResponse: {
+            /** @description True while the account has an active Proctor authenticator app. */
+            readonly enabled: boolean;
+            /**
+             * Format: date-time
+             * @description When two-step verification was turned on. Present only while `enabled` is true.
+             */
+            readonly enabled_at?: string;
+            /** @description The second factor in use, as `/users/me/mfa` names it. Present only while `enabled` is true. More methods may be added later. */
+            readonly method?: string | "authenticator_app";
+        };
+        readonly UserMembershipListResponse: {
+            readonly items: readonly components["schemas"]["UserMembershipResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        readonly UserMembershipName: {
+            /** @description The display name. */
+            readonly display_name: string;
+            readonly id: components["schemas"]["ID"];
+        };
+        /** @description One current membership. An `academic_unit` entry names its unit. A `class` entry names its Class, programme level, programme and Academic Period. */
+        readonly UserMembershipResponse: {
+            /** @description The Academic Period of the enrolment. Present only for `class` entries. */
+            readonly academic_period?: components["schemas"]["UserMembershipName"];
+            /** @description The Academic Unit. Present only for `academic_unit` entries. */
+            readonly academic_unit?: components["schemas"]["UserMembershipName"];
+            /** @description The Class. Present only for `class` entries. */
+            readonly class?: components["schemas"]["ClassRef"];
+            /**
+             * Format: date-time
+             * @description When the membership ends. Omitted when it has no end.
+             */
+            readonly end_at?: string;
+            /** @description The ID of the Academic Unit membership or Class membership itself. */
+            readonly id: components["schemas"]["ID"];
+            /**
+             * @description Whether this is an Academic Unit membership or a Class enrolment.
+             * @enum {string}
+             */
+            readonly kind: "academic_unit" | "class";
+            /** @description The Class's programme. Present only for `class` entries. */
+            readonly programme?: components["schemas"]["UserMembershipName"];
+            /** @description The Class's programme level. Present only for `class` entries. */
+            readonly programme_level?: components["schemas"]["UserMembershipName"];
+            /**
+             * Format: date-time
+             * @description When the membership started.
+             */
+            readonly start_at: string;
+        };
         /** @description A page of Users you can see, sorted by username and then ID unless you choose another order. */
         readonly UserProfileListResponse: {
             /** @description The Users on this page. */
@@ -16395,6 +18116,10 @@ export interface components {
              * @description Time the account was disabled. Omitted while it is enabled.
              */
             readonly disabled_at?: string;
+            /** @description Who disabled the account, for the disable in force. Present only while the account is disabled, when the disable named a person, and only for readers of the full profile: the User themselves or an institution-wide user.view holder. `GET /users/{user_id}` answers only for an active account, so a disabled account is read through the User directory. */
+            readonly disabled_by?: components["schemas"]["PersonRef"];
+            /** @description The reason given when the account was disabled. Present with the same rule as `disabled_by`, and only when a reason was given. */
+            readonly disabled_reason?: string;
             /** @description Name shown to other people. It can be empty. */
             readonly display_name: string;
             /**
@@ -16421,6 +18146,7 @@ export interface components {
             readonly last_name: string;
             /** @description Preferred language tag, such as `en` or `fr-CA`. Defaults to `en`. */
             readonly locale?: string;
+            readonly mfa?: components["schemas"]["UserMFAResponse"];
             /**
              * Format: date-time
              * @description Time of the latest upload or removal. It does not tell you whether a custom picture exists. Use `profile_picture_kind` for that.
@@ -16716,6 +18442,8 @@ export interface components {
                  * @example {
                  *       "items": [
                  *         {
+                 *           "class_count": 24,
+                 *           "class_count_is_lower_bound": false,
                  *           "created_at": "2026-07-15T09:00:00Z",
                  *           "description": "Academic year 2026 to 2027.",
                  *           "display_name": "2026–2027",
@@ -16742,7 +18470,7 @@ export interface components {
                  *           "updated_at": "2026-07-20T14:00:00Z"
                  *         }
                  *       ],
-                 *       "next_cursor": "eyJzdGFydF9hdCI6IjIwMjctMDEtMTFUMDA6MDA6MDBaIiwibmFtZSI6IjIwMjYtMjAyNy1zZW1lc3Rlci0yIiwiaWQiOiJobXlqbWo2OGR3NmdkeGN0bmdoYnJod2N0aCJ9"
+                 *       "next_cursor": "eyJzdGFydF9hdCI6IjIwMjctMDEtMTFUMDA6MDA6MDBaIiwibmFtZSI6IjIwMjYtMjAyNy1zZW1lc3Rlci0yIiwiaWQiOiJobXlqbWo2OGR3NmdkeGN0bmdoYnJod2N0aCIsInNvcnQiOiJzdGFydCIsImRpciI6ImFzYyJ9"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["AcademicPeriodListResponse"];
@@ -16793,6 +18521,7 @@ export interface components {
                  *       "display_name": "Computer Science",
                  *       "id": "14j8umgczgrdp95w77zuxmxfu9",
                  *       "institution_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                 *       "kind": "department",
                  *       "name": "computer-science",
                  *       "revision": 1,
                  *       "updated_at": "2026-08-01T09:00:00Z"
@@ -16816,6 +18545,7 @@ export interface components {
                  *           "display_name": "School of Computer Science",
                  *           "id": "14j8umgczgrdp95w77zuxmxfu9",
                  *           "institution_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                 *           "kind": "department",
                  *           "name": "computer-science",
                  *           "parent_id": "ih1r84kij94nrwis97rft6rduh",
                  *           "revision": 2,
@@ -16827,6 +18557,7 @@ export interface components {
                  *           "display_name": "Software Engineering",
                  *           "id": "1asb7sk89dp1ex339fkh3te5t4",
                  *           "institution_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                 *           "kind": "department",
                  *           "name": "software-engineering",
                  *           "parent_id": "ih1r84kij94nrwis97rft6rduh",
                  *           "revision": 1,
@@ -16891,6 +18622,7 @@ export interface components {
                  *         {
                  *           "academic_unit_id": "889766ufjgio6kbpzjbufozksq",
                  *           "created_at": "2026-07-20T14:05:00Z",
+                 *           "email": "teacher.one@example.edu",
                  *           "id": "iqcx3qc9sbbt6ocshszfqgq6ci",
                  *           "roles_here": [
                  *             {
@@ -16903,7 +18635,7 @@ export interface components {
                  *           "updated_at": "2026-07-20T14:05:00Z",
                  *           "user": {
                  *             "display_name": "Teacher One",
-                 *             "email": "teacher.one@example.edu",
+                 *             "id": "ybndrfg8ejkmcpqxot1uwisza3",
                  *             "username": "teacher.one"
                  *           },
                  *           "user_id": "ybndrfg8ejkmcpqxot1uwisza3"
@@ -16911,6 +18643,7 @@ export interface components {
                  *         {
                  *           "academic_unit_id": "889766ufjgio6kbpzjbufozksq",
                  *           "created_at": "2026-07-21T09:00:00Z",
+                 *           "email": "staff.two@example.edu",
                  *           "id": "dfa1x1n7mkthyoziwxnupsmyia",
                  *           "roles_here": [],
                  *           "roles_here_more": 0,
@@ -16918,7 +18651,7 @@ export interface components {
                  *           "updated_at": "2026-07-21T09:00:00Z",
                  *           "user": {
                  *             "display_name": "Staff Two",
-                 *             "email": "staff.two@example.edu",
+                 *             "id": "f6tcxyfofj3n3buuqfjaw9j1jn",
                  *             "username": "staff.two"
                  *           },
                  *           "user_id": "f6tcxyfofj3n3buuqfjaw9j1jn"
@@ -16940,11 +18673,37 @@ export interface components {
             content: {
                 /**
                  * @example {
+                 *       "administrators": [
+                 *         {
+                 *           "display_name": "Priya Raman",
+                 *           "id": "4ufo8k7p1h3m5bxj9y6rqwtzse",
+                 *           "profile_picture_url": "/api/v1/users/4ufo8k7p1h3m5bxj9y6rqwtzse/profile-picture",
+                 *           "username": "praman"
+                 *         },
+                 *         {
+                 *           "display_name": "Ahmed Farouk",
+                 *           "id": "n3c8xa5hk1ymqpz7rj6wtf4ub9"
+                 *         }
+                 *       ],
+                 *       "administrators_more": 0,
                  *       "created_at": "2026-08-01T09:00:00Z",
                  *       "description": "Computing teaching and research.",
                  *       "display_name": "School of Computer Science",
                  *       "id": "14j8umgczgrdp95w77zuxmxfu9",
                  *       "institution_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                 *       "kind": "department",
+                 *       "member_count": 412,
+                 *       "member_count_is_lower_bound": false,
+                 *       "member_counts_by_affiliation": {
+                 *         "external": 0,
+                 *         "external_is_lower_bound": false,
+                 *         "staff": 36,
+                 *         "staff_is_lower_bound": false,
+                 *         "student": 376,
+                 *         "student_is_lower_bound": false,
+                 *         "teacher": 21,
+                 *         "teacher_is_lower_bound": false
+                 *       },
                  *       "name": "computer-science",
                  *       "parent_id": "ih1r84kij94nrwis97rft6rduh",
                  *       "revision": 3,
@@ -16975,6 +18734,10 @@ export interface components {
                  *       "durable_mail": true,
                  *       "history": [
                  *         {
+                 *           "actor": {
+                 *             "display_name": "Priya Raman",
+                 *             "id": "o87yi4tenx8kodmcuup1hmtsbo"
+                 *           },
                  *           "actor_user_id": "o87yi4tenx8kodmcuup1hmtsbo",
                  *           "changed_at": "2026-08-20T13:15:00Z",
                  *           "changed_fields": [
@@ -16983,9 +18746,14 @@ export interface components {
                  *           ],
                  *           "from_revision": 3,
                  *           "outcome": "applied",
+                 *           "summary": "Priya Raman changed signing everyone out, two-step for role holders",
                  *           "to_revision": 4
                  *         },
                  *         {
+                 *           "actor": {
+                 *             "display_name": "Priya Raman",
+                 *             "id": "o87yi4tenx8kodmcuup1hmtsbo"
+                 *           },
                  *           "actor_user_id": "o87yi4tenx8kodmcuup1hmtsbo",
                  *           "changed_at": "2026-08-02T10:00:00Z",
                  *           "changed_fields": [
@@ -16993,6 +18761,7 @@ export interface components {
                  *           ],
                  *           "from_revision": 2,
                  *           "outcome": "applied",
+                 *           "summary": "Priya Raman changed the idle session timeout",
                  *           "to_revision": 3
                  *         }
                  *       ],
@@ -17256,6 +19025,90 @@ export interface components {
                 readonly "application/json": components["schemas"]["AttemptEvidenceListResponse"];
             };
         };
+        /** @description The export was queued with a fixed expiry. */
+        readonly AuditExportAccepted: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "created_at": "2026-09-01T12:00:00Z",
+                 *       "event_count": 1280,
+                 *       "expires_at": "2026-09-04T12:00:00Z",
+                 *       "format": "csv",
+                 *       "id": "rpn96r4g3jfk3t41u4dus44bzc",
+                 *       "job_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                 *       "redacted": false,
+                 *       "state": "queued"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["AuditExportResponse"];
+            };
+        };
+        /** @description The export file, checked against its hash. */
+        readonly AuditExportFile: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                /** @description Marks the response as an attachment, with a safe file name chosen by the server. */
+                readonly "Content-Disposition"?: string;
+                /** @description SHA-256 of the file, in double quotes. */
+                readonly ETag?: string;
+                /** @description Always `nosniff`, so browsers don't guess a different content type. */
+                readonly "X-Content-Type-Options"?: "nosniff";
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/jsonl": Uint8Array;
+                readonly "text/csv": Uint8Array;
+            };
+        };
+        /** @description The export's fixed expiry has passed, so new downloads are refused. */
+        readonly AuditExportGone: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "code": "audit.export.expired",
+                 *       "detail": "The audit export has expired.",
+                 *       "request_id": "req_docs_audit_export_expired",
+                 *       "status": 410,
+                 *       "title": "Export expired",
+                 *       "type": "https://docs.example.edu/problems/audit.export.expired"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description The export's details. Only the User who asked for it sees them. */
+        readonly AuditExportOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "created_at": "2026-09-01T12:00:00Z",
+                 *       "event_count": 1280,
+                 *       "expires_at": "2026-09-04T12:00:00Z",
+                 *       "format": "csv",
+                 *       "id": "rpn96r4g3jfk3t41u4dus44bzc",
+                 *       "job_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                 *       "ready_at": "2026-09-01T12:00:09Z",
+                 *       "redacted": false,
+                 *       "sha256": "5d41a2b8c9e0f17263a4b5c6d7e8f9011a2b3c4d5e6f708192a3b4c5d6e7f809",
+                 *       "size_bytes": 412044,
+                 *       "state": "ready"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["AuditExportResponse"];
+            };
+        };
         /** @description Audit Event collection */
         readonly AuditListOK: {
             headers: {
@@ -17267,6 +19120,10 @@ export interface components {
                  *       "items": [
                  *         {
                  *           "action": "class.members.manage",
+                 *           "actor": {
+                 *             "display_name": "Ada Admin",
+                 *             "id": "ybndrfg8ejkmcpqxot1uwisza4"
+                 *           },
                  *           "actor_id": "ybndrfg8ejkmcpqxot1uwisza4",
                  *           "created_at": "2026-08-01T09:30:00Z",
                  *           "id": "ybndrfg8ejkmcpqxot1uwisza3",
@@ -17869,7 +19726,10 @@ export interface components {
                  *           ],
                  *           "attempt": {
                  *             "id": "o87yi4tenx8kodmcuup1hmtsbo",
+                 *             "last_saved_at": "2026-09-14T09:52:40Z",
+                 *             "reallowed_at": "2026-09-14T09:38:15Z",
                  *             "state": "active",
+                 *             "suspended_at": "2026-09-14T09:27:04Z",
                  *             "suspension_reason_code": null
                  *           },
                  *           "class": {
@@ -17878,6 +19738,10 @@ export interface components {
                  *           },
                  *           "exam_id": "6xoche483hwrx5rpu8jzjoe7qg",
                  *           "exam_sitting_id": "39kqk53i4cswfzbi7hbai1r8qg",
+                 *           "join_window": {
+                 *             "closes_at": "2026-09-14T09:30:00Z",
+                 *             "opens_at": "2026-09-14T08:50:00Z"
+                 *           },
                  *           "result": null,
                  *           "scheduled_end_at": "2026-09-14T11:00:00Z",
                  *           "scheduled_start_at": "2026-09-14T09:00:00Z",
@@ -17917,6 +19781,7 @@ export interface components {
                  *           "submission": {
                  *             "id": "xpq79ar61ncrjiouey6d9tgp91",
                  *             "provenance": "candidate_submitted",
+                 *             "receipt_code": "7QXR-4M2K-HV9D-3JNP",
                  *             "submitted_at": "2026-09-07T13:48:10Z"
                  *           },
                  *           "title": "Linear Algebra Quiz 2"
@@ -17967,6 +19832,7 @@ export interface components {
                  *             "blocked_navigation_outcome": "record",
                  *             "host_match": "exact",
                  *             "institution_http_exception": false,
+                 *             "label": "Language reference",
                  *             "origin": "https://docs.example.org",
                  *             "path_prefix": "/reference",
                  *             "rule_id": "language-docs"
@@ -18252,6 +20118,37 @@ export interface components {
                 readonly "application/json": components["schemas"]["ClassResponse"];
             };
         };
+        /** @description Class */
+        readonly ClassDetailOK: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "academic_period_id": "sjebyge5cpbop1xwo4eds74ejb",
+                 *       "created_at": "2026-08-05T08:30:00Z",
+                 *       "description": "First-year Class A.",
+                 *       "display_name": "Computer Science Level 100 — B",
+                 *       "id": "6xoche483hwrx5rpu8jzjoe7qg",
+                 *       "name": "cs-level-100-a",
+                 *       "programme_level_id": "iqcx3qc9sbbt6ocshszfqgq6ci",
+                 *       "revision": 2,
+                 *       "teachers": [
+                 *         {
+                 *           "display_name": "Priya Raman",
+                 *           "id": "3n9ki8z1o5xkw7yq4m6rtbh5ce",
+                 *           "profile_picture_url": "/api/v1/users/3n9ki8z1o5xkw7yq4m6rtbh5ce/profile-picture",
+                 *           "username": "praman"
+                 *         }
+                 *       ],
+                 *       "teachers_more": 0,
+                 *       "updated_at": "2026-08-18T12:00:00Z"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ClassDetailResponse"];
+            };
+        };
         /** @description Class collection */
         readonly ClassListOK: {
             headers: {
@@ -18363,19 +20260,38 @@ export interface components {
                  *           "academic_period_id": "p6y6sf8ac6m5if373fkkebj7j6",
                  *           "class_id": "sjebyge5cpbop1xwo4eds74ejb",
                  *           "created_at": "2026-07-28T10:00:00Z",
+                 *           "email": "amara.okafor@example.edu",
                  *           "id": "ih1r84kij94nrwis97rft6rduh",
                  *           "start_at": "2026-09-01T00:00:00Z",
                  *           "updated_at": "2026-07-28T10:00:00Z",
+                 *           "user": {
+                 *             "display_name": "Amara Okafor",
+                 *             "id": "5ebqfbnezgahdbx9oy7rfr6oro",
+                 *             "username": "aokafor"
+                 *           },
                  *           "user_id": "5ebqfbnezgahdbx9oy7rfr6oro"
                  *         },
                  *         {
                  *           "academic_period_id": "p6y6sf8ac6m5if373fkkebj7j6",
                  *           "class_id": "sjebyge5cpbop1xwo4eds74ejb",
                  *           "created_at": "2026-07-28T10:00:02Z",
-                 *           "end_at": "2027-07-01T00:00:00Z",
+                 *           "email": "tomas.lindqvist@example.edu",
+                 *           "end_at": "2027-01-11T00:00:00Z",
                  *           "id": "xpq79ar61ncrjiouey6d9tgp91",
                  *           "start_at": "2026-09-01T00:00:00Z",
+                 *           "transfer": {
+                 *             "at": "2027-01-11T00:00:00Z",
+                 *             "to_class": {
+                 *               "display_name": "Year 1, Group B",
+                 *               "id": "8kpous3h9nfemqtwz47ydgjcx1"
+                 *             }
+                 *           },
                  *           "updated_at": "2026-07-28T10:00:02Z",
+                 *           "user": {
+                 *             "display_name": "Tomas Lindqvist",
+                 *             "id": "17778cuf6b17rhtapprfjozet8",
+                 *             "username": "tlindqvist"
+                 *           },
                  *           "user_id": "17778cuf6b17rhtapprfjozet8"
                  *         }
                  *       ],
@@ -18703,8 +20619,19 @@ export interface components {
                  *       "minimum_desktop_release": "1.4.0",
                  *       "retry_at": "2026-08-28T11:00:00Z",
                  *       "revision": 3,
-                 *       "revoked_desktop_build_ids": [
-                 *         "desktop-build-2026-08-17"
+                 *       "revoked_desktop_builds": [
+                 *         {
+                 *           "architecture": "arm64",
+                 *           "build_id": "desktop-build-2026-08-17",
+                 *           "platform": "darwin",
+                 *           "reason": "Crashes when the laptop wakes",
+                 *           "release": "1.3.2",
+                 *           "revoked_at": "2026-08-28T10:11:12Z",
+                 *           "revoked_by": {
+                 *             "display_name": "Priya Raman",
+                 *             "id": "4ufo8k7p1h3m5bxj9y6rqwtzse"
+                 *           }
+                 *         }
                  *       ],
                  *       "updated_at": "2026-08-28T10:11:12Z"
                  *     }
@@ -19280,7 +21207,12 @@ export interface components {
                  *         "resource_count": 0,
                  *         "revision": 1,
                  *         "title": "Algorithms — final examination",
-                 *         "updated_at": "2026-07-20T10:00:00Z"
+                 *         "updated_at": "2026-07-20T10:00:00Z",
+                 *         "updated_by": {
+                 *           "display_name": "Owen Hughes",
+                 *           "id": "c9me3tsk7oyhx1bwuadgz5nqrf"
+                 *         },
+                 *         "updated_by_user_id": "c9me3tsk7oyhx1bwuadgz5nqrf"
                  *       },
                  *       "exam": {
                  *         "academic_unit_id": "q4nzk1xwe7rbdg3cyjoth5mupa",
@@ -19296,6 +21228,35 @@ export interface components {
                  *     }
                  */
                 readonly "application/json": components["schemas"]["ExamResponse"];
+            };
+        };
+        /** @description Whether the current Draft can be published, and every reason it can't. */
+        readonly ExamDraftCheckOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "draft_revision": 9,
+                 *       "problems": [
+                 *         {
+                 *           "code": "exam.revision.capacity_exceeded",
+                 *           "field": "resources.size_bytes",
+                 *           "message": "This file for candidates is larger than this installation allows.",
+                 *           "resource_id": "3nqhk8zmy1rxwpecb5dtg7uoaf"
+                 *         },
+                 *         {
+                 *           "code": "exam.execution.disabled",
+                 *           "field": "policy.execution",
+                 *           "message": "The draft runs candidates' code, but this installation has code execution turned off."
+                 *         }
+                 *       ],
+                 *       "publishable": false
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ExamDraftCheckResponse"];
             };
         };
         /** @description The export request was accepted with a fixed expiry. Poll the export at its own URL, under the same Sitting or Submission, to see when it is ready. */
@@ -19522,6 +21483,7 @@ export interface components {
                  *           "id": "xpq79ar61ncrjiouey6d9tgp91",
                  *           "policy_kind": "focus_loss",
                  *           "state": "open",
+                 *           "summary": "The exam window lost focus 2 times",
                  *           "unresolved_missing_count": 0
                  *         },
                  *         {
@@ -19538,6 +21500,7 @@ export interface components {
                  *           "id": "17778cuf6b17rhtapprfjozet8",
                  *           "policy_kind": "browser_navigation",
                  *           "state": "open",
+                 *           "summary": "1 page was blocked by the “block-search” browser rule",
                  *           "unresolved_missing_count": 0
                  *         }
                  *       ]
@@ -19904,7 +21867,13 @@ export interface components {
                  *         "resource_count": 2,
                  *         "revision": 9,
                  *         "title": "Algorithms — final examination",
-                 *         "updated_at": "2026-08-03T14:20:00Z"
+                 *         "updated_at": "2026-08-03T14:20:00Z",
+                 *         "updated_by": {
+                 *           "display_name": "Owen Hughes",
+                 *           "id": "c9me3tsk7oyhx1bwuadgz5nqrf",
+                 *           "username": "ohughes"
+                 *         },
+                 *         "updated_by_user_id": "c9me3tsk7oyhx1bwuadgz5nqrf"
                  *       },
                  *       "exam": {
                  *         "academic_unit_id": "q4nzk1xwe7rbdg3cyjoth5mupa",
@@ -20092,6 +22061,138 @@ export interface components {
             };
             content?: never;
         };
+        /** @description The title, instructions and policies the Revision froze. */
+        readonly ExamRevisionContentOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "browser_policy": {
+                 *         "enabled": false
+                 *       },
+                 *       "exam_id": "8uk3fh7sw1mxqdbt5yrcg4oz9a",
+                 *       "instructions_markdown": "Read every question before you begin.",
+                 *       "number": 3,
+                 *       "policy": {
+                 *         "assistant": {
+                 *           "approvals": "always_ask",
+                 *           "budgets": {
+                 *             "command_seconds": 0,
+                 *             "command_timeout_seconds": 0,
+                 *             "commands": 0,
+                 *             "input_tokens": 0,
+                 *             "output_tokens": 0,
+                 *             "tool_calls": 0,
+                 *             "turns": 0
+                 *           },
+                 *           "code_line_budget": 10,
+                 *           "concepts_to_avoid": [],
+                 *           "enabled": false,
+                 *           "instructions": "",
+                 *           "level": "off",
+                 *           "profile_id": ""
+                 *         },
+                 *         "connection_loss": {
+                 *           "outcome": "flag_and_suspend"
+                 *         },
+                 *         "execution": {
+                 *           "enabled": false,
+                 *           "preview": {
+                 *             "enabled": false,
+                 *             "ports": []
+                 *           },
+                 *           "record_input": false,
+                 *           "terminals": 0
+                 *         },
+                 *         "focus_loss": {
+                 *           "enabled": true,
+                 *           "incident_count": 3,
+                 *           "minimum_duration_milliseconds": 2000,
+                 *           "outcome": "flag_and_warn",
+                 *           "window_milliseconds": 300000
+                 *         },
+                 *         "native": {
+                 *           "baseline_id": "desktop_candidate",
+                 *           "families": [
+                 *             {
+                 *               "allowed_application_ids": [],
+                 *               "id": "process_application",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag"
+                 *             },
+                 *             {
+                 *               "id": "interactive_session",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag"
+                 *             },
+                 *             {
+                 *               "id": "clipboard",
+                 *               "mode": "disabled",
+                 *               "observe_os_clipboard_changes": false,
+                 *               "outcome": "flag",
+                 *               "strategy": "disabled"
+                 *             },
+                 *             {
+                 *               "candidate_print_commands": "not_applied",
+                 *               "id": "printing",
+                 *               "mode": "disabled",
+                 *               "monitored_spooler": "not_required",
+                 *               "outcome": "flag"
+                 *             },
+                 *             {
+                 *               "enabled_sub_capabilities": [],
+                 *               "id": "removable_storage",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag"
+                 *             },
+                 *             {
+                 *               "id": "virtualization",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag",
+                 *               "rule": "not_applied"
+                 *             },
+                 *             {
+                 *               "enabled_sub_capabilities": [],
+                 *               "id": "network_configuration",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag"
+                 *             },
+                 *             {
+                 *               "concurrent_use_check": "not_required",
+                 *               "id": "camera",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag",
+                 *               "require_ready": false
+                 *             },
+                 *             {
+                 *               "concurrent_use_check": "not_required",
+                 *               "id": "microphone",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag",
+                 *               "require_ready": false
+                 *             },
+                 *             {
+                 *               "id": "external_capture",
+                 *               "mode": "disabled",
+                 *               "outcome": "flag"
+                 *             }
+                 *           ],
+                 *           "registry_digest": "sha256:e4c05771fa6f34c08c0f01aa98e33f88973baacf832c67d760457f2b4f9d734d",
+                 *           "screen_recording": {
+                 *             "enabled": false
+                 *           }
+                 *         }
+                 *       },
+                 *       "revision_id": "t1oekp5dqa7nwrzhcx3by9mug4",
+                 *       "title": "Algorithms — final examination"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ExamRevisionContentResponse"];
+            };
+        };
         /** @description The new Revision, published from the Draft. */
         readonly ExamRevisionCreated: {
             headers: {
@@ -20208,6 +22309,62 @@ export interface components {
                 readonly "application/json": components["schemas"]["ExamRevisionResponse"];
             };
         };
+        /** @description The Resources the Revision froze, in order. */
+        readonly ExamRevisionResourceListOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "items": [
+                 *         {
+                 *           "content_revision_id": "x7bkq4ezmc1hd9wptnfgy3ar5o",
+                 *           "description_markdown": "Formulas you may use.",
+                 *           "display_name": "Reference sheet",
+                 *           "id": "3nqhk8zmy1rxwpecb5dtg7uoaf",
+                 *           "media_type": "application/pdf",
+                 *           "position": 0,
+                 *           "sha256": "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+                 *           "size": 48213
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ExamRevisionResourceListResponse"];
+            };
+        };
+        /** @description The Starter Workspace the Revision froze, in path order. */
+        readonly ExamRevisionStarterWorkspaceListOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "items": [
+                 *         {
+                 *           "id": "m8dq3xkz7w1ncrbe5pyth4gufo",
+                 *           "kind": "directory",
+                 *           "path": "cmd"
+                 *         },
+                 *         {
+                 *           "content_version": "aZ3kQ9mW2xT7vB1nP5rL8cY4dE",
+                 *           "id": "r4bty8ozwe3kx1nqcm7dhgf5ua",
+                 *           "kind": "file",
+                 *           "media_type": "text/x-go",
+                 *           "path": "cmd/main.go",
+                 *           "sha256": "9c56cc51b374c3ba189210d5b6d4bf57790d351c96c47c02190ecf1e430635ab",
+                 *           "size": 12
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ExamRevisionStarterWorkspaceListResponse"];
+            };
+        };
         /** @description One page of the live candidate-status board. */
         readonly ExamSittingCandidateStatusesOK: {
             headers: {
@@ -20217,6 +22374,20 @@ export interface components {
             content: {
                 /**
                  * @example {
+                 *       "counts": {
+                 *         "by_presence_state": {
+                 *           "connected": 1,
+                 *           "lease_expired": 0,
+                 *           "not_started": 1,
+                 *           "ready": 0,
+                 *           "reconnecting": 0,
+                 *           "submitted": 0,
+                 *           "suspended": 0
+                 *         },
+                 *         "total": 2,
+                 *         "with_attention": 0,
+                 *         "with_failed_checks": 0
+                 *       },
                  *       "environments_waiting_capacity": 0,
                  *       "exam_id": "39kqk53i4cswfzbi7hbai1r8qg",
                  *       "exam_sitting_id": "889766ufjgio6kbpzjbufozksq",
@@ -20232,7 +22403,7 @@ export interface components {
                  *           },
                  *           "candidate": {
                  *             "display_name": "Ada Student",
-                 *             "user_id": "nybc6xhg593upqice3sdeyro5k",
+                 *             "id": "nybc6xhg593upqice3sdeyro5k",
                  *             "username": "student.ada"
                  *           },
                  *           "current_class_membership": true,
@@ -20269,7 +22440,7 @@ export interface components {
                  *           "attempt": null,
                  *           "candidate": {
                  *             "display_name": "Bo Student",
-                 *             "user_id": "dfa1x1n7mkthyoziwxnupsmyia",
+                 *             "id": "dfa1x1n7mkthyoziwxnupsmyia",
                  *             "username": "student.bo"
                  *           },
                  *           "current_class_membership": true,
@@ -20349,6 +22520,10 @@ export interface components {
                  *       "exam_id": "wj3drgzdpnf54rxf5d8qd3dqne",
                  *       "exam_revision_id": "ih1r84kij94nrwis97rft6rduh",
                  *       "id": "14j8umgczgrdp95w77zuxmxfu9",
+                 *       "join_window": {
+                 *         "closes_at": "2026-12-14T09:30:00Z",
+                 *         "opens_at": "2026-12-14T08:50:00Z"
+                 *       },
                  *       "revision": 1,
                  *       "scheduled_end_at": "2026-12-14T11:00:00Z",
                  *       "scheduled_start_at": "2026-12-14T09:00:00Z",
@@ -20415,10 +22590,22 @@ export interface components {
                  * @example {
                  *       "items": [
                  *         {
-                 *           "candidate_user_id": "sjebyge5cpbop1xwo4eds74ejb"
+                 *           "candidate": {
+                 *             "display_name": "Asha Rao",
+                 *             "id": "sjebyge5cpbop1xwo4eds74ejb",
+                 *             "username": "arao"
+                 *           },
+                 *           "candidate_user_id": "sjebyge5cpbop1xwo4eds74ejb",
+                 *           "class_member_since": "2026-09-04T08:00:00Z"
                  *         },
                  *         {
-                 *           "candidate_user_id": "hmyjmj68dw6gdxctnghbrhwcth"
+                 *           "candidate": {
+                 *             "display_name": "Tomas Kim",
+                 *             "id": "hmyjmj68dw6gdxctnghbrhwcth",
+                 *             "username": "tkim"
+                 *           },
+                 *           "candidate_user_id": "hmyjmj68dw6gdxctnghbrhwcth",
+                 *           "class_member_since": "2026-09-04T08:00:00Z"
                  *         }
                  *       ],
                  *       "next_cursor": "eyJjYW5kaWRhdGVfdXNlcl9pZCI6ImhteWptajY4ZHc2Z2R4Y3RuZ2hicmh3Y3RoIn0"
@@ -20441,6 +22628,10 @@ export interface components {
                  *       "exam_id": "wj3drgzdpnf54rxf5d8qd3dqne",
                  *       "exam_revision_id": "ih1r84kij94nrwis97rft6rduh",
                  *       "id": "14j8umgczgrdp95w77zuxmxfu9",
+                 *       "join_window": {
+                 *         "closes_at": "2026-12-14T09:30:00Z",
+                 *         "opens_at": "2026-12-14T08:50:00Z"
+                 *       },
                  *       "opened_at": "2026-12-14T09:00:02Z",
                  *       "paused_at": "2026-12-14T09:41:17Z",
                  *       "revision": 3,
@@ -20623,6 +22814,7 @@ export interface components {
                  *       "manifest_entry_count": 3,
                  *       "manifest_schema_version": 1,
                  *       "manifest_total_file_bytes": 2841,
+                 *       "receipt_code": "7QXR-4M2K-HV9D-3JNP",
                  *       "submission_id": "39kqk53i4cswfzbi7hbai1r8qg",
                  *       "submitted_at": "2026-12-14T10:48:09Z",
                  *       "unresolved_integrity_count": 0,
@@ -20939,8 +23131,18 @@ export interface components {
                  *       },
                  *       "role_binding": {
                  *         "created_at": "2026-08-01T09:00:00Z",
+                 *         "granted_via": "bootstrap",
                  *         "id": "6xoche483hwrx5rpu8jzjoe7qg",
+                 *         "role": {
+                 *           "display_name": "System Administrator",
+                 *           "id": "hmyjmj68dw6gdxctnghbrhwcth"
+                 *         },
                  *         "role_id": "hmyjmj68dw6gdxctnghbrhwcth",
+                 *         "scope": {
+                 *           "display_name": "Northbridge Institute",
+                 *           "id": "p6y6sf8ac6m5if373fkkebj7j6",
+                 *           "type": "institution"
+                 *         },
                  *         "scope_id": "p6y6sf8ac6m5if373fkkebj7j6",
                  *         "scope_type": "institution",
                  *         "start_at": "2026-08-01T09:00:00Z",
@@ -21040,9 +23242,18 @@ export interface components {
                  *       "email": "student.one@example.edu",
                  *       "expires_at": "2026-08-29T14:00:00Z",
                  *       "id": "o514k1ahcaicsys1cko4q4s3y8",
+                 *       "inviter": {
+                 *         "display_name": "Priya Raman",
+                 *         "id": "rpn96r4g3jfk3t41u4dus44bzc"
+                 *       },
                  *       "inviter_user_id": "rpn96r4g3jfk3t41u4dus44bzc",
                  *       "purpose": "student_class",
                  *       "revision": 1,
+                 *       "scope": {
+                 *         "display_name": "Year 1 Mathematics A",
+                 *         "id": "ybndrfg8ejkmcpqxot1uwisza3",
+                 *         "type": "class"
+                 *       },
                  *       "start_at": "2026-09-01T00:00:00Z",
                  *       "state": "pending",
                  *       "updated_at": "2026-08-22T14:00:00Z"
@@ -21077,9 +23288,18 @@ export interface components {
                  *           "email": "student.one@example.edu",
                  *           "expires_at": "2026-08-27T10:00:00Z",
                  *           "id": "ccrzmhoygspnzijnponpyw4zmu",
+                 *           "inviter": {
+                 *             "display_name": "Priya Raman",
+                 *             "id": "rpn96r4g3jfk3t41u4dus44bzc"
+                 *           },
                  *           "inviter_user_id": "rpn96r4g3jfk3t41u4dus44bzc",
                  *           "purpose": "student_class",
                  *           "revision": 1,
+                 *           "scope": {
+                 *             "display_name": "Year 1 Mathematics A",
+                 *             "id": "sjebyge5cpbop1xwo4eds74ejb",
+                 *             "type": "class"
+                 *           },
                  *           "start_at": "2026-09-01T00:00:00Z",
                  *           "state": "pending",
                  *           "updated_at": "2026-08-20T10:00:03Z"
@@ -21091,14 +23311,27 @@ export interface components {
                  *           "email": "teacher.one@example.edu",
                  *           "expires_at": "2026-08-17T09:00:00Z",
                  *           "id": "id9tzepftxa3h5uben569yr37h",
+                 *           "inviter": {
+                 *             "display_name": "Priya Raman",
+                 *             "id": "rpn96r4g3jfk3t41u4dus44bzc"
+                 *           },
                  *           "inviter_user_id": "rpn96r4g3jfk3t41u4dus44bzc",
                  *           "purpose": "teacher_academic_unit",
                  *           "revision": 2,
+                 *           "role": {
+                 *             "display_name": "Teacher",
+                 *             "id": "nybc6xhg593upqice3sdeyro5k"
+                 *           },
                  *           "role_actions": [
                  *             "exam.create",
                  *             "class.view"
                  *           ],
                  *           "role_id": "nybc6xhg593upqice3sdeyro5k",
+                 *           "scope": {
+                 *             "display_name": "Computer Science",
+                 *             "id": "889766ufjgio6kbpzjbufozksq",
+                 *             "type": "academic_unit"
+                 *           },
                  *           "start_at": "2026-08-10T09:00:00Z",
                  *           "state": "accepted",
                  *           "updated_at": "2026-08-11T15:42:10Z"
@@ -21136,9 +23369,18 @@ export interface components {
                  *       "email": "student.one@example.edu",
                  *       "expires_at": "2026-08-27T10:00:00Z",
                  *       "id": "ccrzmhoygspnzijnponpyw4zmu",
+                 *       "inviter": {
+                 *         "display_name": "Priya Raman",
+                 *         "id": "rpn96r4g3jfk3t41u4dus44bzc"
+                 *       },
                  *       "inviter_user_id": "rpn96r4g3jfk3t41u4dus44bzc",
                  *       "purpose": "student_class",
                  *       "revision": 1,
+                 *       "scope": {
+                 *         "display_name": "Year 1 Mathematics A",
+                 *         "id": "sjebyge5cpbop1xwo4eds74ejb",
+                 *         "type": "class"
+                 *       },
                  *       "start_at": "2026-09-01T00:00:00Z",
                  *       "state": "pending",
                  *       "updated_at": "2026-08-20T10:00:03Z"
@@ -21592,10 +23834,12 @@ export interface components {
                  *       "active": [
                  *         {
                  *           "active_references": 1284,
+                 *           "in_use_since": "2026-09-14T08:00:00Z",
                  *           "key_id": "7d3e9a10c4b2f6e8a1d5c7b9e3f20a46"
                  *         },
                  *         {
                  *           "active_references": 37,
+                 *           "in_use_since": "2026-03-02T10:30:00Z",
                  *           "key_id": "2b8f4c6a0e1d3957b2c4e6f8a0b1c3d5"
                  *         }
                  *       ],
@@ -21913,6 +24157,10 @@ export interface components {
                 /**
                  * @example {
                  *       "created_at": "2026-08-18T13:30:00Z",
+                 *       "created_by": {
+                 *         "display_name": "Priya Raman",
+                 *         "id": "wj3drgzdpnf54rxf5d8qd3dqne"
+                 *       },
                  *       "expires_at": "2026-08-25T13:30:00Z",
                  *       "failed_rows": 0,
                  *       "file_name": "chemistry-roster.csv",
@@ -21929,15 +24177,27 @@ export interface components {
                  *       "rows": [
                  *         {
                  *           "operation": "student_class.create",
+                 *           "person": {
+                 *             "display_name": "Amina Diallo",
+                 *             "email_masked": "a***@example.edu"
+                 *           },
                  *           "reference": "1",
                  *           "row": 1,
                  *           "status": "valid"
                  *         },
                  *         {
                  *           "operation": "student_class.create",
+                 *           "person": {
+                 *             "display_name": "Jonas Berg",
+                 *             "email_masked": "j***@example.edu"
+                 *           },
                  *           "reference": "2",
                  *           "row": 2,
-                 *           "status": "valid"
+                 *           "status": "valid",
+                 *           "user": {
+                 *             "display_name": "Jonas Berg",
+                 *             "id": "ih1r84kij94nrwis97rft6rduh"
+                 *           }
                  *         },
                  *         {
                  *           "operation": "student_class.create",
@@ -22014,6 +24274,52 @@ export interface components {
                  *     }
                  */
                 readonly "application/json": components["schemas"]["SessionResponse"];
+            };
+        };
+        /** @description The permission catalogue */
+        readonly PermissionCatalogueOK: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "areas": [
+                 *         {
+                 *           "area": "exams",
+                 *           "title": "Exams"
+                 *         },
+                 *         {
+                 *           "area": "sittings",
+                 *           "title": "Sittings"
+                 *         }
+                 *       ],
+                 *       "permissions": [
+                 *         {
+                 *           "area": "exams",
+                 *           "description": "Edit the exams you manage.",
+                 *           "name": "exam.manage",
+                 *           "scope_types": [
+                 *             "institution",
+                 *             "academic_unit"
+                 *           ],
+                 *           "title": "Manage exams"
+                 *         },
+                 *         {
+                 *           "area": "exams",
+                 *           "description": "Edit exams without being an exam manager, through the audited administrator path.",
+                 *           "name": "exam.manage.override",
+                 *           "override_of": "exam.manage",
+                 *           "scope_types": [
+                 *             "institution",
+                 *             "academic_unit"
+                 *           ],
+                 *           "title": "Manage any exam"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["PermissionCatalogueResponse"];
             };
         };
         /** @description The new Personal Access Token and its secret value, shown only this once */
@@ -22223,6 +24529,7 @@ export interface components {
                  *       "description": "Undergraduate computer science programme.",
                  *       "display_name": "BSc Computer Science",
                  *       "id": "g63dcrphk8idgyjgzbrpajosz6",
+                 *       "kind": "undergraduate",
                  *       "name": "bsc-computer-science",
                  *       "revision": 1,
                  *       "updated_at": "2026-08-02T09:30:00Z"
@@ -22270,6 +24577,8 @@ export interface components {
                  * @example {
                  *       "items": [
                  *         {
+                 *           "class_count": 3,
+                 *           "class_count_is_lower_bound": false,
                  *           "created_at": "2026-08-03T10:00:00Z",
                  *           "description": "First year of the programme.",
                  *           "display_name": "Level 100",
@@ -22277,6 +24586,8 @@ export interface components {
                  *           "name": "level-100",
                  *           "programme_id": "g63dcrphk8idgyjgzbrpajosz6",
                  *           "revision": 1,
+                 *           "student_count": 138,
+                 *           "student_count_is_lower_bound": false,
                  *           "updated_at": "2026-08-03T10:00:00Z"
                  *         },
                  *         {
@@ -22330,12 +24641,19 @@ export interface components {
                  *       "items": [
                  *         {
                  *           "academic_unit_id": "14j8umgczgrdp95w77zuxmxfu9",
+                 *           "class_count": 9,
+                 *           "class_count_is_lower_bound": false,
                  *           "created_at": "2026-08-02T09:30:00Z",
                  *           "description": "Undergraduate computer science programme.",
                  *           "display_name": "BSc Computer Science",
                  *           "id": "g63dcrphk8idgyjgzbrpajosz6",
+                 *           "kind": "undergraduate",
+                 *           "level_count": 3,
+                 *           "level_count_is_lower_bound": false,
                  *           "name": "bsc-computer-science",
                  *           "revision": 1,
+                 *           "student_count": 412,
+                 *           "student_count_is_lower_bound": false,
                  *           "updated_at": "2026-08-02T09:30:00Z"
                  *         },
                  *         {
@@ -22344,6 +24662,7 @@ export interface components {
                  *           "description": "Taught postgraduate programme in data science.",
                  *           "display_name": "MSc Data Science",
                  *           "id": "889766ufjgio6kbpzjbufozksq",
+                 *           "kind": "postgraduate",
                  *           "name": "msc-data-science",
                  *           "revision": 2,
                  *           "updated_at": "2026-08-15T13:05:00Z"
@@ -22369,6 +24688,7 @@ export interface components {
                  *       "description": "Undergraduate computer science programme.",
                  *       "display_name": "Bachelor of Science in Computer Science",
                  *       "id": "g63dcrphk8idgyjgzbrpajosz6",
+                 *       "kind": "undergraduate",
                  *       "name": "bsc-computer-science",
                  *       "revision": 2,
                  *       "updated_at": "2026-08-09T15:00:00Z"
@@ -22465,6 +24785,7 @@ export interface components {
                  * @example {
                  *       "created_at": "2026-09-01T10:00:00Z",
                  *       "created_by_user_id": "dpbj4ddm3hw8fkicm7nuazihkg",
+                 *       "due_for_review": false,
                  *       "exam_id": "xpq79ar61ncrjiouey6d9tgp91",
                  *       "exam_sitting_id": "4z3cy1rp9cucq7qo1g9mq94dj3",
                  *       "id": "yftfs48pasu5fd6czhcwz6b4x3",
@@ -22489,6 +24810,7 @@ export interface components {
                  * @example {
                  *       "created_at": "2026-09-01T10:00:00Z",
                  *       "created_by_user_id": "dpbj4ddm3hw8fkicm7nuazihkg",
+                 *       "due_for_review": false,
                  *       "exam_id": "xpq79ar61ncrjiouey6d9tgp91",
                  *       "exam_sitting_id": "4z3cy1rp9cucq7qo1g9mq94dj3",
                  *       "id": "yftfs48pasu5fd6czhcwz6b4x3",
@@ -22519,6 +24841,7 @@ export interface components {
                  *         {
                  *           "created_at": "2026-09-01T10:00:00Z",
                  *           "created_by_user_id": "dpbj4ddm3hw8fkicm7nuazihkg",
+                 *           "due_for_review": false,
                  *           "exam_id": "xpq79ar61ncrjiouey6d9tgp91",
                  *           "exam_sitting_id": "4z3cy1rp9cucq7qo1g9mq94dj3",
                  *           "id": "yftfs48pasu5fd6czhcwz6b4x3",
@@ -22526,6 +24849,7 @@ export interface components {
                  *           "private_reason": "Preserve records until the institution concludes its review.",
                  *           "reason_code": "institution_request",
                  *           "revision": 1,
+                 *           "until": "2027-09-01T00:00:00Z",
                  *           "work_retired_submission_count": 0
                  *         }
                  *       ]
@@ -22613,6 +24937,7 @@ export interface components {
                  *       "browser_activity": {
                  *         "awaiting_deadline": 0,
                  *         "eligible": 0,
+                 *         "eligible_exams": 0,
                  *         "export_protected": 0,
                  *         "held": 0,
                  *         "incomplete": 0,
@@ -22627,6 +24952,7 @@ export interface components {
                  *       "integrity": {
                  *         "awaiting_deadline": 0,
                  *         "eligible": 0,
+                 *         "eligible_exams": 0,
                  *         "export_protected": 0,
                  *         "held": 0,
                  *         "incomplete": 0,
@@ -22636,6 +24962,7 @@ export interface components {
                  *         "unconfigured": 0
                  *       },
                  *       "policy_revision": 1,
+                 *       "proposed": false,
                  *       "receipts": {
                  *         "awaiting_deadline": 0,
                  *         "eligible": 0,
@@ -22650,6 +24977,7 @@ export interface components {
                  *       "security_operational": {
                  *         "awaiting_deadline": 0,
                  *         "eligible": 0,
+                 *         "eligible_exams": 0,
                  *         "export_protected": 0,
                  *         "held": 0,
                  *         "incomplete": 0,
@@ -22661,6 +24989,7 @@ export interface components {
                  *       "work": {
                  *         "awaiting_deadline": 0,
                  *         "eligible": 0,
+                 *         "eligible_exams": 0,
                  *         "export_protected": 0,
                  *         "held": 0,
                  *         "incomplete": 0,
@@ -22674,89 +25003,17 @@ export interface components {
                 readonly "application/json": components["schemas"]["RetentionPreviewResponse"];
             };
         };
-        /** @description One page of retention records. Each Submission adds four items, one per category. */
+        /** @description One page of retention records by Submission, or one page of Exam summaries with `group_by=exam`. */
         readonly RetentionRecordsOK: {
             headers: {
                 readonly "Cache-Control": components["headers"]["PrivateNoStore"];
                 readonly [name: string]: unknown;
             };
             content: {
-                /**
-                 * @example {
-                 *       "as_of": "2026-09-01T12:00:00Z",
-                 *       "items": [
-                 *         {
-                 *           "blocker": "retention_period",
-                 *           "category": "work",
-                 *           "completed_at": "2026-06-01T12:00:00Z",
-                 *           "completion_current": true,
-                 *           "completion_revision": 2,
-                 *           "eligible_at": "2027-06-01T12:00:00Z",
-                 *           "exam_id": "xpq79ar61ncrjiouey6d9tgp91",
-                 *           "exam_sitting_id": "17778cuf6b17rhtapprfjozet8",
-                 *           "has_integrity": true,
-                 *           "held": false,
-                 *           "shared_published_objects": 1,
-                 *           "submission_id": "zq993bky9h3uj4saw8iywi38cy"
-                 *         },
-                 *         {
-                 *           "blocker": "retention_period",
-                 *           "category": "integrity",
-                 *           "completed_at": "2026-06-01T12:00:00Z",
-                 *           "completion_current": true,
-                 *           "completion_revision": 2,
-                 *           "eligible_at": "2027-06-01T12:00:00Z",
-                 *           "exam_id": "xpq79ar61ncrjiouey6d9tgp91",
-                 *           "exam_sitting_id": "17778cuf6b17rhtapprfjozet8",
-                 *           "has_integrity": true,
-                 *           "held": false,
-                 *           "shared_published_objects": 0,
-                 *           "submission_id": "zq993bky9h3uj4saw8iywi38cy"
-                 *         },
-                 *         {
-                 *           "blocker": "",
-                 *           "category": "browser_activity",
-                 *           "completed_at": "2026-06-01T12:00:00Z",
-                 *           "completion_current": true,
-                 *           "completion_revision": 2,
-                 *           "eligible_at": "2026-08-30T12:00:00Z",
-                 *           "exam_id": "xpq79ar61ncrjiouey6d9tgp91",
-                 *           "exam_sitting_id": "17778cuf6b17rhtapprfjozet8",
-                 *           "has_integrity": true,
-                 *           "held": false,
-                 *           "retirement": {
-                 *             "completion_revision": 2,
-                 *             "control_revision": 2,
-                 *             "id": "5ebqfbnezgahdbx9oy7rfr6oro",
-                 *             "policy_revision": 3,
-                 *             "purge_pending": 0,
-                 *             "purge_verified": 0,
-                 *             "retire_after": "2026-09-07T02:00:00Z",
-                 *             "scheduled_at": "2026-08-31T02:00:00Z",
-                 *             "state": "grace"
-                 *           },
-                 *           "shared_published_objects": 0,
-                 *           "submission_id": "zq993bky9h3uj4saw8iywi38cy"
-                 *         },
-                 *         {
-                 *           "blocker": "retention_unconfigured",
-                 *           "category": "security_operational",
-                 *           "completed_at": "2026-06-01T12:00:00Z",
-                 *           "completion_current": true,
-                 *           "completion_revision": 2,
-                 *           "exam_id": "xpq79ar61ncrjiouey6d9tgp91",
-                 *           "exam_sitting_id": "17778cuf6b17rhtapprfjozet8",
-                 *           "has_integrity": true,
-                 *           "held": false,
-                 *           "shared_published_objects": 0,
-                 *           "submission_id": "zq993bky9h3uj4saw8iywi38cy"
-                 *         }
-                 *       ],
-                 *       "next_cursor": "eyJhZnRlcl9zdWJtaXNzaW9uX2lkIjoienE5OTMifQ",
-                 *       "policy_revision": 3
-                 *     }
-                 */
-                readonly "application/json": components["schemas"]["RetentionRecordsResponse"];
+                readonly "application/json": {
+                    readonly items: readonly Record<string, never>[];
+                    readonly next_cursor?: components["schemas"]["NextCursor"];
+                } | components["schemas"]["RetentionRecordsResponse"] | components["schemas"]["RetentionExamSummariesResponse"];
             };
         };
         /** @description Role Binding created */
@@ -22768,8 +25025,22 @@ export interface components {
                 /**
                  * @example {
                  *       "created_at": "2026-07-28T15:04:00Z",
+                 *       "granted_by": {
+                 *         "display_name": "Priya Raman",
+                 *         "id": "sjebyge5cpbop1xwo4eds74ejb"
+                 *       },
+                 *       "granted_via": "manual",
                  *       "id": "g63dcrphk8idgyjgzbrpajosz6",
+                 *       "role": {
+                 *         "display_name": "Teacher",
+                 *         "id": "1asb7sk89dp1ex339fkh3te5t4"
+                 *       },
                  *       "role_id": "1asb7sk89dp1ex339fkh3te5t4",
+                 *       "scope": {
+                 *         "display_name": "Mathematics",
+                 *         "id": "14j8umgczgrdp95w77zuxmxfu9",
+                 *         "type": "academic_unit"
+                 *       },
                  *       "scope_id": "14j8umgczgrdp95w77zuxmxfu9",
                  *       "scope_type": "academic_unit",
                  *       "start_at": "2026-08-01T00:00:00Z",
@@ -22790,8 +25061,22 @@ export interface components {
                  * @example {
                  *       "created_at": "2026-07-28T15:04:00Z",
                  *       "end_at": "2026-09-30T12:00:00Z",
+                 *       "granted_by": {
+                 *         "display_name": "Priya Raman",
+                 *         "id": "sjebyge5cpbop1xwo4eds74ejb"
+                 *       },
+                 *       "granted_via": "manual",
                  *       "id": "g63dcrphk8idgyjgzbrpajosz6",
+                 *       "role": {
+                 *         "display_name": "Teacher",
+                 *         "id": "1asb7sk89dp1ex339fkh3te5t4"
+                 *       },
                  *       "role_id": "1asb7sk89dp1ex339fkh3te5t4",
+                 *       "scope": {
+                 *         "display_name": "Mathematics",
+                 *         "id": "14j8umgczgrdp95w77zuxmxfu9",
+                 *         "type": "academic_unit"
+                 *       },
                  *       "scope_id": "14j8umgczgrdp95w77zuxmxfu9",
                  *       "scope_type": "academic_unit",
                  *       "start_at": "2026-08-01T00:00:00Z",
@@ -22813,8 +25098,22 @@ export interface components {
                  *       "items": [
                  *         {
                  *           "created_at": "2026-08-01T09:30:00Z",
+                 *           "granted_by": {
+                 *             "display_name": "Priya Raman",
+                 *             "id": "sjebyge5cpbop1xwo4eds74ejb"
+                 *           },
+                 *           "granted_via": "manual",
                  *           "id": "g63dcrphk8idgyjgzbrpajosz6",
+                 *           "role": {
+                 *             "display_name": "Teacher",
+                 *             "id": "1asb7sk89dp1ex339fkh3te5t4"
+                 *           },
                  *           "role_id": "1asb7sk89dp1ex339fkh3te5t4",
+                 *           "scope": {
+                 *             "display_name": "Mathematics",
+                 *             "id": "14j8umgczgrdp95w77zuxmxfu9",
+                 *             "type": "academic_unit"
+                 *           },
                  *           "scope_id": "14j8umgczgrdp95w77zuxmxfu9",
                  *           "scope_type": "academic_unit",
                  *           "start_at": "2026-08-01T09:30:00Z",
@@ -22824,8 +25123,22 @@ export interface components {
                  *         {
                  *           "created_at": "2026-02-10T08:00:00Z",
                  *           "end_at": "2026-07-31T17:00:00Z",
+                 *           "granted_by": {
+                 *             "display_name": "Priya Raman",
+                 *             "id": "sjebyge5cpbop1xwo4eds74ejb"
+                 *           },
+                 *           "granted_via": "manual",
                  *           "id": "889766ufjgio6kbpzjbufozksq",
+                 *           "role": {
+                 *             "display_name": "Teacher",
+                 *             "id": "iqcx3qc9sbbt6ocshszfqgq6ci"
+                 *           },
                  *           "role_id": "iqcx3qc9sbbt6ocshszfqgq6ci",
+                 *           "scope": {
+                 *             "display_name": "Year 2 Statistics",
+                 *             "id": "fotnmte5o3j9wftdm5rtbfofqr",
+                 *             "type": "class"
+                 *           },
                  *           "scope_id": "fotnmte5o3j9wftdm5rtbfofqr",
                  *           "scope_type": "class",
                  *           "start_at": "2026-02-10T08:00:00Z",
@@ -23501,6 +25814,7 @@ export interface components {
                 /**
                  * @example {
                  *       "exam_attempt_id": "6xoche483hwrx5rpu8jzjoe7qg",
+                 *       "receipt_code": "7QXR-4M2K-HV9D-3JNP",
                  *       "released_at": "2026-12-18T15:20:00Z",
                  *       "student_remarks_markdown": "Your submission was reviewed and no further action is needed.",
                  *       "submission_id": "39kqk53i4cswfzbi7hbai1r8qg",
@@ -23796,6 +26110,53 @@ export interface components {
                 readonly "application/json": components["schemas"]["UserEmailStateResponse"];
             };
         };
+        /** @description The User's current memberships you can see */
+        readonly UserMembershipListOK: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "items": [
+                 *         {
+                 *           "academic_unit": {
+                 *             "display_name": "Computer Science",
+                 *             "id": "14j8umgczgrdp95w77zuxmxfu9"
+                 *           },
+                 *           "id": "3yqk1oxnmb8gxe4cwa6r1ytsjy",
+                 *           "kind": "academic_unit",
+                 *           "start_at": "2025-09-01T00:00:00Z"
+                 *         },
+                 *         {
+                 *           "academic_period": {
+                 *             "display_name": "2026/27",
+                 *             "id": "c4sxtxwr3pd8gmk1o5y9nazhqe"
+                 *           },
+                 *           "class": {
+                 *             "display_name": "CS2 Group A",
+                 *             "id": "mx1kgmf7h3drjxs5ub8n3o4wpe"
+                 *           },
+                 *           "end_at": "2027-07-01T00:00:00Z",
+                 *           "id": "q8n4cx7oufyp5nm1bdt3wh9eia",
+                 *           "kind": "class",
+                 *           "programme": {
+                 *             "display_name": "BSc Computing",
+                 *             "id": "kd5u7xdgpbn8zw3r1sfoey9mqc"
+                 *           },
+                 *           "programme_level": {
+                 *             "display_name": "Year 2",
+                 *             "id": "o9g8oyzef7r1eihn5t3ypu4cwa"
+                 *           },
+                 *           "start_at": "2026-09-01T00:00:00Z"
+                 *         }
+                 *       ],
+                 *       "next_cursor": "eyJraW5kIjoiY2xhc3MifQ"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["UserMembershipListResponse"];
+            };
+        };
         /** @description User profile collection */
         readonly UserProfileListOK: {
             headers: {
@@ -23811,6 +26172,11 @@ export interface components {
                  *           "first_name": "Jonas",
                  *           "id": "ih1r84kij94nrwis97rft6rduh",
                  *           "last_name": "Berg",
+                 *           "mfa": {
+                 *             "enabled": true,
+                 *             "enabled_at": "2026-03-14T10:22:00Z",
+                 *             "method": "authenticator_app"
+                 *           },
                  *           "profile_picture_kind": "default",
                  *           "profile_picture_url": "/api/v1/users/ih1r84kij94nrwis97rft6rduh/profile-picture",
                  *           "summary": {
@@ -23868,6 +26234,9 @@ export interface components {
                  *       "last_login_at": "2026-08-01T09:12:44Z",
                  *       "last_name": "Diallo",
                  *       "locale": "en",
+                 *       "mfa": {
+                 *         "enabled": false
+                 *       },
                  *       "profile_picture_changed_at": "2026-06-12T14:05:00Z",
                  *       "profile_picture_kind": "custom",
                  *       "profile_picture_url": "/api/v1/users/wj3drgzdpnf54rxf5d8qd3dqne/profile-picture?v=14",
@@ -23930,6 +26299,8 @@ export interface components {
         readonly AffiliationID: components["schemas"]["ID"];
         /** @description The identifier of an entry in the Attempt Workspace. */
         readonly AttemptWorkspaceEntryID: components["schemas"]["ID"];
+        /** @description ID of the audit export. */
+        readonly AuditExportID: components["schemas"]["ID"];
         /** @description ID of the browser activity source: a lowercase UUID version 4 that the Desktop assigned when it started the source. */
         readonly BrowserSourceSessionID: string;
         /** @description The identifier of the open Attempt Connection that belongs to the current Session. */
@@ -24365,6 +26736,7 @@ export interface components {
                  *             "blocked_navigation_outcome": "record",
                  *             "host_match": "exact",
                  *             "institution_http_exception": false,
+                 *             "label": "Algorithms reference",
                  *             "origin": "https://reference.example.edu",
                  *             "path_prefix": "/algorithms",
                  *             "rule_id": "reference"
@@ -24374,6 +26746,7 @@ export interface components {
                  *             "blocked_navigation_outcome": "integrity_evidence",
                  *             "host_match": "exact_and_subdomains",
                  *             "institution_http_exception": false,
+                 *             "label": "Course library",
                  *             "origin": "https://library.example.edu",
                  *             "path_prefix": "/",
                  *             "rule_id": "library"
@@ -24485,6 +26858,18 @@ export interface components {
                 readonly "application/json": components["schemas"]["ConfigureExamDraftNativePolicyRequest"];
             };
         };
+        /** @description The new Exam's title and the Academic Unit that will own it. */
+        readonly CopyExam: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "academic_unit_id": "q4nzk1xwe7rbdg3cyjoth5mupa",
+                 *       "title": "Algorithms — resit examination"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["CopyExamRequest"];
+            };
+        };
         /** @description The operation, its scope and fields, and the User directory filter that picks the Users it applies to. */
         readonly CreateAcademicAdministrationPreview: {
             readonly content: {
@@ -24497,6 +26882,7 @@ export interface components {
                  *         "never_signed_in": true
                  *       },
                  *       "operation": "user.disable",
+                 *       "reason": "Left the institution before the start of term.",
                  *       "scope_id": "ybndrfg8ejkmcpqxot1uwisza3",
                  *       "scope_type": "institution"
                  *     }
@@ -24527,6 +26913,7 @@ export interface components {
                  * @example {
                  *       "description": "Teaching and research in computing.",
                  *       "display_name": "Computer Science",
+                 *       "kind": "department",
                  *       "name": "computer-science"
                  *     }
                  */
@@ -24555,6 +26942,21 @@ export interface components {
                  *     }
                  */
                 readonly "application/json": components["schemas"]["CreateAffiliationRequest"];
+            };
+        };
+        /** @description The audit listing's filters, under its query parameter names, and the file format. Every filter is optional and narrows the same way it narrows the listing. */
+        readonly CreateAuditExport: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "action": [
+                 *         "role_binding.manage"
+                 *       ],
+                 *       "created_after": "2026-09-01T00:00:00Z",
+                 *       "format": "csv"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["CreateAuditExportRequest"];
             };
         };
         /** @description The Academic Period, machine name and display text for a new Class under the Programme Level in the path. */
@@ -24658,7 +27060,8 @@ export interface components {
                 /**
                  * @example {
                  *       "private_reason": "Preserve records until the institution concludes its review.",
-                 *       "reason_code": "institution_request"
+                 *       "reason_code": "institution_request",
+                 *       "until": "2027-09-01T00:00:00Z"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["CreateRetentionHoldRequest"];
@@ -25217,6 +27620,19 @@ export interface components {
                 readonly "application/json": components["schemas"]["RenameSessionRequest"];
             };
         };
+        /** @description The Review to reopen, its current revision and why. */
+        readonly ReopenExamIntegrityReview: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "expected_revision": 8,
+                 *       "reason": "The second flag needs another look at the clip.",
+                 *       "submission_review_id": "ybndrfg8ejkmcpqxot1uwisza3"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ReopenExamIntegrityReviewRequest"];
+            };
+        };
         /** @description The Draft revision you last saw, and every current Resource ID in the new order. */
         readonly ReorderExamResources: {
             readonly content: {
@@ -25265,8 +27681,11 @@ export interface components {
                  *       "expected_revision": 3,
                  *       "minimum_desktop_release": "1.4.0",
                  *       "retry_at": "2026-08-28T11:00:00Z",
-                 *       "revoked_desktop_build_ids": [
-                 *         "desktop-build-2026-08-17"
+                 *       "revoked_desktop_builds": [
+                 *         {
+                 *           "build_id": "desktop-build-2026-08-17",
+                 *           "reason": "Crashes when the laptop wakes"
+                 *         }
                  *       ]
                  *     }
                  */
@@ -25463,6 +27882,10 @@ export interface components {
                  * @example {
                  *       "class_id": "ybndrfg8ejkmcpqxot1uwisza4",
                  *       "exam_revision_id": "ybndrfg8ejkmcpqxot1uwisza3",
+                 *       "join_window": {
+                 *         "closes_at": "2026-12-14T09:30:00Z",
+                 *         "opens_at": "2026-12-14T08:50:00Z"
+                 *       },
                  *       "scheduled_end_at": "2026-12-14T11:00:00Z",
                  *       "scheduled_start_at": "2026-12-14T09:00:00Z"
                  *     }
@@ -25664,6 +28087,9 @@ export interface components {
                 /**
                  * @example {
                  *       "expected_revision": 3,
+                 *       "join_window": {
+                 *         "opens_at": "2026-12-14T09:20:00Z"
+                 *       },
                  *       "scheduled_end_at": "2026-12-14T11:30:00Z",
                  *       "scheduled_start_at": "2026-12-14T09:30:00Z"
                  *     }
@@ -25913,6 +28339,16 @@ export interface operations {
             readonly query?: {
                 /** @description Text to find in the Academic Period name or display name, matched literally and ignoring case. */
                 readonly q?: string;
+                /** @description Keeps the Academic Periods of one kind of owner. Filters only narrow what you can already see. */
+                readonly owner_type?: "institution" | "academic_unit";
+                /** @description Keeps the Academic Periods of this owner. It needs `owner_type`. */
+                readonly owner_id?: components["schemas"]["ID"];
+                /** @description Keeps the Academic Periods covering this instant, from `start_at` up to but not including `end_at`. */
+                readonly active_at?: string;
+                /** @description The page order, each key followed by identifier: `start` (start time, then name, the default) or `name`. A cursor only continues the sort and direction that produced it, so repeat both when following it. */
+                readonly sort?: "start" | "name";
+                /** @description The direction of `sort`. */
+                readonly dir?: "asc" | "desc";
                 /** @description Maximum number of items to return in this page. */
                 readonly limit?: components["parameters"]["PageLimit"];
                 /** @description The `next_cursor` from the previous page, sent back exactly as received. Omit it to get the first page. */
@@ -26207,6 +28643,8 @@ export interface operations {
             readonly query?: {
                 /** @description Text to find in the Class name or display name, matched literally and ignoring case. */
                 readonly q?: string;
+                /** @description Keeps the Classes of this Academic Period. A cursor doesn't remember it, so repeat it on every page. */
+                readonly academic_period_id?: components["schemas"]["ID"];
                 /** @description Sort by name, then by identifier, ascending (`asc`, the default) or descending (`desc`). A cursor works only with the direction that produced it. */
                 readonly dir?: "asc" | "desc";
                 /** @description Maximum number of items to return in this page. */
@@ -26350,6 +28788,8 @@ export interface operations {
     readonly listAcademicUnitMembers: {
         readonly parameters: {
             readonly query?: {
+                /** @description Keeps members who hold a current Affiliation of any listed kind: at `active_at`, or now for the full history. Repeat the parameter for several kinds, each kind at most once. It also narrows `total`. */
+                readonly affiliation?: readonly ("student" | "teacher" | "staff" | "external")[];
                 /** @description Return the memberships in effect at this instant. Defaults to now. It cannot be combined with `history=true`. When following a cursor you may omit it, because the cursor keeps the first page's instant. */
                 readonly active_at?: string;
                 /** @description When true, return the full membership history instead of only the memberships in effect at one instant. It cannot be combined with `active_at`. */
@@ -26729,6 +29169,72 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly createAuditExport: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description A unique key you choose for this request, such as a random UUID. If you retry with the same key and the same input within 24 hours, you get the first result back and the change is not made twice. Reusing a key with different input fails with `idempotency.conflict`. */
+                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["CreateAuditExport"];
+        readonly responses: {
+            readonly 202: components["responses"]["AuditExportAccepted"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly getAuditExport: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description ID of the audit export. */
+                readonly audit_export_id: components["parameters"]["AuditExportID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["AuditExportOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly downloadAuditExport: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description ID of the audit export. */
+                readonly audit_export_id: components["parameters"]["AuditExportID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["AuditExportFile"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 410: components["responses"]["AuditExportGone"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -27663,7 +30169,7 @@ export interface operations {
         };
         readonly requestBody?: never;
         readonly responses: {
-            readonly 200: components["responses"]["ClassOK"];
+            readonly 200: components["responses"]["ClassDetailOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
@@ -27774,6 +30280,8 @@ export interface operations {
     readonly listClassMembers: {
         readonly parameters: {
             readonly query?: {
+                /** @description Keeps students whose username, display name, first or last name contains this text, matched literally and ignoring case, as the User directory matches. Their email address is matched too only if you hold Institution-wide user.view. It also narrows `total`. A cursor doesn't remember it, so repeat it on every page. */
+                readonly q?: string;
                 /** @description Return the enrollments in effect at this instant. Defaults to now. It cannot be combined with `history=true`. When following a cursor you may omit it, because the cursor keeps the first page's instant. */
                 readonly active_at?: string;
                 /** @description When true, return the full enrollment history instead of only the enrollments in effect at one instant. It cannot be combined with `active_at`. */
@@ -27864,6 +30372,60 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listDesktopReleases: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description The `next_cursor` from the previous page, sent back exactly as received. Omit it to get the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description The verified Proctor Desktop builds */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "architecture": "arm64",
+                     *           "build_id": "desktop-1.4.0-darwin-arm64",
+                     *           "newest": true,
+                     *           "platform": "darwin",
+                     *           "release": "1.4.0",
+                     *           "released_at": "2026-09-01T12:00:00Z"
+                     *         },
+                     *         {
+                     *           "architecture": "arm64",
+                     *           "build_id": "desktop-1.3.2-darwin-arm64",
+                     *           "newest": false,
+                     *           "platform": "darwin",
+                     *           "release": "1.3.2",
+                     *           "released_at": "2026-07-14T09:00:00Z"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["DesktopReleaseListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -29528,6 +32090,84 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listExamSittingsAcrossExams: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keep Sittings in any of these states. Repeat it for more than one. */
+                readonly state?: readonly components["schemas"]["ExamSittingState"][];
+                /** @description Keep Sittings scheduled to start before this instant. */
+                readonly starts_before?: string;
+                /** @description Keep Sittings scheduled to end after this instant. With starts_before, it must be earlier. */
+                readonly ends_after?: string;
+                /** @description Keep Sittings of Exams owned by this Academic Unit. */
+                readonly academic_unit_id?: components["schemas"]["ID"];
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Cursor from next_cursor of the previous page. Send it back unchanged, with the same filters. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page of Sittings. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "academic_unit_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                     *           "class": {
+                     *             "display_name": "Computer Science, year 2",
+                     *             "id": "14j8umgczgrdp95w77zuxmxfu9"
+                     *           },
+                     *           "counts": {
+                     *             "by_presence_state": {
+                     *               "connected": 57,
+                     *               "lease_expired": 0,
+                     *               "not_started": 3,
+                     *               "ready": 0,
+                     *               "reconnecting": 3,
+                     *               "submitted": 2,
+                     *               "suspended": 1
+                     *             },
+                     *             "total": 66,
+                     *             "with_attention": 2,
+                     *             "with_failed_checks": 1
+                     *           },
+                     *           "exam": {
+                     *             "display_name": "Algorithms final",
+                     *             "id": "39kqk53i4cswfzbi7hbai1r8qg"
+                     *           },
+                     *           "id": "889766ufjgio6kbpzjbufozksq",
+                     *           "needs_attention_count": 3,
+                     *           "revision": 4,
+                     *           "scheduled_end_at": "2026-08-01T11:00:00Z",
+                     *           "scheduled_start_at": "2026-08-01T09:00:00Z",
+                     *           "state": "open"
+                     *         }
+                     *       ],
+                     *       "server_time": "2026-08-01T09:45:00Z"
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["ExamSittingAcrossListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly getSecurityPolicyOverview: {
         readonly parameters: {
             readonly query?: never;
@@ -29595,6 +32235,8 @@ export interface operations {
                 readonly q?: string;
                 /** @description Return active Exams, archived Exams, or all of them. Defaults to active. */
                 readonly archive_state?: "active" | "archived" | "all";
+                /** @description true returns only Exams with at least one Sitting; false only Exams with none, such as those not yet scheduled. Omit it for both. */
+                readonly has_sittings?: boolean;
                 /** @description Return only Exams with a Sitting in one of these states. Repeat the parameter for several states. With ends_after and starts_before, the same Sitting must also fall in that time range. */
                 readonly sitting_state?: readonly components["schemas"]["ExamSittingState"][];
                 /** @description Return only Exams with a Sitting scheduled to end after this time. Send it together with starts_before. */
@@ -29680,6 +32322,31 @@ export interface operations {
         readonly requestBody: components["requestBodies"]["ArchiveExam"];
         readonly responses: {
             readonly 200: components["responses"]["ExamIdentityOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly copyExam: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description A unique key you choose for this request, such as a random UUID. If you retry with the same key and the same input within 24 hours, you get the first result back and the change is not made twice. Reusing a key with different input fails with `idempotency.conflict`. */
+                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
+            };
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["CopyExam"];
+        readonly responses: {
+            readonly 201: components["responses"]["ExamCreated"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
@@ -29788,6 +32455,27 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly checkExamDraft: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ExamDraftCheckOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -30543,6 +33231,143 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly getExamRevisionContent: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ExamRevisionContentOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listExamRevisionResources: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description The `next_cursor` from the previous page, sent back exactly as received. Omit it to get the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ExamRevisionResourceListOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly getExamRevisionResourceContent: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: {
+                /** @description The ETag from an earlier response for this content. If it still matches, the server returns 304 with no body. */
+                readonly "If-None-Match"?: string;
+            };
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+                /** @description The Exam Resource identifier. */
+                readonly exam_resource_id: components["parameters"]["ExamResourceID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ExamResourceProtectedContent"];
+            readonly 304: components["responses"]["ExamProtectedContentNotModified"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listExamRevisionStarterWorkspace: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description The `next_cursor` from the previous page, sent back exactly as received. Omit it to get the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ExamRevisionStarterWorkspaceListOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly getExamRevisionStarterWorkspaceFileContent: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: {
+                /** @description The ETag from an earlier response for this file. If it still matches, the server returns 304 with no body. */
+                readonly "If-None-Match"?: string;
+            };
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The ID of a published Revision of this Exam. */
+                readonly exam_revision_id: components["parameters"]["ExamRevisionID"];
+                /** @description The ID of a file or directory in the Draft's Starter Workspace. */
+                readonly starter_workspace_entry_id: components["parameters"]["StarterWorkspaceEntryID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["ExamStarterWorkspaceProtectedContent"];
+            readonly 304: components["responses"]["ExamStarterWorkspaceContentNotModified"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly listExamSittings: {
         readonly parameters: {
             readonly query?: {
@@ -30798,6 +33623,187 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listLiveAttemptIntegrityFlags: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keep records at or after this instant. */
+                readonly from?: string;
+                /** @description Keep records before this instant. With from, it must be later. */
+                readonly to?: string;
+                /** @description Largest number of records on this page. */
+                readonly limit?: number;
+                /** @description Cursor from next_cursor of the previous page. Send it back unchanged, with the same window. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "as_of": "2026-12-14T09:45:00Z",
+                     *       "complete": false,
+                     *       "items": [
+                     *         {
+                     *           "created_at": "2026-12-14T09:22:47Z",
+                     *           "evidence_count": 2,
+                     *           "evidence_overflow_count": 0,
+                     *           "exam_attempt_id": "6xoche483hwrx5rpu8jzjoe7qg",
+                     *           "generation": 2,
+                     *           "id": "xpq79ar61ncrjiouey6d9tgp91",
+                     *           "policy_kind": "focus_loss",
+                     *           "state": "open",
+                     *           "summary": "The exam window lost focus 2 times",
+                     *           "unresolved_missing_count": 0
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["LiveIntegrityFlagListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listLiveAttemptIntegrityEvidence: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keep records at or after this instant. */
+                readonly from?: string;
+                /** @description Keep records before this instant. With from, it must be later. */
+                readonly to?: string;
+                /** @description Largest number of records on this page. */
+                readonly limit?: number;
+                /** @description Cursor from next_cursor of the previous page. Send it back unchanged, with the same window. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+                /** @description The Integrity Flag identifier. */
+                readonly integrity_flag_id: components["parameters"]["IntegrityFlagID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "as_of": "2026-12-14T09:45:00Z",
+                     *       "complete": false,
+                     *       "items": [
+                     *         {
+                     *           "duration_milliseconds": 8400,
+                     *           "exam_attempt_id": "6xoche483hwrx5rpu8jzjoe7qg",
+                     *           "generation": 2,
+                     *           "id": "zq993bky9h3uj4saw8iywi38cy",
+                     *           "integrity_flag_id": "xpq79ar61ncrjiouey6d9tgp91",
+                     *           "missing_before": 0,
+                     *           "observed_at": "2026-12-14T09:22:46Z",
+                     *           "participation_id": "o87yi4tenx8kodmcuup1hmtsbo",
+                     *           "policy_kind": "focus_loss",
+                     *           "recorded_at": "2026-12-14T09:22:47Z",
+                     *           "sequence": 1,
+                     *           "signal_id": "yu7twx6xxb4udbc94foq5zq9ni",
+                     *           "source": "window_blur"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["LiveIntegrityEvidenceListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listLiveAttemptNativeConditions: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keep records at or after this instant. */
+                readonly from?: string;
+                /** @description Keep records before this instant. With from, it must be later. */
+                readonly to?: string;
+                /** @description Largest number of records on this page. */
+                readonly limit?: number;
+                /** @description Cursor from next_cursor of the previous page. Send it back unchanged, with the same window. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "as_of": "2026-12-14T11:05:00Z",
+                     *       "complete": true,
+                     *       "items": []
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["LiveNativeConditionListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly reallowExamAttempt: {
         readonly parameters: {
             readonly query?: never;
@@ -30857,10 +33863,46 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "items": []
+                     *       "items": [
+                     *         {
+                     *           "exam_attempt_id": "dgjcx1ia56br8kpous3h9nfemq",
+                     *           "id": "twz47ydgjcx1ia56br8kpous3h",
+                     *           "range": {
+                     *             "end": "2026-08-01T09:42:00Z",
+                     *             "from_session_start": false,
+                     *             "start": "2026-08-01T09:40:00Z"
+                     *           },
+                     *           "reason": "Looked away from the screen for a long time.",
+                     *           "requested_at": "2026-08-01T09:42:05Z",
+                     *           "requested_by": {
+                     *             "display_name": "Priya Raman",
+                     *             "id": "nybc6xhg593upqice3sdeyro5k"
+                     *           },
+                     *           "revision": 4,
+                     *           "source": "manager",
+                     *           "state": "ready",
+                     *           "updated_at": "2026-08-01T09:43:10Z"
+                     *         },
+                     *         {
+                     *           "exam_attempt_id": "dgjcx1ia56br8kpous3h9nfemq",
+                     *           "failure": "upload_deadline",
+                     *           "id": "8kpous3h9nfemqtwz47ydgjcx1",
+                     *           "integrity_flag_id": "ia56br8kpous3h9nfemqtwz47y",
+                     *           "range": {
+                     *             "end": "2026-08-01T09:22:00Z",
+                     *             "from_session_start": false,
+                     *             "start": "2026-08-01T09:20:00Z"
+                     *           },
+                     *           "requested_at": "2026-08-01T09:21:00Z",
+                     *           "revision": 3,
+                     *           "source": "incident",
+                     *           "state": "failed",
+                     *           "updated_at": "2026-08-01T09:31:00Z"
+                     *         }
+                     *       ]
                      *     }
                      */
-                    readonly "application/json": components["schemas"]["ScreenClipListResponse"];
+                    readonly "application/json": components["schemas"]["ManagedScreenClipListResponse"];
                 };
             };
             readonly 400: components["responses"]["BadRequest"];
@@ -31058,6 +34100,73 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listLiveAttemptTimeline: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keep records at or after this instant. */
+                readonly from?: string;
+                /** @description Keep records before this instant. With from, it must be later. */
+                readonly to?: string;
+                /** @description Largest number of records on this page. */
+                readonly limit?: number;
+                /** @description Cursor from next_cursor of the previous page. Send it back unchanged, with the same window. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "as_of": "2026-12-14T09:45:00Z",
+                     *       "complete": false,
+                     *       "items": [
+                     *         {
+                     *           "at": "2026-12-14T09:22:47Z",
+                     *           "flag": {
+                     *             "created_at": "2026-12-14T09:22:47Z",
+                     *             "evidence_count": 1,
+                     *             "evidence_overflow_count": 0,
+                     *             "exam_attempt_id": "6xoche483hwrx5rpu8jzjoe7qg",
+                     *             "generation": 2,
+                     *             "id": "xpq79ar61ncrjiouey6d9tgp91",
+                     *             "policy_kind": "focus_loss",
+                     *             "state": "open",
+                     *             "summary": "The exam window lost focus 1 time",
+                     *             "unresolved_missing_count": 0
+                     *           },
+                     *           "kind": "flag"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["LiveAttemptTimelineResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly cancelExamSitting: {
         readonly parameters: {
             readonly query?: never;
@@ -31090,8 +34199,16 @@ export interface operations {
             readonly query?: {
                 /** @description Largest number of candidate rows to return on this page. */
                 readonly limit?: number;
-                /** @description Cursor from next_cursor of the previous page. Send it back unchanged. */
+                /** @description Cursor from next_cursor of the previous page. Send it back unchanged, with the same filters. */
                 readonly cursor?: string;
+                /** @description Keep candidates in any of these presence states. Repeat the parameter for more than one state; a state may appear once. */
+                readonly presence_state?: readonly components["schemas"]["SittingCandidatePresenceState"][];
+                /** @description failing keeps candidates whose live participation fails an enforced native rule. */
+                readonly check?: "failing";
+                /** @description True keeps candidates with unresolved integrity attention. False leaves the list unfiltered. */
+                readonly attention?: boolean;
+                /** @description Keep candidates whose display name contains this text, ignoring case. */
+                readonly q?: string;
             };
             readonly header?: never;
             readonly path: {
@@ -31413,6 +34530,69 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly releaseExamSittingResults: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description A unique key you choose for this request, such as a random UUID. If you retry with the same key and the same input within 24 hours, you get the first result back and the change is not made twice. Reusing a key with different input fails with `idempotency.conflict`. */
+                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
+            };
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+            };
+            readonly cookie?: never;
+        };
+        /** @description The explicit Submissions or the finalized results to release for the Sitting. */
+        readonly requestBody: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "submission_ids": [
+                 *         "39kqk53i4cswfzbi7hbai1r8qg",
+                 *         "6xoche483hwrx5rpu8jzjoe7qg"
+                 *       ]
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ReleaseSittingResultsRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description Each Submission's outcome, in the order named. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "outcome": "released",
+                     *           "submission_id": "39kqk53i4cswfzbi7hbai1r8qg"
+                     *         },
+                     *         {
+                     *           "outcome": "not_finalized",
+                     *           "submission_id": "6xoche483hwrx5rpu8jzjoe7qg"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["ResultReleaseBatchResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly resumeExamSitting: {
         readonly parameters: {
             readonly query?: never;
@@ -31436,6 +34616,92 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listExamSittingSubmissions: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keep Submissions whose review is in any of these states. Repeat it for more than one. */
+                readonly review_state?: readonly ("none" | "draft" | "finalized")[];
+                /** @description Keep Submissions whose result is withheld or released. A Submission with no review is withheld. */
+                readonly release_state?: readonly ("withheld" | "released")[];
+                /** @description true keeps Submissions with at least one integrity Flag, false those with none. */
+                readonly has_flags?: boolean;
+                /** @description submitted lists the earliest Submission first; name lists by display name, using the username as a sort key when the display name is empty. */
+                readonly sort?: "submitted" | "name";
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Send next_cursor from the previous page unchanged with the same sort and filters. Restart without a cursor if its anchor is unavailable. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page of the Sitting's Submissions. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "counts": {
+                     *         "flagged_submissions": 6,
+                     *         "flags": 9,
+                     *         "released": 0,
+                     *         "reviewed": 20,
+                     *         "total": 26
+                     *       },
+                     *       "items": [
+                     *         {
+                     *           "candidate": {
+                     *             "display_name": "Ada Student",
+                     *             "id": "nybc6xhg593upqice3sdeyro5k",
+                     *             "username": "student.ada"
+                     *           },
+                     *           "exam_attempt_id": "6xoche483hwrx5rpu8jzjoe7qg",
+                     *           "exam_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                     *           "exam_sitting_id": "14j8umgczgrdp95w77zuxmxfu9",
+                     *           "flag_count": 2,
+                     *           "integrity_state": "settled",
+                     *           "receipt_code": "7QXR-4M2K-HV9D-3JNP",
+                     *           "review": {
+                     *             "finalized_at": "2026-12-15T09:12:00Z",
+                     *             "finalized_by": {
+                     *               "display_name": "Priya Raman",
+                     *               "id": "dfa1x1n7mkthyoziwxnupsmyia"
+                     *             },
+                     *             "finalized_by_user_id": "dfa1x1n7mkthyoziwxnupsmyia",
+                     *             "id": "ih1r84kij94nrwis97rft6rduh",
+                     *             "release_state": "withheld",
+                     *             "revision": 4,
+                     *             "state": "finalized"
+                     *           },
+                     *           "submission_id": "39kqk53i4cswfzbi7hbai1r8qg",
+                     *           "submitted_at": "2026-12-14T10:48:09Z",
+                     *           "unresolved_integrity_count": 0
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["SubmissionListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -31709,6 +34975,18 @@ export interface operations {
                 readonly created_after?: string;
                 /** @description Return only Invitations created before this instant. */
                 readonly created_before?: string;
+                /** @description Return only Invitations that expire at or after this instant. */
+                readonly expires_after?: string;
+                /** @description Return only Invitations that expire before this instant. It must be later than `expires_after`. */
+                readonly expires_before?: string;
+                /** @description Return only Invitations whose invited address or suggested display name starts with this text, compared case-insensitively after trimming spaces. It is matched literally, at most 254 characters. */
+                readonly q?: string;
+                /** @description Return only Invitations whose newest delivery is in one of these states. Repeat the parameter for several states. An Invitation with no delivery matches none. */
+                readonly delivery_state?: readonly ("queued" | "sending" | "accepted" | "failed" | "suppressed" | "canceled")[];
+                /** @description Sort by creation (`created`, the default) or expiry (`expires`) time, with Invitation ID breaking ties. A cursor works only with the sort and direction that produced it. */
+                readonly sort?: "created" | "expires";
+                /** @description Descending (`desc`, the default, newest or latest first) or ascending (`asc`) by the `sort` key. */
+                readonly dir?: "asc" | "desc";
                 /** @description The `next_cursor` from the previous page, passed back unchanged. */
                 readonly cursor?: string;
                 /** @description The most Invitations to return on this page. */
@@ -32523,6 +35801,24 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listPermissions: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["PermissionCatalogueOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly listPlugins: {
         readonly parameters: {
             readonly query?: {
@@ -32639,6 +35935,8 @@ export interface operations {
     readonly listClasses: {
         readonly parameters: {
             readonly query?: {
+                /** @description Keeps the Classes of this Academic Period. A cursor doesn't remember it, so repeat it on every page. */
+                readonly academic_period_id?: components["schemas"]["ID"];
                 /** @description Sort by name, then by identifier, ascending (`asc`, the default) or descending (`desc`). A cursor works only with the direction that produced it. */
                 readonly dir?: "asc" | "desc";
                 /** @description Maximum number of items to return in this page. */
@@ -32883,6 +36181,68 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listInstitutionRetentionHolds: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keeps the holds on this Exam. */
+                readonly exam_id?: components["schemas"]["ID"];
+                /** @description Include released holds as well as holds that still protect records. */
+                readonly include_released?: boolean;
+                /** @description Keep only holds placed for this reason. */
+                readonly reason_code?: "institution_request" | "integrity_review" | "records_review" | "review_not_required" | "case_closed" | "mistake" | "other";
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description The `next_cursor` from the previous page, sent back exactly as received. Omit it to get the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page of Retention Holds */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "created_at": "2026-09-01T10:00:00Z",
+                     *           "created_by": {
+                     *             "display_name": "Priya Raman",
+                     *             "id": "dpbj4ddm3hw8fkicm7nuazihkg"
+                     *           },
+                     *           "due_for_review": true,
+                     *           "exam": {
+                     *             "display_name": "Algorithms final",
+                     *             "id": "xpq79ar61ncrjiouey6d9tgp91"
+                     *           },
+                     *           "exam_sitting_id": "4z3cy1rp9cucq7qo1g9mq94dj3",
+                     *           "id": "yftfs48pasu5fd6czhcwz6b4x3",
+                     *           "reason_code": "institution_request",
+                     *           "revision": 1,
+                     *           "until": "2026-12-01T00:00:00Z"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["RetentionHoldListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly createRetentionPreview: {
         readonly parameters: {
             readonly query?: never;
@@ -32930,8 +36290,10 @@ export interface operations {
     readonly listRetentionRecords: {
         readonly parameters: {
             readonly query?: {
-                /** @description Maximum number of Submissions to include. Each one adds a work, an integrity, a Browser Activity and a security operational item. */
-                readonly limit?: number;
+                /** @description Set to `exam` for per-Exam summaries. Omit it to list records by Submission. */
+                readonly group_by?: "exam";
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
                 /** @description The `next_cursor` value from the previous page. Treat it as an unreadable token and pass it unchanged. */
                 readonly cursor?: string;
             };
@@ -32942,6 +36304,38 @@ export interface operations {
         readonly requestBody?: never;
         readonly responses: {
             readonly 200: components["responses"]["RetentionRecordsOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly exportRetentionRecords: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description The records as CSV */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example exam_id,exam_title,exam_sitting_id,submission_id,category,blocker,eligible_at,held,completion_current,retired_at,policy_revision,as_of
+                     *     xpq79ar61ncrjiouey6d9tgp91,Algorithms final,17778cuf6b17rhtapprfjozet8,zq993bky9h3uj4saw8iywi38cy,work,retention_period,2027-06-01T12:00:00Z,false,true,,3,2026-09-01T12:00:00Z
+                     */
+                    readonly "text/csv": string;
+                };
+            };
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
@@ -33324,6 +36718,76 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listSubmissions: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Keep Submissions whose review is in any of these states. Repeat it for more than one. */
+                readonly review_state?: readonly ("none" | "draft" | "finalized")[];
+                /** @description Keep Submissions whose result is withheld or released. A Submission with no review is withheld. */
+                readonly release_state?: readonly ("withheld" | "released")[];
+                /** @description true keeps Submissions with at least one integrity Flag, false those with none. */
+                readonly has_flags?: boolean;
+                /** @description submitted lists the earliest Submission first; name lists by display name, using the username as a sort key when the display name is empty. */
+                readonly sort?: "submitted" | "name";
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Send next_cursor from the previous page unchanged with the same sort and filters. Restart without a cursor if its anchor is unavailable. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description One page of Submissions. */
+            readonly 200: {
+                headers: {
+                    readonly "Cache-Control": components["headers"]["NoStore"];
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "candidate": {
+                     *             "display_name": "Ada Student",
+                     *             "id": "nybc6xhg593upqice3sdeyro5k",
+                     *             "username": "student.ada"
+                     *           },
+                     *           "exam": {
+                     *             "display_name": "Algorithms final",
+                     *             "id": "wj3drgzdpnf54rxf5d8qd3dqne"
+                     *           },
+                     *           "exam_attempt_id": "6xoche483hwrx5rpu8jzjoe7qg",
+                     *           "exam_id": "wj3drgzdpnf54rxf5d8qd3dqne",
+                     *           "exam_sitting_id": "14j8umgczgrdp95w77zuxmxfu9",
+                     *           "flag_count": 0,
+                     *           "integrity_state": "settled",
+                     *           "receipt_code": "7QXR-4M2K-HV9D-3JNP",
+                     *           "review": {
+                     *             "release_state": "withheld",
+                     *             "state": "none"
+                     *           },
+                     *           "submission_id": "39kqk53i4cswfzbi7hbai1r8qg",
+                     *           "submitted_at": "2026-12-14T10:48:09Z",
+                     *           "unresolved_integrity_count": 0
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    readonly "application/json": components["schemas"]["SubmissionListResponse"];
+                };
+            };
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -33711,6 +37175,31 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly reopenExamIntegrityReview: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description A unique key you choose for this request, such as a random UUID. If you retry with the same key and the same input within 24 hours, you get the first result back and the change is not made twice. Reusing a key with different input fails with `idempotency.conflict`. */
+                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
+            };
+            readonly path: {
+                /** @description The Submission identifier. */
+                readonly submission_id: components["parameters"]["SubmissionID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["ReopenExamIntegrityReview"];
+        readonly responses: {
+            readonly 200: components["responses"]["ExamIntegrityReviewMutationOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly pingSystem: {
         readonly parameters: {
             readonly query: {
@@ -33784,6 +37273,10 @@ export interface operations {
                 readonly role_id?: readonly components["schemas"]["ID"][];
                 /** @description Keeps only `active` or only `disabled` accounts. As with `include_disabled`, only Institution-wide user.view can see disabled Users, so with scoped permissions `disabled` returns an empty page. You can't combine it with `include_disabled=true`. */
                 readonly state?: "active" | "disabled";
+                /** @description Keeps Users whose account has two-step verification on (`enabled`) or off (`disabled`). On means an active Proctor authenticator app; a second factor an external sign-in provider checks does not count. Only callers who can see two-step verification (Institution-wide user.view, or user.mfa.reset) can use it; anyone else gets `request.invalid` on `mfa`. */
+                readonly mfa?: "enabled" | "disabled";
+                /** @description With `true`, keeps active Users who hold a current Role Binding at any scope. Combined with `mfa=disabled` it lists exactly the role holders the access policy preflight counts in `role_holders_without_mfa_count`. Using `true` requires Institution-wide `user.view`. Omit the filter or send `false` to leave the list unfiltered. */
+                readonly role_holder?: boolean;
                 /** @description With `true`, keeps Users who have never signed in. Activity is first recorded when a User gets a Session. Only Institution-wide user.view can filter on activity; anyone else gets `request.invalid`. You can't combine it with `last_active_after` or `last_active_before`. */
                 readonly never_signed_in?: boolean;
                 /** @description Keeps Users last active at or after this RFC 3339 time. A User who was never active does not match. Only Institution-wide user.view can filter on activity; anyone else gets `request.invalid`. */
@@ -34551,6 +38044,32 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listUserMemberships: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items to return in this page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description The `next_cursor` from the previous page, sent back exactly as received. Omit it to get the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
+            readonly header?: never;
+            readonly path: {
+                /** @description The User identifier. */
+                readonly user_id: components["parameters"]["UserID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["UserMembershipListOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };

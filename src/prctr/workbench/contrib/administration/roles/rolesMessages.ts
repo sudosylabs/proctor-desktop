@@ -410,6 +410,21 @@ export const rolesMessages = Object.freeze({
 		defaultMessage: 'Build identifiers, one per line.',
 		description: 'Hint under the blocked builds field.'
 	}),
+	policyRevokedReason: defineMessage({
+		id: 'administration.access.revoked.reason',
+		defaultMessage: 'Reason for newly blocked builds',
+		description: 'Label of the field giving why builds added to the blocked list are refused.'
+	}),
+	policyRevokedReasonHint: defineMessage({
+		id: 'administration.access.revoked.reason.hint',
+		defaultMessage: 'Builds already blocked keep their reason.',
+		description: 'Hint under the reason for newly blocked builds.'
+	}),
+	policyRevokedReasonRequired: defineMessage({
+		id: 'administration.access.revoked.reason.required',
+		defaultMessage: 'Say why these builds are blocked.',
+		description: 'Error when builds were added to the blocked list without a reason.'
+	}),
 	policyDesktopSaved: defineMessage({
 		id: 'administration.access.desktop.saved',
 		defaultMessage: 'The Proctor Desktop policy is saved',

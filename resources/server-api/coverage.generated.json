@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sha256": "8fcbf88ae787d2e734f0c4b0da260a1da20774537dc697d4aa3b71541a51c60b",
-  "paths": 290,
+  "sha256": "3120509eb1112e8117019cc1ad404a4c2b1b8d1a0487f2216696e2b84de6f91c",
+  "paths": 314,
   "operations": [
     {
       "operationId": "runAcademicAdministrationBatch",
@@ -217,6 +217,24 @@
       "operationId": "listAuditEvents",
       "method": "GET",
       "path": "/api/v1/audits",
+      "transport": "http"
+    },
+    {
+      "operationId": "createAuditExport",
+      "method": "POST",
+      "path": "/api/v1/audits/exports",
+      "transport": "http"
+    },
+    {
+      "operationId": "getAuditExport",
+      "method": "GET",
+      "path": "/api/v1/audits/exports/{audit_export_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "downloadAuditExport",
+      "method": "GET",
+      "path": "/api/v1/audits/exports/{audit_export_id}/download",
       "transport": "http"
     },
     {
@@ -568,6 +586,12 @@
       "transport": "http"
     },
     {
+      "operationId": "listDesktopReleases",
+      "method": "GET",
+      "path": "/api/v1/desktop-releases",
+      "transport": "http"
+    },
+    {
       "operationId": "getPublicAccessDiscovery",
       "method": "GET",
       "path": "/api/v1/discovery",
@@ -868,6 +892,12 @@
       "transport": "http"
     },
     {
+      "operationId": "listExamSittingsAcrossExams",
+      "method": "GET",
+      "path": "/api/v1/exam-sittings",
+      "transport": "http"
+    },
+    {
       "operationId": "getSecurityPolicyOverview",
       "method": "GET",
       "path": "/api/v1/exam-sittings/{exam_sitting_id}/security-policy",
@@ -904,6 +934,12 @@
       "transport": "http"
     },
     {
+      "operationId": "copyExam",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/copy",
+      "transport": "http"
+    },
+    {
       "operationId": "editExamDraftText",
       "method": "PATCH",
       "path": "/api/v1/exams/{exam_id}/draft",
@@ -919,6 +955,12 @@
       "operationId": "configureExamDraftBrowserPolicy",
       "method": "PUT",
       "path": "/api/v1/exams/{exam_id}/draft/browser-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "checkExamDraft",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/draft/check",
       "transport": "http"
     },
     {
@@ -1084,6 +1126,36 @@
       "transport": "http"
     },
     {
+      "operationId": "getExamRevisionContent",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamRevisionResources",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/resources",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamRevisionResourceContent",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/resources/{exam_resource_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamRevisionStarterWorkspace",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/starter-workspace",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamRevisionStarterWorkspaceFileContent",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}/starter-workspace/files/{starter_workspace_entry_id}/content",
+      "transport": "http"
+    },
+    {
       "operationId": "listExamSittings",
       "method": "GET",
       "path": "/api/v1/exams/{exam_id}/sittings",
@@ -1138,6 +1210,24 @@
       "transport": "http"
     },
     {
+      "operationId": "listLiveAttemptIntegrityFlags",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/integrity-flags",
+      "transport": "http"
+    },
+    {
+      "operationId": "listLiveAttemptIntegrityEvidence",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/integrity-flags/{integrity_flag_id}/evidence",
+      "transport": "http"
+    },
+    {
+      "operationId": "listLiveAttemptNativeConditions",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/native-conditions",
+      "transport": "http"
+    },
+    {
       "operationId": "reallowExamAttempt",
       "method": "POST",
       "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/reallow",
@@ -1183,6 +1273,12 @@
       "operationId": "suspendExamAttempt",
       "method": "POST",
       "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/suspend",
+      "transport": "http"
+    },
+    {
+      "operationId": "listLiveAttemptTimeline",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/timeline",
       "transport": "http"
     },
     {
@@ -1264,9 +1360,21 @@
       "transport": "http"
     },
     {
+      "operationId": "releaseExamSittingResults",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/result-releases",
+      "transport": "http"
+    },
+    {
       "operationId": "resumeExamSitting",
       "method": "POST",
       "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/resume",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamSittingSubmissions",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/submissions",
       "transport": "http"
     },
     {
@@ -1516,6 +1624,12 @@
       "transport": "http"
     },
     {
+      "operationId": "listPermissions",
+      "method": "GET",
+      "path": "/api/v1/permissions",
+      "transport": "http"
+    },
+    {
       "operationId": "listPlugins",
       "method": "GET",
       "path": "/api/v1/plugins",
@@ -1612,6 +1726,12 @@
       "transport": "http"
     },
     {
+      "operationId": "listInstitutionRetentionHolds",
+      "method": "GET",
+      "path": "/api/v1/retention/holds",
+      "transport": "http"
+    },
+    {
       "operationId": "createRetentionPreview",
       "method": "POST",
       "path": "/api/v1/retention/previews",
@@ -1627,6 +1747,12 @@
       "operationId": "listRetentionRecords",
       "method": "GET",
       "path": "/api/v1/retention/records",
+      "transport": "http"
+    },
+    {
+      "operationId": "exportRetentionRecords",
+      "method": "GET",
+      "path": "/api/v1/retention/records/export",
       "transport": "http"
     },
     {
@@ -1726,6 +1852,12 @@
       "transport": "http"
     },
     {
+      "operationId": "listSubmissions",
+      "method": "GET",
+      "path": "/api/v1/submissions",
+      "transport": "http"
+    },
+    {
       "operationId": "listSubmissionAssistantTranscript",
       "method": "GET",
       "path": "/api/v1/submissions/{submission_id}/assistant-transcript",
@@ -1801,6 +1933,12 @@
       "operationId": "releaseStudentExamResult",
       "method": "POST",
       "path": "/api/v1/submissions/{submission_id}/review/release",
+      "transport": "http"
+    },
+    {
+      "operationId": "reopenExamIntegrityReview",
+      "method": "POST",
+      "path": "/api/v1/submissions/{submission_id}/review/reopen",
       "transport": "http"
     },
     {
@@ -2035,6 +2173,12 @@
       "operationId": "enableUser",
       "method": "POST",
       "path": "/api/v1/users/{user_id}/enable",
+      "transport": "http"
+    },
+    {
+      "operationId": "listUserMemberships",
+      "method": "GET",
+      "path": "/api/v1/users/{user_id}/memberships",
       "transport": "http"
     },
     {

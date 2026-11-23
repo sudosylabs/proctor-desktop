@@ -975,7 +975,10 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 				minimum_desktop_release: i.minimumRelease,
 				administrator_message: i.message,
 				retry_at: iso(i.retryAt),
-				revoked_desktop_build_ids: [...i.revokedBuildIds]
+				revoked_desktop_builds: i.revokedBuilds.map((b) => ({
+					build_id: b.buildId,
+					reason: b.reason
+				}))
 			})
 		}),
 		success
@@ -1056,7 +1059,9 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 	retentionRecords: route(
 		'listRetentionRecords',
 		(i) => ({ query: page(i) }),
-		(v) => wire.retentionRecords(v)
+		// Without `group_by` the server lists Submission rows; validating the projection
+		// refuses any other shape.
+		(v) => wire.retentionRecords(v as Parameters<typeof wire.retentionRecords>[0])
 	),
 	// Jobs
 	jobs: route(
@@ -1245,14 +1250,7 @@ export class AdministrationService {
 			},
 			{ pollIntervalMs: changes ? SAFETY_POLL_MS : POLL_MS }
 		);
-		if (!changes) {
-			// Invitations announce only the ones you issued, so the page is still polled.
-			if (intent.kind !== 'invitations' && intent.kind !== 'invitation') return observation;
-			return combinedDisposable(
-				observation,
-				api.events.on('invitation.changed', undefined, refresh)
-			);
-		}
+		if (!changes) return observation;
 		let fallback: ReturnType<typeof setInterval> | undefined;
 		let disposed = false;
 		void changes.accepted.then((accepted) => {
@@ -1290,6 +1288,10 @@ export class AdministrationService {
 					institution('access_policy.view'),
 					refresh
 				);
+			case 'invitations':
+			case 'invitation':
+				// Delivered at the Invitation's scope and every scope enclosing it.
+				return events.on('invitation.changed', institution('invitation.view'), refresh);
 			case 'jobs':
 			case 'job':
 			case 'jobAttempts':

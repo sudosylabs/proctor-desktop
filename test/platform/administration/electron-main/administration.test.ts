@@ -809,12 +809,10 @@ void test('pages a server event keeps current subscribe on the Institution and p
 		service
 			.observeAdministration(binding, { kind: 'invitations', limit: 10 }, () => {})
 			.dispose();
-		assert.deepEqual(subscriptions, [{ name: 'invitation.changed', scope: undefined }]);
-		assert.deepEqual(
-			polls,
-			[60_000],
-			'invitations announce only your own, so the page is still polled'
-		);
+		assert.deepEqual(subscriptions, [
+			{ name: 'invitation.changed', scope: institution('invitation.view') }
+		]);
+		assert.deepEqual(polls, [300_000]);
 
 		subscriptions.length = 0;
 		polls.length = 0;
@@ -1099,7 +1097,8 @@ void test('audits carry their summary, classes their student count, and first pa
 					academic_period_id: unit,
 					start_at: at,
 					created_at: at,
-					updated_at: at
+					updated_at: at,
+					user: { id }
 				})),
 				total: 11
 			});
