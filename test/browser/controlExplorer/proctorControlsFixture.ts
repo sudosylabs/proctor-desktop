@@ -55,6 +55,17 @@ export function proctorControlsFixture(host: HTMLElement): ControlFixtureResult 
 			icon: proctorIconFactory('action.end')
 		})
 	);
+	// An action the account can't take yet keeps its label and adds a decorative lock; its
+	// accessible name says why.
+	const locked = store.add(
+		new ButtonControl(buttons, {
+			variant: 'secondary',
+			label: 'Reset two-step',
+			icon: proctorIconFactory('account.security'),
+			trailingIcon: proctorIconFactory('status.locked', 14),
+			accessibleLabel: 'Reset two-step, needs two-step verification on your account'
+		})
+	);
 	const choices = group('proctor-choices');
 	const segmented = store.add(
 		new SegmentedControl(choices, {
@@ -120,7 +131,7 @@ export function proctorControlsFixture(host: HTMLElement): ControlFixtureResult 
 	store.add(toggle.onDidChange((on) => changes.push(`minimap:${on}`)));
 	store.add(stepper.onDidChange((value) => changes.push(`font:${value}`)));
 	return {
-		states: 18,
+		states: 19,
 		disposable: {
 			dispose: () => {
 				store.dispose();
@@ -149,7 +160,14 @@ export function proctorControlsFixture(host: HTMLElement): ControlFixtureResult 
 				throw new Error('A failure toast is announced');
 			if (host.querySelector('.prctr-icon svg path[d]') === null)
 				throw new Error('Proctor icons render as inline SVG');
-			return 6;
+			const lock = locked.element.querySelector('.prctr-button__trailing');
+			if (
+				lock?.getAttribute('aria-hidden') !== 'true' ||
+				locked.element.getAttribute('aria-label')?.includes('two-step verification') !==
+					true
+			)
+				throw new Error('A locked action hides its lock and names why');
+			return 7;
 		}
 	};
 }

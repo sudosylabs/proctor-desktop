@@ -85,6 +85,11 @@
 	.prctr-button .prctr-button__label {
 		overflow-wrap: normal;
 	}
+	.prctr-button .prctr-button__trailing {
+		color: var(--prctr-color-text-tertiary);
+		display: flex;
+		margin-inline-start: -2px;
+	}
 	.prctr-button[data-busy='true'] > :not(.prctr-button__label, .prctr-button__busy) {
 		display: none;
 	}
