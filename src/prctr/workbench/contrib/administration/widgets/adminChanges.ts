@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
+import { Disposable } from '../../../../base/common/lifecycle.js';
 import type {
 	AdministrationChangeIntent,
 	AdministrationResponse
@@ -12,12 +12,14 @@ import { IInstantiationService } from '../../../../platform/instantiation/common
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import {
-	ConfirmItsYouDialog,
-	type ReauthenticationPort
-} from '../../../browser/authenticated/pages/confirmItsYouDialog.js';
+	SignInCheck,
+	type SignInCheckPort,
+	type SignInRequirement
+} from '../../../browser/authenticated/pages/signInCheck.js';
 import { PageDialog } from '../../../browser/authenticated/pages/pageDialog.js';
 import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
+import { IAccountService } from '../../../services/account/common/account.js';
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { AdminChips, type AdminChip } from './adminChips.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
@@ -27,18 +29,23 @@ export type AdminChangeResult = AdministrationResponse | 'busy';
 
 /**
  * Sends Administration changes for one page. A change the institution guards with a recent
- * sign-in first asks the person to confirm it is them, then is sent again; cancelling that
- * confirmation ends the change as cancelled.
+ * sign-in, or with a two-step one, goes through the shared {@link SignInCheck}: Confirm it's you,
+ * then the change is sent again; cancelling ends it as cancelled. A change that needs two-step
+ * verification the account doesn't have ends with the dialog that says so.
  */
 export class AdminChanges extends Disposable {
-	private readonly confirmation = this._register(new MutableDisposable<ConfirmItsYouDialog>());
+	private readonly signIn: SignInCheck;
 
 	constructor(
 		@IAdministrationService private readonly administration: IAdministrationService,
+		@IAccountService private readonly account: IAccountService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
-		@IInstantiationService private readonly instantiationService: IInstantiationService
+		@IInstantiationService instantiationService: IInstantiationService
 	) {
 		super();
+		this.signIn = this._register(
+			instantiationService.createInstance(SignInCheck, this.signInPort())
+		);
 	}
 
 	/** Sends one change; `summary` says what it does if the person must confirm it is them. */
@@ -47,23 +54,33 @@ export class AdminChanges extends Disposable {
 		summary: readonly string[]
 	): Promise<AdminChangeResult> {
 		const result = await this.administration.change(intent);
-		if (
-			result === 'busy' ||
-			result.kind !== 'error' ||
-			result.reason !== 'reauthenticationRequired'
-		)
-			return result;
-		const confirmed = await new Promise<boolean>((resolve) => {
-			this.confirmation.value = this.instantiationService.createInstance(
-				ConfirmItsYouDialog,
-				summary,
-				resolve,
-				this.reauthentication()
-			);
-		});
-		if (this._store.isDisposed) return { kind: 'error', reason: 'cancelled' };
-		if (!confirmed) return { kind: 'error', reason: 'cancelled' };
+		if (result === 'busy' || result.kind !== 'error') return result;
+		const requirement =
+			result.reason === 'reauthenticationRequired'
+				? 'recent'
+				: result.reason === 'strongRequired'
+					? 'twoStep'
+					: undefined;
+		if (requirement === undefined) return result;
+		const confirmed = await this.signIn.resolve(requirement, summary);
+		if (this._store.isDisposed || !confirmed) return { kind: 'error', reason: 'cancelled' };
 		return this.administration.change(intent);
+	}
+
+	/**
+	 * Before a form for a change that needs a two-step sign-in: false after explaining that the
+	 * account needs two-step verification first, or that this installation doesn't offer it.
+	 */
+	beforeTwoStep(): Promise<boolean> {
+		return this.signIn.beforeTwoStep();
+	}
+
+	/**
+	 * Runs the sign-in check a read was refused for, such as the keys; true when it is worth
+	 * reading again.
+	 */
+	checkSignIn(requirement: SignInRequirement, summary: readonly string[]): Promise<boolean> {
+		return this.signIn.resolve(requirement, summary);
 	}
 
 	/** A failure's sentence, or the busy notice. */
@@ -72,7 +89,7 @@ export class AdminChanges extends Disposable {
 		return result.kind === 'error' ? this.format.failure(result.reason) : '';
 	}
 
-	private reauthentication(): ReauthenticationPort {
+	private signInPort(): SignInCheckPort {
 		return {
 			confirm: async () => {
 				const result = await this.administration.change({ kind: 'reauthenticate' });
@@ -85,7 +102,11 @@ export class AdminChanges extends Disposable {
 					text: this.format.failure(result.kind === 'error' ? result.reason : 'invalid')
 				};
 			},
-			cancel: () => void this.administration.request({ kind: 'cancelReauthentication' })
+			cancel: () => void this.administration.request({ kind: 'cancelReauthentication' }),
+			standing: () => this.account.readSignIn(),
+			openSecurity: async () => {
+				await this.account.request({ kind: 'openSecurity' });
+			}
 		};
 	}
 }

@@ -355,10 +355,37 @@ export const operationsMessages = Object.freeze({
 		defaultMessage: 'Retiring the key. Follow it under Jobs.',
 		description: 'Toast after starting to retire a key.'
 	}),
-	mailKeysStrong: defineMessage({
-		id: 'administration.operations.mail.keys.strong',
-		defaultMessage: 'Keys are shown to a sign-in with two-step verification only.',
-		description: 'Shown when keys need a stronger sign-in.'
+	mailKeysLocked: defineMessage({
+		id: 'administration.operations.mail.keys.locked',
+		defaultMessage: 'Shown only to a sign-in with two-step verification',
+		description:
+			'Title of the row that stands in for the keys when this sign-in can’t read them.'
+	}),
+	mailKeysLockedCode: defineMessage({
+		id: 'administration.operations.mail.keys.locked.code',
+		defaultMessage:
+			'Your current sign-in didn’t use it. Confirm it’s you with your authenticator code to see and rotate the mail and two-step keys.',
+		description:
+			'Why the keys are hidden and the way on, when this sign-in hasn’t used two-step verification.'
+	}),
+	mailKeysLockedTurnOn: defineMessage({
+		id: 'administration.operations.mail.keys.locked.turnon',
+		defaultMessage:
+			'Your account doesn’t have two-step verification yet. Turn it on, then confirm it’s you with the new code to see and rotate the mail and two-step keys.',
+		description:
+			'Why the keys are hidden and the way on, when the account has no two-step verification.'
+	}),
+	mailKeysLockedUnavailable: defineMessage({
+		id: 'administration.operations.mail.keys.locked.unavailable',
+		defaultMessage:
+			'This Proctor doesn’t offer two-step verification, so nobody can see or rotate these keys until it’s turned on.',
+		description:
+			'Why the keys are hidden, when the installation has two-step verification turned off.'
+	}),
+	mailKeysLockedRecent: defineMessage({
+		id: 'administration.operations.mail.keys.locked.recent',
+		defaultMessage: 'Confirm it’s you to see and rotate the mail and two-step keys.',
+		description: 'Why the keys are hidden and the way on, when the sign-in isn’t recent enough.'
 	}),
 	jobsStarted: defineMessage({
 		id: 'administration.operations.jobs.started',

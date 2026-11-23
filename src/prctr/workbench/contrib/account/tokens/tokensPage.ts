@@ -6,8 +6,8 @@ import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { ConfirmItsYouDialog } from '../../../browser/authenticated/pages/confirmItsYouDialog.js';
-import { accountReauthentication } from '../widgets/accountReauthentication.js';
+import { SignInCheck } from '../../../browser/authenticated/pages/signInCheck.js';
+import { accountSignInCheck } from '../widgets/accountReauthentication.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type {
@@ -289,16 +289,18 @@ export class TokensPage extends Disposable implements PageView {
 				result.kind === 'error' &&
 				result.reason === 'reauthenticationRequired'
 			) {
-				this.dialog.value = this.instantiationService.createInstance(
-					ConfirmItsYouDialog,
-					[token.description, this.format.text('tokenEnableSummary')],
-					(ok) => {
+				const check = this.instantiationService.createInstance(
+					SignInCheck,
+					accountSignInCheck(this.account, this.format)
+				);
+				this.dialog.value = check;
+				void check
+					.resolve('recent', [token.description, this.format.text('tokenEnableSummary')])
+					.then((ok) => {
 						if (this._store.isDisposed) return;
 						if (ok) this.sendToggle(intent, action, token, section, true);
 						else section.focusRow(token.id);
-					},
-					accountReauthentication(this.account, this.format)
-				);
+					});
 				return;
 			}
 			this.onChangeComplete(

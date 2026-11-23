@@ -6,6 +6,7 @@ import type {
 	ReauthenticationPort,
 	ReauthenticationResult
 } from '../../../browser/authenticated/pages/confirmItsYouDialog.js';
+import type { SignInCheckPort } from '../../../browser/authenticated/pages/signInCheck.js';
 import type { IAccountService } from '../../../services/account/common/account.js';
 import type { IAccountFormatService } from '../accountFormat.js';
 
@@ -28,6 +29,20 @@ export function accountReauthentication(
 		},
 		cancel(): void {
 			void account.request({ kind: 'cancelReauthentication' });
+		}
+	};
+}
+
+/** Account's sign-in checks: its own reauthentication, standing and security page. */
+export function accountSignInCheck(
+	account: IAccountService,
+	format: IAccountFormatService
+): SignInCheckPort {
+	return {
+		...accountReauthentication(account, format),
+		standing: () => account.readSignIn(),
+		async openSecurity(): Promise<void> {
+			await account.request({ kind: 'openSecurity' });
 		}
 	};
 }

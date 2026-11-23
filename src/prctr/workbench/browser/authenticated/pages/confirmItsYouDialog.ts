@@ -5,6 +5,10 @@
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
+import {
+	confirmAsksForCode,
+	type SignInStanding
+} from '../../../../platform/identity/common/signInStanding.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { PageDialog } from './pageDialog.js';
 import { PageFeedback } from './pageFeedback.js';
@@ -32,8 +36,9 @@ export interface ReauthenticationPort {
 /**
  * Asks the person to confirm it is them before a change the institution guards, such as
  * creating an access token. Continue opens the institution's own page in the system browser,
- * where they sign in again with the method this session used; the change is then sent again by
- * its owner. Cancel stops a confirmation still waiting for the browser.
+ * where they sign in again with the method this session used, and with the authenticator code
+ * when this sign-in hasn't used two-step verification yet; the change is then sent again by its
+ * owner. Cancel stops a confirmation still waiting for the browser. Opened by {@link SignInCheck}.
  */
 export class ConfirmItsYouDialog extends Disposable {
 	private readonly dialog: PageDialog;
@@ -46,6 +51,8 @@ export class ConfirmItsYouDialog extends Disposable {
 	constructor(
 		/** What the guarded change will do, one line each, so the person knows what they confirm. */
 		summary: readonly string[],
+		/** How this sign-in stands, when it could be read; it names the way to sign in. */
+		standing: SignInStanding | undefined,
 		private readonly onDidFinish: (confirmed: boolean) => void,
 		private readonly reauthentication: ReauthenticationPort,
 		@IPageFormatService private readonly format: IPageFormatService,
@@ -56,11 +63,12 @@ export class ConfirmItsYouDialog extends Disposable {
 		this.dialog = this._register(
 			new PageDialog(this.pane, {
 				title: this.format.text('confirmItsYouTitle'),
-				description: this.format.institutionText(
-					'confirmItsYouBody',
-					'confirmItsYouBodyGeneric'
-				),
-				size: 'small'
+				description: [
+					this.format.institutionText('confirmItsYouBody', 'confirmItsYouBodyGeneric'),
+					this.format.text(confirmStep(standing)),
+					this.format.text('confirmItsYouDone')
+				].join(' '),
+				size: 'medium'
 			})
 		);
 		if (summary.length > 0)
@@ -74,6 +82,7 @@ export class ConfirmItsYouDialog extends Disposable {
 				)
 			);
 		this.feedback = this._register(new PageFeedback(this.dialog.body));
+		this.dialog.setFootnote(this.format.text('confirmItsYouFootnote'));
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
@@ -119,6 +128,9 @@ export class ConfirmItsYouDialog extends Disposable {
 
 	private setWaiting(waiting: boolean): void {
 		this.waiting = waiting;
+		this.dialog.setFootnote(
+			this.format.text(waiting ? 'confirmItsYouStopNote' : 'confirmItsYouFootnote')
+		);
 		this.confirm.setState({
 			label: this.format.text(
 				waiting ? 'confirmItsYouWaitingButton' : 'confirmItsYouContinue'
@@ -134,4 +146,20 @@ export class ConfirmItsYouDialog extends Disposable {
 		this.dispose();
 		this.onDidFinish(confirmed);
 	}
+}
+
+/** The sentence naming how to sign in: the Session's own method, and the code when it raises. */
+function confirmStep(
+	standing: SignInStanding | undefined
+):
+	| 'confirmItsYouStep'
+	| 'confirmItsYouStepPassword'
+	| 'confirmItsYouStepPasswordCode'
+	| 'confirmItsYouStepProvider'
+	| 'confirmItsYouStepProviderCode' {
+	if (standing === undefined) return 'confirmItsYouStep';
+	const code = confirmAsksForCode(standing);
+	if (standing.method === 'password')
+		return code ? 'confirmItsYouStepPasswordCode' : 'confirmItsYouStepPassword';
+	return code ? 'confirmItsYouStepProviderCode' : 'confirmItsYouStepProvider';
 }

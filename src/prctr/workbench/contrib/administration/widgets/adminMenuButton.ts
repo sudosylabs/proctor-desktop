@@ -60,6 +60,12 @@ export class AdminMenuButton extends Disposable {
 			destructive: action.destructive === true,
 			separatorBefore: index > 0 && index === firstDestructive,
 			enabled: action.enabled !== false,
+			...(action.locked === undefined
+				? {}
+				: {
+						trailingIcon: proctorIconFactory('status.locked', 14),
+						accessibleLabel: action.locked
+					}),
 			run: action.run
 		}));
 		this.pane.menu.show(this.element, entries, label);

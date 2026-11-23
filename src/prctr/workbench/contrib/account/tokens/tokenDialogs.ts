@@ -21,8 +21,8 @@ import type {
 	AccountToken
 } from '../../../../platform/account/common/accountProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { ConfirmItsYouDialog } from '../../../browser/authenticated/pages/confirmItsYouDialog.js';
-import { accountReauthentication } from '../widgets/accountReauthentication.js';
+import { SignInCheck } from '../../../browser/authenticated/pages/signInCheck.js';
+import { accountSignInCheck } from '../widgets/accountReauthentication.js';
 import {
 	DEFAULT_TOKEN_EXPIRY,
 	scopeGrantable,
@@ -95,7 +95,7 @@ export class NewTokenDialog extends Disposable {
 	private working = false;
 	/** Confirm it's you is open or its retry is in flight; a second refusal is then reported. */
 	private confirming = false;
-	private readonly confirmation = this._register(new MutableDisposable<ConfirmItsYouDialog>());
+	private readonly confirmation = this._register(new MutableDisposable<SignInCheck>());
 
 	constructor(
 		private readonly onDidCreate: (
@@ -538,17 +538,17 @@ export class NewTokenDialog extends Disposable {
 		this.feedback.set();
 		this.dialog.hide();
 		const summary = [intent.description, this.summary()];
-		this.confirmation.value = this.instantiationService.createInstance(
-			ConfirmItsYouDialog,
-			summary,
-			(confirmed) => {
-				if (this._store.isDisposed) return;
-				this.dialog.show(this.create.element);
-				if (confirmed) void this.send(intent).finally(() => (this.confirming = false));
-				else this.confirming = false;
-			},
-			accountReauthentication(this.account, this.format)
+		const check = this.instantiationService.createInstance(
+			SignInCheck,
+			accountSignInCheck(this.account, this.format)
 		);
+		this.confirmation.value = check;
+		void check.resolve('recent', summary).then((confirmed) => {
+			if (this._store.isDisposed) return;
+			this.dialog.show(this.create.element);
+			if (confirmed) void this.send(intent).finally(() => (this.confirming = false));
+			else this.confirming = false;
+		});
 	}
 
 	private setWorking(working: boolean): void {

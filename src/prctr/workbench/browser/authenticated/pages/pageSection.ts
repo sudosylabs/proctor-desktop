@@ -32,6 +32,11 @@ export interface PageRowAction {
 	/** Last in the menu, after a separator, in red; it always opens a confirmation. */
 	readonly destructive?: boolean;
 	readonly enabled?: boolean;
+	/**
+	 * The action needs something the account lacks, such as two-step verification: a lock after
+	 * its label, and this accessible name. It stays enabled and explains when chosen.
+	 */
+	readonly locked?: string;
 	readonly run: () => void;
 }
 

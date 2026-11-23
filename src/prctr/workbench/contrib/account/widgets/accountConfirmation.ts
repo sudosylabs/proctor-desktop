@@ -104,10 +104,12 @@ export class AccountConfirmation extends Disposable {
 			label: this.format.text('cancel')
 		});
 		this.confirm.setState({ label: this.options.confirmLabel, icon });
-		this.feedback.set(
-			result === 'busy' ? this.format.text('busy') : this.format.failure(result.reason),
-			'error'
-		);
+		// A Confirm it's you the person stopped leaves the change as it was, with nothing to say.
+		if (result === 'busy' || result.reason !== 'cancelled')
+			this.feedback.set(
+				result === 'busy' ? this.format.text('busy') : this.format.failure(result.reason),
+				'error'
+			);
 		this.confirm.focus();
 	}
 
