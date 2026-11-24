@@ -90,8 +90,9 @@ authority.
 ## 6. Preserve secure window transitions
 
 Compose common, authenticated, and candidate allowlists explicitly. Candidate
-always includes IDE Workspace and Exam Materials; the browser activates
-only from trusted Attempt capability and posture. The AI agent remains absent.
+always includes IDE Workspace and Exam Materials; the browser, server terminals,
+port previews and the assistant activate only from trusted Attempt capability
+and posture, and none of them exposes a local process.
 
 Opening CandidateWindow closes AuthenticatedWindow. Pause keeps CandidateWindow
 under a blocking overlay and gates interaction. Suspension gates first, protects

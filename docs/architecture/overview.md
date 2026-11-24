@@ -32,9 +32,9 @@ Most durable product data is remote. A local folder is not the Attempt
 Workspace. Desktop owns a Working Overlay and protected recovery/cache around
 the server's v1 cursor/journal/mutation contract. The integrated browser enforces
 revision-frozen policy over the candidate's network and delivers minimized
-ordered Browser Activity. Code execution is absent for now: the server removed
-execution hosts and terminals, and a Run capability is planned before the first
-release. The AI agent is deferred.
+ordered Browser Activity. Code runs only in the server's per-Attempt execution
+environment; CandidateWindow presents its terminals and port previews, and the
+server-run AI assistant at the level the exam allows.
 
 ## Process boundary
 

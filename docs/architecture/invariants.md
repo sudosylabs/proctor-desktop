@@ -11,8 +11,8 @@ change.
 2. `product.remote-workspace` Attempt Workspace identity does not derive from a local or remote-VM
    filesystem path.
 3. `product.no-local-process` The Candidate renderer never receives a local process, shell, or
-   generic execution handle. Code execution is absent until its boundary is
-   accepted.
+   generic execution handle. Terminals and port previews are streams from the
+   server's per-Attempt execution environment, relayed by Electron main.
 4. `product.integrity-flag` An Integrity Flag records evidence and never represents an automatic finding
    of guilt or a grade.
 5. `product.independent-gates` Server readiness, authentication, authenticated navigation, Attempt

@@ -333,8 +333,7 @@ still-unresolved protected-record retention policy.
 
 Atomic batch, historical-version reads, range-backed models, server conflict
 resolution/revert, journal mutation keys, and per-entry capability snapshots are
-deferred extensions. Protected-record retention remains unresolved. Code
-execution is absent: the server removed execution hosts, and the planned Run
-capability will read acknowledged Workspace state rather than own a filesystem
-projection. Identity/security governs key custody and candidate gates, and native capability
+deferred extensions. Protected-record retention remains unresolved. Code runs
+in the server's per-Attempt execution environment, which the server keeps in step
+with acknowledged Workspace state; Desktop owns no filesystem projection for it. Identity/security governs key custody and candidate gates, and native capability
 work owns privileged placement and platform enforcement.

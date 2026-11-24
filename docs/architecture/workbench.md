@@ -285,13 +285,18 @@ bar dragging, double-click behavior and window-edge resizing remain available; t
 rail and the top bar's empty space also move the window. CandidateWindow layout
 policy is independent.
 
-`CandidateWindow` additionally exposes a `PanelPart`, currently without a
-contribution; it is reserved for the planned Run output. Candidate navigation initially has `Workspace` and `Exam
-Materials`; the integrated browser opens only as a policy-controlled workbench
-item in the content area. The Workspace sidebar owns the file tree, the content
-area owns code-file and browser items, and the panel is reserved for Run output.
+`CandidateWindow` additionally exposes a `PanelPart` for the server-hosted
+terminals of the Attempt's execution environment, with a Ports view; it never
+hosts a local shell. Candidate navigation has `Workspace`, `Exam Materials`, the
+policy-controlled exam browser and, when the frozen policy enables it,
+`Assistant`. The Workspace sidebar owns the file tree; the content area owns
+code-file, browser and port-preview items; the panel owns terminals and ports;
 Exam Materials owns a separately authorized resource list and read-only viewers.
-There is no first-release agent region.
+The Assistant occupies an auxiliary region beside the content. It shows the
+exam's assistant level, its remaining budget and the candidate's approvals for
+commands and edits, and every exchange is kept with the Submission. The server
+decides which tools each level offers. These contributions are designed and not
+yet implemented.
 
 Regions are resizable only within composition-approved placements and provide
 an accessible reset. Detached content windows, arbitrary docking, renderer-
