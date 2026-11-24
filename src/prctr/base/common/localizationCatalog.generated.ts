@@ -10,6 +10,7 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "account.client.desktop": "Proctor Desktop",
     "account.client.other": "Other app",
     "account.client.web": "Web browser",
+    "account.failure.busy": "Other changes to this are still being saved. Try again in a moment.",
     "account.failure.cancelled": "Stopped before it finished. Nothing changed.",
     "account.failure.conflict": "This changed somewhere else. The list is being refreshed; review it and try again.",
     "account.failure.denied": "Your account isn’t allowed to do this.",

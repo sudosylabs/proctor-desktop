@@ -34,6 +34,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
+    "account.failure.busy": {
+      "message": "Other changes to this are still being saved. Try again in a moment.",
+      "description": "Too many changes to the same account data are already waiting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
     "account.failure.cancelled": {
       "message": "Stopped before it finished. Nothing changed.",
       "description": "The person cancelled a browser step, or it was cancelled in Proctor.",

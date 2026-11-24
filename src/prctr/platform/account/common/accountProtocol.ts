@@ -317,7 +317,9 @@ export type AccountFailure =
 	/** The person stopped a step in the browser, or it was cancelled here. */
 	| 'cancelled'
 	/** The browser step was not finished in time. */
-	| 'expired';
+	| 'expired'
+	/** Too many changes to the same data are already waiting; nothing was sent. */
+	| 'busy';
 export type AccountResponse =
 	| { readonly kind: 'photo'; readonly dataUrl: string; readonly etag: string }
 	| { readonly kind: 'data'; readonly data: AccountData }

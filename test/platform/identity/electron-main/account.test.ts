@@ -928,7 +928,8 @@ void test('Sessions and registered desktops refresh on the server event that cov
 				polls.push(options.pollIntervalMs);
 				return { dispose() {} };
 			},
-			refresh: (key: unknown) => void refreshed.push(key)
+			refresh: (key: unknown) => void refreshed.push(key),
+			refreshTags: (tags: unknown) => void refreshed.push(tags)
 		},
 		events: {
 			on: (name: string, _scope: undefined, listener: () => void) => {
@@ -955,5 +956,9 @@ void test('Sessions and registered desktops refresh on the server event that cov
 		'user_profile_picture_changed'
 	]);
 	assert.deepEqual(polls, [300_000, 300_000, 300_000, 60_000]);
-	assert.equal(refreshed.length, 3);
+	assert.deepEqual(refreshed, [
+		['account/sessions', 'account/desktops'],
+		['account/sessions', 'account/desktops'],
+		['account/profile']
+	]);
 });

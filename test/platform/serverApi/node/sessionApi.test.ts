@@ -3,7 +3,10 @@ import { test } from 'node:test';
 import { createServer } from 'node:http';
 import { WebSocketServer } from 'ws';
 import { SessionApi } from '../../../../src/prctr/platform/serverApi/node/sessionApi.js';
-import type { ReadState } from '../../../../src/prctr/platform/serverApi/node/sessionReads.js';
+import {
+	TAG_HINT_INTERVAL_MS,
+	type ReadState
+} from '../../../../src/prctr/platform/serverApi/node/sessionReads.js';
 import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import {
 	ServerApiError,
@@ -403,5 +406,97 @@ void test('a server event refreshes the read it names; a fresh reconnect refresh
 		client.dispose();
 		for (const socket of sockets.clients) socket.terminate();
 		await new Promise<void>((resolve) => sockets.close(() => http.close(() => resolve())));
+	}
+});
+
+void test('a change that names its tags re-reads only the reads it covers, including listed rows', async () => {
+	const client = new SessionApi({
+		binding: testBinding,
+		origin,
+		execute: async () => ({ status: 204, headers: {}, bytes: new Uint8Array() })
+	});
+	const calls = { list: 0, profile: 0, other: 0, untagged: 0 };
+	const observe = (name: keyof typeof calls, policy: object) =>
+		client.reads.observe(
+			[name],
+			async () => ({ items: [{ id: 'a' }], n: ++calls[name] }),
+			() => {},
+			policy
+		);
+	const observations = [
+		observe('list', {
+			tags: ['user'],
+			valueTags: (value: unknown) =>
+				(value as { items: { id: string }[] }).items.map((item) => `user/${item.id}`)
+		}),
+		observe('profile', { tags: ['user/a'] }),
+		observe('other', { tags: ['user/b', 'job'] }),
+		observe('untagged', {})
+	];
+	try {
+		await tick();
+		assert.deepEqual(calls, { list: 1, profile: 1, other: 1, untagged: 1 });
+		await client.request(
+			'archiveAcademicUnit',
+			{ path: { academic_unit_id: id } },
+			{ fence: ['user/a'] }
+		);
+		assert.deepEqual(
+			calls,
+			{ list: 2, profile: 2, other: 1, untagged: 1 },
+			'the list holds row user/a; user/b, jobs and untagged reads keep their data'
+		);
+		await client.reads.invalidateTags(['user/a/sessions']);
+		assert.deepEqual(calls, { list: 2, profile: 2, other: 1, untagged: 1 }, 'nothing holds it');
+		await client.request('archiveAcademicUnit', { path: { academic_unit_id: id } });
+		assert.deepEqual(calls, { list: 3, profile: 3, other: 2, untagged: 2 }, 'no tags: all');
+	} finally {
+		for (const observation of observations) observation.dispose();
+		client.dispose();
+	}
+});
+
+void test('a server event hints each tag at most once per interval and joins hints inside it', async (context) => {
+	context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });
+	const client = new SessionApi({ binding: testBinding, origin, execute: unanswered });
+	let jobs = 0;
+	let mail = 0;
+	const observations = [
+		client.reads.observe(
+			['jobs'],
+			async () => ++jobs,
+			() => {},
+			{ tags: ['job'] }
+		),
+		client.reads.observe(
+			['mail'],
+			async () => ++mail,
+			() => {},
+			{ tags: ['mail'] }
+		)
+	];
+	const settle = async () => {
+		for (let n = 0; n < 5; n++) await tick();
+	};
+	try {
+		await settle();
+		assert.equal(jobs, 1);
+		client.reads.refreshTags(['job']);
+		await settle();
+		assert.equal(jobs, 2, 'the first hint refreshes at once');
+		for (let n = 0; n < 10; n++) client.reads.refreshTags(['job']);
+		client.reads.refreshTags(['mail']);
+		await settle();
+		assert.equal(jobs, 2, 'hints inside the interval wait');
+		assert.equal(mail, 2, 'another tag is not held back');
+		context.mock.timers.tick(TAG_HINT_INTERVAL_MS);
+		await settle();
+		assert.equal(jobs, 3, 'the waiting hints join one refresh');
+		context.mock.timers.tick(TAG_HINT_INTERVAL_MS * 3);
+		await settle();
+		assert.equal(jobs, 3);
+	} finally {
+		for (const observation of observations) observation.dispose();
+		client.dispose();
 	}
 });

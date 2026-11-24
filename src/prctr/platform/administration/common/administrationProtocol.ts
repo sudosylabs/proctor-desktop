@@ -1529,7 +1529,9 @@ export const administrationFailures = [
 	/** The preview is past its commit deadline; a new preview is needed. */
 	'expired',
 	/** The person can no longer see what the preview's filter selects, so it can't be used. */
-	'accessChanged'
+	'accessChanged',
+	/** Too many changes to the same data are already waiting; nothing was sent. */
+	'busy'
 ] as const;
 export type AdministrationFailure = (typeof administrationFailures)[number];
 

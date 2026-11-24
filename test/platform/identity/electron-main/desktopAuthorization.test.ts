@@ -1610,15 +1610,16 @@ void test('account tokens, email verification and retention notices are bound, s
 		createMode = 'hold';
 		const pending = accountOf(service).account(binding, create);
 		await new Promise((resolve) => setTimeout(resolve, 20));
-		assert.deepEqual(
-			await accountOf(service).account(binding, { kind: 'revokeToken', id: tokenId }),
-			{
-				kind: 'error',
-				reason: 'unavailable'
-			}
+		// A second change to the tokens waits for the first instead of running beside it.
+		const revoking = accountOf(service).account(binding, { kind: 'revokeToken', id: tokenId });
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		assert.ok(
+			!seen.includes(`DELETE /api/v1/users/me/tokens/${tokenId}`),
+			'the revoke is not sent while the creation runs'
 		);
 		releaseCreate?.();
 		const created = await pending;
+		assert.deepEqual(await revoking, { kind: 'success' });
 		assert.equal(created.kind, 'tokenCreated');
 		if (created.kind === 'tokenCreated') {
 			assert.equal(created.credential, credential);
@@ -1858,7 +1859,11 @@ void test('administration runs on the bound Session: DPoP signed, cached, invali
 			{ kind: 'success' }
 		);
 		await administration.administration(binding, { kind: 'institution' });
-		assert.equal(institutionReads, 2, 'a change invalidates administration reads');
+		assert.equal(
+			institutionReads,
+			1,
+			'a change re-reads only what it writes; the Institution keeps its cached data'
+		);
 		revoked = true;
 		assert.deepEqual(
 			await administration.administration(binding, { kind: 'disableUser', id: registration }),

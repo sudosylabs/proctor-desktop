@@ -12,6 +12,7 @@ import {
 import type { SessionBinding } from '../common/projection.js';
 import { encodeRequest, type ApiRequestInput, type EncodedApiRequest } from './requestEncoding.js';
 import { decodeResponse } from './responseDecoding.js';
+import type { ServerDataTag } from '../common/serverDataTags.js';
 import { SessionReads } from './sessionReads.js';
 import type { HttpResponse } from './serverHttpTransport.js';
 import { ServerEvents } from './serverEvents.js';
@@ -21,6 +22,11 @@ export interface ApiRequestOptions {
 	readonly signal?: AbortSignal;
 	readonly timeoutMs?: number;
 	readonly maxResponseBytes?: number;
+	/**
+	 * For a change: the tags it writes, so only reads holding them are fenced afterwards.
+	 * Without it, a change fences every read of the Session.
+	 */
+	readonly fence?: readonly ServerDataTag[];
 }
 export interface SessionApiOptions {
 	readonly binding: SessionBinding;
@@ -87,8 +93,9 @@ export class SessionApi extends Disposable {
 	}
 
 	/**
-	 * Sends one operation. A change fences the Session's reads afterwards, so no read started
-	 * before it can publish older data. Changes are sent once and never retried here.
+	 * Sends one operation. A change fences the reads it wrote afterwards (all of them, unless it
+	 * names its tags), so no read started before it can publish older data. Changes are sent
+	 * once and never retried here.
 	 */
 	async request<K extends ApiOperationId>(
 		id: K,
@@ -98,13 +105,14 @@ export class SessionApi extends Disposable {
 		this.assertCurrent();
 		if (id === 'connectWebSocket') throw new ServerApiError('invalidRequest');
 		const request = encodeRequest(this.origin, id, input as ApiRequestInput);
+		const { fence: _fence, ...transport } = options;
 		const signal = AbortSignal.any([
 			this.lifetime.signal,
 			...(options.signal ? [options.signal] : [])
 		]);
 		let response: HttpResponse;
 		try {
-			response = await this.options.execute({ ...request, ...options, signal });
+			response = await this.options.execute({ ...request, ...transport, signal });
 		} catch (error) {
 			this.assertCurrent();
 			if (signal.aborted) throw new ServerApiError('cancelled');
@@ -113,7 +121,10 @@ export class SessionApi extends Disposable {
 		this.assertCurrent();
 		if (signal.aborted) throw new ServerApiError('cancelled');
 		const decoded = decodeResponse(request.operation, response) as ApiResponse<K>;
-		if (!readMethods.has(request.method)) await this.reads.invalidate();
+		if (!readMethods.has(request.method))
+			await (options.fence
+				? this.reads.invalidateTags(options.fence)
+				: this.reads.invalidate());
 		this.assertCurrent();
 		if (signal.aborted) throw new ServerApiError('cancelled');
 		return decoded;

@@ -27,6 +27,14 @@ import {
 	type AdministrationReadIntent,
 	type AdministrationResponse
 } from '../common/administrationProtocol.js';
+import type { ServerChangeTags, ServerDataTag } from '../../serverApi/common/serverDataTags.js';
+import { TagChangeQueue } from '../../serverApi/common/tagChangeQueue.js';
+import {
+	administrationChangeTags,
+	administrationEventTags,
+	administrationReadTags,
+	administrationValueTags
+} from './administrationData.js';
 import * as wire from './administrationWire.js';
 
 type AuditAction = components['schemas']['AuditAction'];
@@ -199,7 +207,8 @@ interface Route<I extends RoutedKind> {
 		api: Pick<SessionApi, 'request'>,
 		intent: AdministrationIntentOf<I>,
 		idempotencyKey: string,
-		signal?: AbortSignal
+		signal?: AbortSignal,
+		fence?: readonly ServerDataTag[]
 	): Promise<AdministrationResponse>;
 }
 function route<I extends RoutedKind, K extends ApiOperationId>(
@@ -213,9 +222,10 @@ function route<I extends RoutedKind, K extends ApiOperationId>(
 ): Route<I> {
 	return {
 		operation,
-		async call(api, intent, idempotencyKey, signal) {
+		async call(api, intent, idempotencyKey, signal, fence) {
 			const result = await api.request(operation, input(intent, idempotencyKey), {
-				signal
+				signal,
+				...(fence ? { fence } : {})
 			});
 			const response = project(result.value as Success<K>, intent, result.headers ?? {});
 			// A page never holds more than the person asked for.
@@ -1198,6 +1208,15 @@ const failureCodes: Readonly<Record<string, AdministrationFailure>> = {
 	'academic_administration_preview.authorization_lost': 'accessChanged'
 };
 
+/** The cache tags of a read: what it holds before it answers, then one per listed row. */
+function readTags(intent: AdministrationReadIntent): {
+	readonly tags: readonly ServerDataTag[];
+	readonly valueTags?: (value: unknown) => readonly ServerDataTag[];
+} {
+	const valueTags = administrationValueTags(intent);
+	return { tags: administrationReadTags(intent), ...(valueTags ? { valueTags } : {}) };
+}
+
 /** How often a page with no server event is re-read. */
 const POLL_MS = 60_000;
 /** How often a page its server event keeps current is re-read anyway. */
@@ -1206,10 +1225,11 @@ const SAFETY_POLL_MS = 300_000;
 /**
  * The privileged Administration capability. Every intent becomes one allow-listed operation on
  * the bound Session's typed client; replies are whitelist projections, and failures are closed
- * reasons. One change runs at a time.
+ * reasons. Changes that touch overlapping data run one after another; the rest run together.
  */
 export class AdministrationService {
-	#changing = false;
+	/** One queue per Session, so a change never waits on another Session's. */
+	readonly #queues = new WeakMap<AdministrationApi, TagChangeQueue>();
 	#disposed = false;
 	constructor(private readonly session: AdministrationSessionPort) {}
 
@@ -1220,8 +1240,10 @@ export class AdministrationService {
 		const intent = validateAdministrationIntent(raw);
 		if (!isAdministrationRead(intent)) return this.#change(binding, intent);
 		try {
-			return await this.#api(binding).reads.read(['administration', intent], (signal) =>
-				this.#read(binding, intent, signal)
+			return await this.#api(binding).reads.read(
+				['administration', intent],
+				(signal) => this.#read(binding, intent, signal),
+				readTags(intent)
 			);
 		} catch (error) {
 			return this.#failure(error, intent);
@@ -1238,7 +1260,9 @@ export class AdministrationService {
 		const api = this.#api(binding);
 		const key = ['administration', intent] as const;
 		const refresh = () => api.reads.refresh(key);
-		const changes = this.#subscribeChanges(binding, intent.kind, refresh);
+		const changes = this.#subscribeChanges(binding, intent.kind, (tags) =>
+			api.reads.refreshTags(tags)
+		);
 		// Events are best-effort after commit, so a page they cover is still re-read now and then;
 		// a page with no event, or whose subscription the server refuses, is polled.
 		const observation = api.reads.observe(
@@ -1248,7 +1272,7 @@ export class AdministrationService {
 				if (state.error) listener(this.#failure(state.error, intent));
 				else if (state.value) listener(state.value);
 			},
-			{ pollIntervalMs: changes ? SAFETY_POLL_MS : POLL_MS }
+			{ pollIntervalMs: changes ? SAFETY_POLL_MS : POLL_MS, ...readTags(intent) }
 		);
 		if (!changes) return observation;
 		let fallback: ReturnType<typeof setInterval> | undefined;
@@ -1266,13 +1290,14 @@ export class AdministrationService {
 
 	/**
 	 * Subscribes to the server event that reports changes to a page, when there is one. Jobs,
-	 * imports and the Access Policy are subscribed to on the Institution; a viewer the server
-	 * doesn't let see them there is refused, and the page falls back to polling.
+	 * imports, Invitations and the Access Policy are subscribed to on the Institution; a viewer
+	 * the server doesn't let see them there is refused, and the page falls back to polling. An
+	 * event hints the tags it names, so every page holding them refreshes once.
 	 */
 	#subscribeChanges(
 		binding: SessionBinding,
 		kind: AdministrationReadIntent['kind'],
-		refresh: () => void
+		hint: (tags: readonly ServerDataTag[]) => void
 	): ServerEventSubscription | undefined {
 		const events = this.#api(binding).events;
 		const institution = <A extends string>(action: A) =>
@@ -1283,28 +1308,31 @@ export class AdministrationService {
 			}) as const;
 		switch (kind) {
 			case 'accessPolicy':
-				return events.on(
-					'access_policy_changed',
-					institution('access_policy.view'),
-					refresh
+				return events.on('access_policy_changed', institution('access_policy.view'), () =>
+					hint(administrationEventTags.access_policy_changed)
 				);
 			case 'invitations':
 			case 'invitation':
 				// Delivered at the Invitation's scope and every scope enclosing it.
-				return events.on('invitation.changed', institution('invitation.view'), refresh);
+				return events.on('invitation.changed', institution('invitation.view'), () =>
+					hint(administrationEventTags['invitation.changed'])
+				);
 			case 'jobs':
 			case 'job':
 			case 'jobAttempts':
-				return events.on('job.changed', institution('job.view'), refresh);
+				return events.on('job.changed', institution('job.view'), () =>
+					hint(administrationEventTags['job.changed'])
+				);
 			case 'onboardingImports':
 			case 'onboardingImport': {
+				const imported = () => hint(administrationEventTags['onboarding_import.changed']);
 				const subscribed = events.on(
 					'onboarding_import.changed',
 					institution('onboarding_batch.view'),
-					refresh
+					imported
 				);
 				// An import only its creator may read is announced to the creator alone.
-				const mine = events.on('onboarding_import.changed', undefined, refresh);
+				const mine = events.on('onboarding_import.changed', undefined, imported);
 				return {
 					accepted: subscribed.accepted,
 					dispose: () => combinedDisposable(subscribed, mine).dispose()
@@ -1353,8 +1381,24 @@ export class AdministrationService {
 				return this.#failure(error, intent);
 			}
 		}
-		if (this.#changing) return { kind: 'error', reason: 'unavailable' };
-		this.#changing = true;
+		let session: AdministrationApi;
+		try {
+			session = this.#api(binding);
+		} catch (error) {
+			return this.#failure(error, intent);
+		}
+		let queue = this.#queues.get(session);
+		if (!queue) this.#queues.set(session, (queue = new TagChangeQueue()));
+		const tags = administrationChangeTags(intent, binding.principalId);
+		const result = await queue.run(tags.locks, () => this.#apply(binding, intent, tags));
+		return result === 'busy' ? { kind: 'error', reason: 'busy' } : result;
+	}
+
+	async #apply(
+		binding: SessionBinding,
+		intent: Exclude<AdministrationChangeIntent, { kind: 'cancelReauthentication' }>,
+		tags: ServerChangeTags
+	): Promise<AdministrationResponse> {
 		try {
 			const api = guardAdministrationApi(this.#api(binding));
 			if (intent.kind === 'reauthenticate') {
@@ -1371,19 +1415,19 @@ export class AdministrationService {
 			// One key per change; the single retry after a lost reply reuses it.
 			const idempotencyKey = idempotent ? randomBytes(32).toString('base64url') : '';
 			try {
-				return await route.call(api, typed, idempotencyKey);
+				return await route.call(api, typed, idempotencyKey, undefined, tags.writes);
 			} catch (error) {
 				if (!idempotent || !lostReply(error)) throw error;
 				return await route.call(
 					guardAdministrationApi(this.#api(binding)),
 					typed,
-					idempotencyKey
+					idempotencyKey,
+					undefined,
+					tags.writes
 				);
 			}
 		} catch (error) {
 			return this.#failure(error, intent);
-		} finally {
-			this.#changing = false;
 		}
 	}
 

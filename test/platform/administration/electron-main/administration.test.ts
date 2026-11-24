@@ -615,15 +615,13 @@ void test('server refusals become closed reasons, and a rejected credential ends
 	}
 });
 
-void test('one change runs at a time, confirmation maps to closed reasons, and disposal ends it', async () => {
-	let release: (() => void) | undefined;
+void test('changes to the same data queue, others run together, confirmation maps to closed reasons, and disposal ends it', async () => {
+	const releases: (() => void)[] = [];
 	let cancelled = 0;
 	let outcome: 'success' | 'strongAuthenticationRequired' | 'cancelled' = 'success';
 	const h = harness(
 		async () => {
-			await new Promise<void>((resolve) => {
-				release = resolve;
-			});
+			await new Promise<void>((resolve) => releases.push(resolve));
 			return json({
 				id,
 				type: 'onboarding_import.execute',
@@ -646,19 +644,26 @@ void test('one change runs at a time, confirmation maps to closed reasons, and d
 		}
 	);
 	try {
-		const pending = h.service.administration(binding, { kind: 'cancelJob', id });
-		assert.deepEqual(await h.service.administration(binding, { kind: 'retryJob', id }), {
-			kind: 'error',
-			reason: 'unavailable'
-		});
+		const settle = () => new Promise((resolve) => setImmediate(resolve));
+		const first = h.service.administration(binding, { kind: 'cancelJob', id });
+		// The same job waits for the first change; another job's change runs beside it.
+		const second = h.service.administration(binding, { kind: 'retryJob', id });
+		const other = h.service.administration(binding, { kind: 'cancelJob', id: 'k'.repeat(26) });
 		assert.deepEqual(
 			await h.service.administration(binding, { kind: 'cancelReauthentication' }),
 			{ kind: 'success' }
 		);
 		assert.equal(cancelled, 1);
-		while (!release) await new Promise((resolve) => setImmediate(resolve));
-		release();
-		assert.deepEqual(await pending, { kind: 'success' });
+		while (releases.length < 2) await settle();
+		for (let tick = 0; tick < 5; tick++) await settle();
+		assert.equal(releases.length, 2, 'the second change to the same job is still waiting');
+		releases.shift()!();
+		releases.shift()!();
+		assert.deepEqual(await first, { kind: 'success' });
+		assert.deepEqual(await other, { kind: 'success' });
+		while (releases.length < 1) await settle();
+		releases.shift()!();
+		assert.deepEqual(await second, { kind: 'success' });
 		assert.deepEqual(await h.service.administration(binding, { kind: 'reauthenticate' }), {
 			kind: 'success'
 		});
@@ -762,7 +767,8 @@ void test('pages a server event keeps current subscribe on the Institution and p
 				polls.push(options.pollIntervalMs);
 				return { dispose() {} };
 			},
-			refresh: (key: unknown) => void refreshed.push(key)
+			refresh: (key: unknown) => void refreshed.push(key),
+			refreshTags: (tags: unknown) => void refreshed.push(tags)
 		},
 		events: {
 			on: (name: string, scope: unknown, listener: () => void) => {
@@ -790,7 +796,7 @@ void test('pages a server event keeps current subscribe on the Institution and p
 		assert.deepEqual(subscriptions, [{ name: 'job.changed', scope: institution('job.view') }]);
 		assert.deepEqual(polls, [300_000]);
 		listeners[0]!();
-		assert.equal(refreshed.length, 1);
+		assert.deepEqual(refreshed, [['job', 'keys']], 'the event hints the tags it names');
 		jobs.dispose();
 
 		subscriptions.length = 0;
@@ -1433,4 +1439,33 @@ void test('an expired preview and lost access to its filter have reasons of thei
 	} finally {
 		h.dispose();
 	}
+});
+
+void test('Administration reads and changes name the server data they hold and write', async () => {
+	const { administrationChangeTags, administrationReadTags, administrationValueTags } =
+		await import('../../../../src/prctr/platform/administration/electron-main/administrationData.js');
+	assert.deepEqual(administrationReadTags({ kind: 'user', id }), [`user/${id}`]);
+	const rows = administrationValueTags({ kind: 'users', limit: 10 });
+	assert.deepEqual(
+		rows?.({
+			kind: 'data',
+			data: { resource: 'users', value: { items: [{ id: 'a' }, { id: 'b' }] } }
+		}),
+		['user/a', 'user/b']
+	);
+	assert.equal(administrationValueTags({ kind: 'institution' }), undefined);
+	const other = 'o'.repeat(26);
+	assert.deepEqual(administrationChangeTags({ kind: 'disableUser', id: other }, id), {
+		writes: [`user/${other}`, 'counts', 'audit'],
+		locks: [`user/${other}`, 'counts']
+	});
+	assert.deepEqual(
+		administrationChangeTags({ kind: 'disableUser', id }, id).writes,
+		[`user/${id}`, 'counts', 'audit', 'account'],
+		'a change to your own User re-reads the Account pages'
+	);
+	assert.deepEqual(administrationChangeTags({ kind: 'reauthenticate' }, id), {
+		writes: [],
+		locks: []
+	});
 });

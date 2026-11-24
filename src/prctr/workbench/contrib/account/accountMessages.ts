@@ -84,6 +84,11 @@ const sharedMessages = Object.freeze({
 		defaultMessage: 'That action could not be completed.',
 		description: 'A menu action failed unexpectedly.'
 	}),
+	failureBusy: defineMessage({
+		id: 'account.failure.busy',
+		defaultMessage: 'Other changes to this are still being saved. Try again in a moment.',
+		description: 'Too many changes to the same account data are already waiting.'
+	}),
 	failureUnavailable: defineMessage({
 		id: 'account.failure.unavailable',
 		defaultMessage: 'The server can’t be reached right now. Try again in a moment.',
