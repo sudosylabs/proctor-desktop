@@ -41,6 +41,7 @@
     "../test/workbench/services/attemptWorkspace/common/**/*.ts",
     "../test/workbench/contrib/integratedBrowser/common/**/*.ts",
     "../test/workbench/services/authenticatedNavigation/common/**/*.ts",
+    "../test/workbench/services/serverData/common/**/*.ts",
     "../test/workbench/contrib/account/common/**/*.ts",
     "../test/workbench/contrib/administration/common/**/*.ts",
     "../test/workbench/services/examSecurity/**/*.test.ts",
