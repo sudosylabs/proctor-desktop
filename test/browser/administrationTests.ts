@@ -303,7 +303,7 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 		);
 
 		// Disabling asks first, then sends the change and shows the new status.
-		const more = root.querySelector<HTMLButtonElement>('.prctr-admin-menu-button')!;
+		const more = root.querySelector<HTMLButtonElement>('.prctr-page-menu-button')!;
 		more.click();
 		const disable = [...document.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(
 			(item) => item.textContent?.includes('Disable account')

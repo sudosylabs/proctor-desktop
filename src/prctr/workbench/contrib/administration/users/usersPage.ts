@@ -28,7 +28,7 @@ import {
 } from '../widgets/adminList.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 import { BulkUserChanges } from './bulkUserChanges.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { UserActions, type AdminUser } from './userActions.js';
 import { SaveViewDialog } from './saveViewDialog.js';
 import { AdminTabs } from '../widgets/adminTabs.js';
@@ -572,7 +572,7 @@ export class UsersPage extends Disposable implements PageView {
 		);
 		this.disableButton.element.dataset.secondary = 'true';
 		const more = this._register(
-			new AdminMenuButton(
+			new PageMenuButton(
 				host,
 				format.text('usersBulkMore'),
 				() => {

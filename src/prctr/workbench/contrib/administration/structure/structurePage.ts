@@ -36,7 +36,7 @@ import {
 } from '../widgets/adminFormDialog.js';
 import { AdminList, type AdminListItem } from '../widgets/adminList.js';
 import { AdminTabs } from '../widgets/adminTabs.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { readOnce, readPages } from '../widgets/adminReads.js';
 import { UnitTree, type AdminUnit } from './unitTree.js';
 import './media/structurePage.css';
@@ -76,7 +76,7 @@ export class StructurePage extends Disposable implements PageView {
 	private readonly views: AdminTabs<'contents' | 'members'>;
 	private readonly classesHost: HTMLElement;
 	private readonly classAction = this._register(new MutableDisposable());
-	private readonly menu: AdminMenuButton;
+	private readonly menu: PageMenuButton;
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private unit: AdminUnit | undefined;
@@ -110,7 +110,7 @@ export class StructurePage extends Disposable implements PageView {
 		);
 		this._register(periods.onDidRequest(() => navigation.selectAdministrationPage('periods')));
 		this.menu = this._register(
-			new AdminMenuButton(
+			new PageMenuButton(
 				headerActions,
 				format.text('classMore'),
 				() => this.unitActions(),

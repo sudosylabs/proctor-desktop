@@ -29,7 +29,7 @@ import { permissionMatrix, readableCode } from '../common/administrationPresenta
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { renderDetails } from '../widgets/adminDetails.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { readPages } from '../widgets/adminReads.js';
 import './media/rolesPage.css';
 
@@ -46,7 +46,7 @@ export class RolesPage extends Disposable implements PageView {
 	private readonly listStore = this._register(new DisposableStore());
 	private readonly details: PageSection;
 	private readonly permissions: PageSection;
-	private readonly menu: AdminMenuButton;
+	private readonly menu: PageMenuButton;
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private readonly gridStore = this._register(new DisposableStore());
@@ -73,7 +73,7 @@ export class RolesPage extends Disposable implements PageView {
 		);
 		this._register(create.onDidRequest(() => this.edit(undefined)));
 		this.menu = this._register(
-			new AdminMenuButton(
+			new PageMenuButton(
 				headerActions,
 				format.text('classMore'),
 				() => this.menuActions(),

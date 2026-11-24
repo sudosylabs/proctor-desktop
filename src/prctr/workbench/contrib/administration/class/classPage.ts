@@ -27,7 +27,7 @@ import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { AdminFilters } from '../widgets/adminFilters.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
 import { AdminList, type AdminListItem } from '../widgets/adminList.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { AdminTabs } from '../widgets/adminTabs.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 
@@ -90,7 +90,7 @@ export class ClassPage extends Disposable implements PageView {
 			})
 		);
 		this._register(
-			new AdminMenuButton(headerActions, format.text('classMore'), () => this.menu(), pane)
+			new PageMenuButton(headerActions, format.text('classMore'), () => this.menu(), pane)
 		);
 
 		// Students, Teachers and Invitations are tabs, each its own list with its count.

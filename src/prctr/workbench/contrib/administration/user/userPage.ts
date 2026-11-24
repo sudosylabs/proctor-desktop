@@ -32,7 +32,7 @@ import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { renderDetails } from '../widgets/adminDetails.js';
 import { AdminFormDialog, type AdminFormOptions } from '../widgets/adminFormDialog.js';
 import { initialsOf } from '../widgets/adminList.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { strongSignInStep } from '../../../../platform/identity/common/signInStanding.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import { adminRead, readPages, readUnitTree } from '../widgets/adminReads.js';
@@ -121,7 +121,7 @@ export class UserPage extends Disposable implements PageView {
 		);
 		this._register(this.resetButton.onDidRequest(() => this.resetTwoStep()));
 		this._register(
-			new AdminMenuButton(
+			new PageMenuButton(
 				headerActions,
 				format.text('userMore'),
 				() => this.menuActions(),

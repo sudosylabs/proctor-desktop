@@ -7,25 +7,25 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import { createProctorIcon } from '../../../../platform/theme/browser/proctorIcon.js';
-import './media/adminChips.css';
+import './media/pageChips.css';
 
-export interface AdminChip {
+export interface PageChip {
 	readonly id: string;
 	readonly label: string;
 	/** Why the entry can't be used; the chip shows it in red with this as its title. */
 	readonly problem?: string;
 }
 
-export interface AdminChipsOptions {
+export interface PageChipsOptions {
 	/** The field's accessible name. */
 	readonly label: string;
 	/** The accessible name of a chip's ×, as in "Remove k.tanaka@…". */
-	removeLabel(chip: AdminChip): string;
+	removeLabel(chip: PageChip): string;
 	/** Lets the person add entries by typing: Enter, a comma or a space ends one; a paste is split. */
 	readonly input?: {
 		readonly placeholder: string;
 		/** Turns typed text into chips; repeats of existing chips are left out by the owner. */
-		parse(text: string): readonly AdminChip[];
+		parse(text: string): readonly PageChip[];
 	};
 	/** The id of the hint under the field, read with it. */
 	readonly describedBy?: string;
@@ -35,25 +35,25 @@ export interface AdminChipsOptions {
  * Entries shown as chips in one box, each removed with its ×, the standard way to edit a list of
  * addresses or people. With an input the person adds entries by typing or pasting a list.
  */
-export class AdminChips extends Disposable {
+export class PageChips extends Disposable {
 	readonly element: HTMLElement;
 	private readonly list: HTMLElement;
 	private readonly input: HTMLInputElement | undefined;
 	private readonly chipStore = this._register(new DisposableStore());
-	private entries: AdminChip[] = [];
-	private readonly changeEmitter = this._register(new Emitter<readonly AdminChip[]>());
-	readonly onDidChange: Event<readonly AdminChip[]> = this.changeEmitter.event;
+	private entries: PageChip[] = [];
+	private readonly changeEmitter = this._register(new Emitter<readonly PageChip[]>());
+	readonly onDidChange: Event<readonly PageChip[]> = this.changeEmitter.event;
 
 	constructor(
 		host: HTMLElement,
-		private readonly options: AdminChipsOptions
+		private readonly options: PageChipsOptions
 	) {
 		super();
 		const $ = createElementFactory(host.ownerDocument);
-		this.list = $('ul.prctr-admin-chips__list', { attrs: { 'aria-label': options.label } });
-		this.element = $('div.prctr-admin-chips', {}, this.list);
+		this.list = $('ul.prctr-page-chips__list', { attrs: { 'aria-label': options.label } });
+		this.element = $('div.prctr-page-chips', {}, this.list);
 		if (options.input !== undefined) {
-			const input = $('input.prctr-admin-chips__input', {
+			const input = $('input.prctr-page-chips__input', {
 				type: 'text',
 				placeholder: options.input.placeholder,
 				attrs: {
@@ -103,7 +103,7 @@ export class AdminChips extends Disposable {
 		host.append(this.element);
 	}
 
-	get chips(): readonly AdminChip[] {
+	get chips(): readonly PageChip[] {
 		return this.entries;
 	}
 
@@ -112,7 +112,7 @@ export class AdminChips extends Disposable {
 		return this.input?.value.trim() ?? '';
 	}
 
-	set(chips: readonly AdminChip[]): void {
+	set(chips: readonly PageChip[]): void {
 		this.entries = [...chips];
 		this.render();
 		this.changeEmitter.fire(this.entries);
@@ -128,7 +128,7 @@ export class AdminChips extends Disposable {
 
 	focus(): void {
 		if (this.input !== undefined) this.input.focus();
-		else this.list.querySelector<HTMLElement>('.prctr-admin-chips__remove')?.focus();
+		else this.list.querySelector<HTMLElement>('.prctr-page-chips__remove')?.focus();
 	}
 
 	setInvalid(invalid: boolean): void {
@@ -136,7 +136,7 @@ export class AdminChips extends Disposable {
 		this.input?.setAttribute('aria-invalid', String(invalid));
 	}
 
-	private add(chips: readonly AdminChip[]): void {
+	private add(chips: readonly PageChip[]): void {
 		const known = new Set(this.entries.map((chip) => chip.id));
 		const added = chips.filter((chip) => !known.has(chip.id) && known.add(chip.id));
 		if (added.length === 0) return;
@@ -153,7 +153,7 @@ export class AdminChips extends Disposable {
 		this.changeEmitter.fire(this.entries);
 		if (!keepFocus) return;
 		// Focus moves to the chip that took its place, or to the input.
-		const removes = this.list.querySelectorAll<HTMLElement>('.prctr-admin-chips__remove');
+		const removes = this.list.querySelectorAll<HTMLElement>('.prctr-page-chips__remove');
 		const next = removes[Math.min(index, removes.length - 1)];
 		if (next !== undefined) next.focus();
 		else this.focus();
@@ -165,7 +165,7 @@ export class AdminChips extends Disposable {
 		const $ = createElementFactory(document);
 		this.list.replaceChildren(
 			...this.entries.map((chip) => {
-				const remove = $('button.prctr-admin-chips__remove', {
+				const remove = $('button.prctr-page-chips__remove', {
 					type: 'button',
 					title: this.options.removeLabel(chip),
 					attrs: { 'aria-label': this.options.removeLabel(chip) }
@@ -179,15 +179,15 @@ export class AdminChips extends Disposable {
 					addDisposableListener(remove, 'click', () => this.remove(chip.id, true))
 				);
 				return $(
-					'li.prctr-admin-chips__chip',
+					'li.prctr-page-chips__chip',
 					{
 						data: { invalid: String(chip.problem !== undefined) },
 						...(chip.problem === undefined ? {} : { title: chip.problem })
 					},
-					$('span.prctr-admin-chips__label', { textContent: chip.label }),
+					$('span.prctr-page-chips__label', { textContent: chip.label }),
 					...(chip.problem === undefined
 						? []
-						: [$('span.prctr-admin-chips__problem', { textContent: chip.problem })]),
+						: [$('span.prctr-page-chips__problem', { textContent: chip.problem })]),
 					remove
 				);
 			})

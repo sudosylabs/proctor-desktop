@@ -35,7 +35,7 @@ import {
 	AdminConfirmation,
 	type AdminChangeResult
 } from '../widgets/adminChanges.js';
-import { AdminChips } from '../widgets/adminChips.js';
+import { PageChips } from '../../../browser/authenticated/pages/pageChips.js';
 import { adminField } from '../widgets/adminForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 import { FilterPreviewDialog } from './filterPreviewDialog.js';
@@ -376,7 +376,7 @@ export class BulkUserChanges extends Disposable {
  */
 class BulkPlaceDialog extends Disposable {
 	private readonly dialog: PageDialog;
-	private readonly people: AdminChips;
+	private readonly people: PageChips;
 	private readonly unit: SelectControl<string>;
 	private readonly target: SelectControl<string>;
 	private readonly feedback: PageFeedback;
@@ -406,7 +406,7 @@ class BulkPlaceDialog extends Disposable {
 		const body = this.dialog.body;
 		const peopleField = adminField(body, format.text('bulkPeople'));
 		this.people = this._register(
-			new AdminChips(peopleField.element, {
+			new PageChips(peopleField.element, {
 				label: format.text('bulkPeople'),
 				removeLabel: (chip) => format.text('inviteRemove', { address: chip.label })
 			})

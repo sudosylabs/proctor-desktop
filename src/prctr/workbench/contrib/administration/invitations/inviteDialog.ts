@@ -21,7 +21,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { parseEmails } from '../common/administrationPresentation.js';
 import { AdminChanges } from '../widgets/adminChanges.js';
-import { AdminChips } from '../widgets/adminChips.js';
+import { PageChips } from '../../../browser/authenticated/pages/pageChips.js';
 import { adminField } from '../widgets/adminForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 
@@ -40,7 +40,7 @@ const DEFAULT_EXPIRY_DAYS = 7;
  */
 export class InviteDialog extends Disposable {
 	private readonly dialog: PageDialog;
-	private readonly emails: AdminChips;
+	private readonly emails: PageChips;
 	private readonly emailHint: HTMLElement;
 	private readonly expiry: SelectControl<string>;
 	private readonly unit: SelectControl<string>;
@@ -96,7 +96,7 @@ export class InviteDialog extends Disposable {
 			format.text('inviteChipsHint')
 		);
 		this.emails = this._register(
-			new AdminChips(emailField.element, {
+			new PageChips(emailField.element, {
 				label: format.text('inviteEmails'),
 				removeLabel: (chip) => format.text('inviteRemove', { address: chip.label }),
 				describedBy: emailField.hint.id,
