@@ -2,12 +2,10 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { SignInCheck } from '../../../browser/authenticated/pages/signInCheck.js';
-import { accountSignInCheck } from '../widgets/accountReauthentication.js';
+import { AccountChanges } from '../widgets/accountReauthentication.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type {
@@ -65,15 +63,17 @@ export class TokensPage extends Disposable implements PageView {
 	private readonly dialog = this._register(new MutableDisposable());
 	private readonly unconfirmed = new Set<string>();
 
+	private readonly changes: AccountChanges;
+
 	constructor(
 		body: HTMLElement,
 		headerActions: HTMLElement,
-		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
 		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
+		this.changes = this._register(this.instantiationService.createInstance(AccountChanges));
 		this.tokens = this._register(
 			this.instantiationService.createInstance(AccountRead<'tokens'>, 'tokens')
 		);
@@ -255,7 +255,10 @@ export class TokensPage extends Disposable implements PageView {
 					message: this.format.text('confirmRevokeBody'),
 					confirmLabel: this.format.text('confirmRevokeAction'),
 					confirmIcon: 'action.delete',
-					run: () => this.account.change({ kind: 'revokeToken', id: token.id }),
+					run: () =>
+						this.changes.send({ kind: 'revokeToken', id: token.id }, [
+							token.description
+						]),
 					onDidComplete: (result) =>
 						this.onChangeComplete(result, token, section, 'tokenRevoked')
 				},
@@ -267,7 +270,7 @@ export class TokensPage extends Disposable implements PageView {
 			kind: action === 'disable' ? 'disableToken' : 'enableToken',
 			id: token.id
 		};
-		this.sendToggle(intent, action, token, section, false);
+		this.sendToggle(intent, action, token, section);
 	}
 
 	/** Turning a token back on may need a recent sign-in: Confirm it's you, then the same request again. */
@@ -275,32 +278,17 @@ export class TokensPage extends Disposable implements PageView {
 		intent: AccountIntent,
 		action: TokenAction,
 		token: AccountToken,
-		section: PageSection,
-		confirmed: boolean
+		section: PageSection
 	): void {
-		void this.account.change(intent).then((result) => {
+		const summary = [token.description, this.format.text('tokenEnableSummary')];
+		void this.changes.send(intent, summary).then((result) => {
 			if (this._store.isDisposed) return;
 			if (result === 'busy') {
 				section.feedback.set(this.format.text('busy'), 'error');
 				return;
 			}
-			if (
-				!confirmed &&
-				result.kind === 'error' &&
-				result.reason === 'reauthenticationRequired'
-			) {
-				const check = this.instantiationService.createInstance(
-					SignInCheck,
-					accountSignInCheck(this.account, this.format)
-				);
-				this.dialog.value = check;
-				void check
-					.resolve('recent', [token.description, this.format.text('tokenEnableSummary')])
-					.then((ok) => {
-						if (this._store.isDisposed) return;
-						if (ok) this.sendToggle(intent, action, token, section, true);
-						else section.focusRow(token.id);
-					});
+			if (result.kind === 'error' && result.reason === 'cancelled') {
+				section.focusRow(token.id);
 				return;
 			}
 			this.onChangeComplete(

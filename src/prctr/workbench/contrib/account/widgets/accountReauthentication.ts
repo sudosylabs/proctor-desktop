@@ -3,46 +3,64 @@
  *--------------------------------------------------------------------------------------------*/
 
 import type {
-	ReauthenticationPort,
-	ReauthenticationResult
-} from '../../../browser/authenticated/pages/confirmItsYouDialog.js';
+	AccountIntent,
+	AccountResponse
+} from '../../../../platform/account/common/accountProtocol.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
+import {
+	PageChanges,
+	reauthenticationPort,
+	type PageChangePort
+} from '../../../browser/authenticated/pages/pageChanges.js';
 import type { SignInCheckPort } from '../../../browser/authenticated/pages/signInCheck.js';
-import type { IAccountService } from '../../../services/account/common/account.js';
-import type { IAccountFormatService } from '../accountFormat.js';
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { accountChangeWording } from './accountConfirmation.js';
 
-/** Confirms it is the person through the Account capability's browser reauthentication. */
-export function accountReauthentication(
+/** What Account lends the shared change runner. */
+function accountChangePort(
 	account: IAccountService,
 	format: IAccountFormatService
-): ReauthenticationPort {
+): PageChangePort<AccountIntent, AccountResponse> {
 	return {
-		async confirm(): Promise<ReauthenticationResult> {
-			const result = await account.change({ kind: 'reauthenticate' });
-			if (result === 'busy') return { kind: 'failed', text: format.text('busy') };
-			if (result.kind === 'success') return { kind: 'confirmed' };
-			if (result.kind === 'error' && result.reason === 'cancelled')
-				return { kind: 'cancelled' };
-			return {
-				kind: 'failed',
-				text: format.failure(result.kind === 'error' ? result.reason : 'invalid')
-			};
+		change: (intent) => account.change(intent),
+		requirement: (error) =>
+			error.reason === 'reauthenticationRequired'
+				? 'recent'
+				: error.reason === 'strongAuthenticationRequired'
+					? 'twoStep'
+					: undefined,
+		cancelled: () => ({ kind: 'error', reason: 'cancelled' }),
+		reauthenticate: () => account.change({ kind: 'reauthenticate' }),
+		cancelReauthentication: () => void account.request({ kind: 'cancelReauthentication' }),
+		standing: () => account.readSignIn(),
+		openSecurity: async () => {
+			await account.request({ kind: 'openSecurity' });
 		},
-		cancel(): void {
-			void account.request({ kind: 'cancelReauthentication' });
-		}
+		wording: accountChangeWording(format)
 	};
 }
 
-/** Account's sign-in checks: its own reauthentication, standing and security page. */
+/** Sends Account changes for one page: the shared change runner, bound to Account. */
+export class AccountChanges extends PageChanges<AccountIntent, AccountResponse> {
+	constructor(
+		@IAccountService account: IAccountService,
+		@IAccountFormatService format: IAccountFormatService,
+		@IInstantiationService instantiationService: IInstantiationService
+	) {
+		super(accountChangePort(account, format), instantiationService);
+	}
+}
+
+/** Account's sign-in checks, for a flow that runs Confirm it's you itself. */
 export function accountSignInCheck(
 	account: IAccountService,
 	format: IAccountFormatService
 ): SignInCheckPort {
+	const port = accountChangePort(account, format);
 	return {
-		...accountReauthentication(account, format),
-		standing: () => account.readSignIn(),
-		async openSecurity(): Promise<void> {
-			await account.request({ kind: 'openSecurity' });
-		}
+		...reauthenticationPort(port),
+		standing: () => port.standing(),
+		openSecurity: () => port.openSecurity()
 	};
 }

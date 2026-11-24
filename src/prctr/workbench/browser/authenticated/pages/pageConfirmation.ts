@@ -26,6 +26,8 @@ export function changeFailureNeedsRead(reason: string): boolean {
  */
 export interface PageChangeWording<R> {
 	describe(result: PageChangeResult<R>): string | undefined;
+	/** The sentence for any failure or for busy, a stopped check included. */
+	sentence(result: PageChangeResult<R>): string;
 }
 
 export interface PageConfirmationOptions<R extends { readonly kind: string }> {

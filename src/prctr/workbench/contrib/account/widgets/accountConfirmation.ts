@@ -33,6 +33,10 @@ export function accountChangeWording(
 			if (result.kind !== 'error') return format.failure('invalid');
 			// A Confirm it's you the person stopped leaves the change as it was, with nothing to say.
 			return result.reason === 'cancelled' ? undefined : format.failure(result.reason);
+		},
+		sentence: (result) => {
+			if (result === 'busy') return format.text('busy');
+			return format.failure(result.kind === 'error' ? result.reason : 'invalid');
 		}
 	};
 }
