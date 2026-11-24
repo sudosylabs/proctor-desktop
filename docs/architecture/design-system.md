@@ -33,7 +33,7 @@ who do not use an IDE. It uses a Proctor-owned rail-and-sidebar frame:
   with the account photo or initials at the bottom. The photo opens Account and
   carries the accent ring while Account is open. On macOS the traffic lights sit
   at the top of the rail.
-- A **contextual sidebar** (default 232px, resizable from 200 to 320px with a
+- A **contextual sidebar** (default 236px, resizable from 200 to 320px with a
   keyboard-operable separator, hideable) shows the current area's title and
   pages; in Account it ends with Sign out. Below a 1000px window width it stops
   docking and opens over the content instead.
@@ -45,10 +45,15 @@ who do not use an IDE. It uses a Proctor-owned rail-and-sidebar frame:
   native caption buttons sits above the frame.
 
 Pages follow the task rather than an editor pane or file tree; a page that
-needs detail shows it in its own panel beside its list. IBM Plex Sans and Mono,
-the Proctor palette, and status by shape apply. Selection in the rail and
-sidebar is a neutral grey with ink text. The purple brand accent is reserved for
-the main action and focus.
+needs detail shows it in its own panel beside its list. IBM Plex Sans and Mono
+and the **Plum** palette apply. Plum is generated, not hand-picked:
+`build/generators/plumPalette.ts` makes a plum-tinted neutral and one accent in
+12 OKLCH steps per theme (1 app background, 2 subtle background, 3–5 element
+rest, hover and selected, 6–8 borders, 9–10 solid, 11–12 text) and the red,
+amber and green status hues at equal weight, and writes the Proctor Light and
+Dark themes. Selection in the rail and sidebar is a plum-tinted step with ink
+text; the accent (light `#690DAB`, dark `#7D33C2`) marks the main action, focus
+and work still in progress.
 
 These product surfaces do not follow the VS Code look; Settings is a Proctor
 Account page, not the VS Code Settings editor. CandidateWindow retains the IDE
@@ -57,29 +62,38 @@ preview is not the visual acceptance surface.
 
 ### Page layout
 
-- A page's content is one centred column, at most 760px wide (880px for pages
-  built around a table), with 40px side padding. A wide window adds margin, not
-  line length.
-- A record's page (one user, one class) opens with a trail back to its list,
-  then the record's name with initials for a person and a status word beside
-  it.
-- A table has no card: column labels in the quiet text colour, hairlines
-  between rows, people as initials with a name and one detail line, status as a
-  word on a tinted pill, and one "⋯" menu per row, always visible in muted grey.
+- A page's content is one centred column with 12px top and 40px side padding:
+  at most 760px wide for Account, 880px for a record and 1080px for a page built
+  around a table. A wide window adds margin, not line length. Page titles are
+  28/36 semibold at −0.01em.
+- A record's page (one user, one import) opens with a trail back to its list,
+  then the record's name (with the person's avatar), a status word beside it
+  only when it needs saying, and the **record line**: short facts joined by
+  "·", identifiers in mono.
+- A table has no card: a 40px header in the quiet text colour, 40px rows (48px
+  with a second line), hairlines between rows, people as initials with a name
+  and one detail line, status as a word in its tone, and one "⋯" menu per row.
+  A server-paged list is `AdminList`; rows a record already holds use the
+  shared `PageTable`, drawn the same way.
   A bar of search and select filters sits above it, with More filters for the
-  rarer ones. A sortable column's header is a button with an arrow and
-  `aria-sort`; the pager says "Showing 1–10 of 1,284" on a counted list and
-  offers 10, 25 or 50 rows a page, remembered per list in the person's settings.
+  rarer ones; filters are 32px pills naming the filter and its value. A sortable
+  column's header is a button with an arrow and `aria-sort`; the pager always
+  says "Showing 1–10 of 1,284" (a one-page list counts what it shows) and keeps
+  its steps, disabled on one page. Long lists offer 10, 25 or 50 rows a page,
+  remembered per list in the person's settings; short kept lists don't.
 - Status colour answers "do I need to act?". `StatusBadgeTone` names the meaning
   and the badge picks the colour: red `failure` when something went wrong, amber
   `attention` when it waits on you or lapses soon, green `safeguard` only for a
-  protection on the viewer's own account (Verified, Linked, Set, On), and grey
-  `neutral` for everything else, work still running included. Purple is for
-  actions and selection, never a status. A status is a word, never an icon.
-- Sections are grouped lists on `color.background.card`: 10px radius, a
-  hairline boundary and no shadow. A row is a small glyph, its title and one
-  detail line, then either a status word or one "⋯" actions menu. The current
-  session's Sign out is the one inline row button.
+  protection on the viewer's own account (Verified, Linked, Set, On), the accent
+  `progress` for work Proctor is still doing (Checking, Importing), and grey
+  `neutral` for everything else. A status is one word in its tone, never an
+  icon or a pill, in tables, rows, details ("… · Verified") and headings.
+- Sections are flat: a heading, then rows between hairlines, no card. A section
+  showing only a state (empty, failed, no access) sits on a tinted panel. A row
+  is a small glyph, its title and one detail line, then a status word, a button
+  or one "⋯" menu; what a row holds (a token's permissions) reads as one quiet
+  line, "A, B, C and 7 more". Figures are `PageStats`, steps of a piece of work
+  `PageSteps`, label and value pairs `renderDetails`.
 - A dialog is a card near the top of the window. Its title is a question, its
   body one sentence on what happens, and its actions Cancel and the verb. Every
   button has an icon except Cancel and Close. Signing out always asks first.
@@ -90,12 +104,14 @@ preview is not the visual acceptance surface.
   paragraphs use `text-wrap: pretty`, so no line ends on a lone word.
 - Decorative flourishes are excluded: no gradient or blob backgrounds, tinted
   icon tiles, pill chips, illustrated empty states, or shadows on static cards.
+- `npm run preview:pages` renders the real AuthenticatedWindow offscreen with the
+  boards' data; a page is accepted against its board in both themes.
 
 ### States
 
 Every section uses one states pattern:
 
-- after 300 ms without an answer, skeleton rows shaped like the content appear;
+- after 1 s without an answer, skeleton rows shaped like the content appear;
   pages never show a spinner, and only a busy button spins;
 - at 8 s a "Still waiting for {institution}…" note offers Try again;
 - at 15 s the read fails inline in its section with Try again;
