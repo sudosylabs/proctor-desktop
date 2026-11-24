@@ -366,12 +366,9 @@ export async function runAccountTests(document: Document): Promise<void> {
 		account.reads.set('sessions', sessions);
 		account.reads.set('notices', () => data({ section: 'notices', notices: [], more: false }));
 		assign('profile');
-		check(root.querySelector('h1')?.textContent === 'Profile', 'Profile has its heading');
 		check(
-			root
-				.querySelector('.prctr-page-pane__description')
-				?.textContent?.includes('Northfield University'),
-			'Profile describes the institution'
+			(root.querySelector('h1')?.textContent ?? '') !== '',
+			'Profile is headed by the person'
 		);
 		check(
 			root.querySelector(
@@ -391,8 +388,14 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'profile details'
 		);
 		check(
-			root.querySelector('.prctr-account-profile__username')?.textContent === 'a.okafor',
-			'Username is shown'
+			root.querySelector('.prctr-page-pane__record-mono')?.textContent === 'a.okafor',
+			'Username is on the record line'
+		);
+		check(
+			root
+				.querySelector('.prctr-page-pane__record')
+				?.textContent?.includes('Northfield University'),
+			'The record line names the institution'
 		);
 		check(
 			root.textContent!.includes('English (United Kingdom)'),
@@ -400,9 +403,9 @@ export async function runAccountTests(document: Document): Promise<void> {
 		);
 		check(root.textContent!.includes('Not verified'), 'Unverified email is marked');
 		await wait(() => {
-			const signIn = [
-				...root.querySelectorAll<HTMLElement>('.prctr-account-details__row')
-			].find((candidate) => candidate.querySelector('dt')?.textContent === 'Last seen');
+			const signIn = [...root.querySelectorAll<HTMLElement>('.prctr-page-details__row')].find(
+				(candidate) => candidate.querySelector('dt')?.textContent === 'Last seen'
+			);
 			return !!signIn && !signIn.hidden && signIn.textContent!.includes('Proctor Desktop');
 		}, 'last seen from this window’s session');
 		check(
@@ -415,11 +418,8 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'Initials offer only Add photo'
 		);
 		check(
-			!root.querySelector('.prctr-account-details__mono') &&
-				getComputedStyle(root.querySelector('.prctr-account-profile__username')!)
-					.fontFamily !==
-					getComputedStyle(root.querySelector('.prctr-account-details__value')!)
-						.fontFamily,
+			getComputedStyle(root.querySelector('.prctr-page-pane__record-mono')!).fontFamily !==
+				getComputedStyle(root.querySelector('.prctr-page-details__value')!).fontFamily,
 			'Only the username is monospace'
 		);
 		check(

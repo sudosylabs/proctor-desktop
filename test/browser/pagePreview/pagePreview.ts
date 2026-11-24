@@ -1,6 +1,7 @@
 import type { AccountClient } from '../../../src/prctr/platform/account/common/accountProtocol.ts';
 import type { ExamActivityClient } from '../../../src/prctr/platform/examActivity/common/examActivityProtocol.ts';
 import type { UserSettingsProjection } from '../../../src/prctr/platform/settings/common/settingsRendererProtocol.ts';
+import { BoardAccount } from './boardAccount.ts';
 import { BoardAdministration, BOARD_NOW } from './boardData.ts';
 
 /*
@@ -21,7 +22,7 @@ const offset = BOARD_NOW - realNow();
 Date.now = () => realNow() + offset;
 
 const unavailable = { kind: 'error' as const, reason: 'unavailable' as const };
-const account: AccountClient = { request: async () => unavailable };
+const account: AccountClient = new BoardAccount();
 const examActivity: ExamActivityClient = { request: async () => unavailable as never };
 const projection: UserSettingsProjection = {
 	source: '{}',

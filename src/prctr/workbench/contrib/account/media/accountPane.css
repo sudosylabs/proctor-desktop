@@ -1,4 +1,4 @@
-/* Account's own page content: the profile identity, details, notices and footnotes. The pane,
+/* Account's own page content: the profile's file input and feedback, notices and footnotes. The pane,
  * sections and rows are the shell's page parts. */
 @layer contributions {
 	/* #region Profile */
@@ -7,110 +7,6 @@
 		flex-direction: column;
 		gap: 10px;
 	}
-	.prctr-account .prctr-account-profile__identity {
-		align-items: center;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 14px 18px;
-	}
-	.prctr-account .prctr-account-profile__avatar {
-		align-items: center;
-		background: var(--prctr-color-avatar-background);
-		block-size: 64px;
-		border-radius: 50%;
-		color: var(--prctr-color-avatar-foreground);
-		display: flex;
-		flex: none;
-		font-size: 22px;
-		font-weight: var(--prctr-typography-weight-semibold);
-		inline-size: 64px;
-		justify-content: center;
-		overflow: hidden;
-	}
-	.prctr-account .prctr-account-profile__avatar img {
-		block-size: 100%;
-		inline-size: 100%;
-		object-fit: cover;
-	}
-	.prctr-account .prctr-account-profile__names {
-		display: flex;
-		flex: 1 1 200px;
-		flex-direction: column;
-		gap: 3px;
-		min-inline-size: 0;
-	}
-	.prctr-account .prctr-account-profile__name {
-		font-size: 20px;
-		font-weight: var(--prctr-typography-weight-semibold);
-		line-height: 28px;
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-	.prctr-account .prctr-account-profile__username {
-		color: var(--prctr-color-text-secondary);
-		font-family: var(--prctr-typography-font-monospace);
-		font-size: 13px;
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-	.prctr-account .prctr-account-profile__institution {
-		align-items: center;
-		color: var(--prctr-color-text-secondary);
-		display: flex;
-		font-size: 13px;
-		gap: 6px;
-		margin: 4px 0 0;
-	}
-	.prctr-account .prctr-account-profile__photo-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-
-	.prctr-account .prctr-account-details {
-		margin: 0;
-	}
-	.prctr-account .prctr-account-details__row {
-		align-items: center;
-		box-sizing: border-box;
-		column-gap: 12px;
-		display: grid;
-		grid-template-columns: minmax(96px, 150px) minmax(0, 1fr) auto;
-		min-block-size: 46px;
-		padding: 8px 16px;
-	}
-	.prctr-account .prctr-account-details__row + .prctr-account-details__row {
-		border-block-start: var(--prctr-shape-stroke-default) solid
-			var(--prctr-color-border-default);
-	}
-	.prctr-account .prctr-account-details__label {
-		color: var(--prctr-color-text-secondary);
-	}
-	.prctr-account .prctr-account-details__value,
-	.prctr-account .prctr-account-details__note {
-		margin: 0;
-		min-inline-size: 0;
-		overflow-wrap: anywhere;
-	}
-	.prctr-account .prctr-account-details__value[data-empty='true'] {
-		color: var(--prctr-color-text-tertiary);
-	}
-	.prctr-account .prctr-account-details__note {
-		align-items: center;
-		display: inline-flex;
-		font-size: 13px;
-		gap: 5px;
-		white-space: nowrap;
-	}
-	@container (max-width: 480px) {
-		.prctr-account .prctr-account-details__row {
-			grid-template-columns: minmax(0, 1fr) auto;
-		}
-		.prctr-account .prctr-account-details__label {
-			grid-column: 1 / -1;
-		}
-	}
-
 	/* A lasting condition of the page, such as an unverified email. */
 	.prctr-account .prctr-account-notice {
 		align-items: center;

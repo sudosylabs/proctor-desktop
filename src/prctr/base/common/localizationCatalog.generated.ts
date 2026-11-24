@@ -140,6 +140,7 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "account.profile.send.verification": "Send verification email",
     "account.profile.time.zone": "Time zone",
     "account.profile.unverified.notice": "Your email isn’t verified, so Proctor can’t use it to help you get back into your account.",
+    "account.profile.username": "Username",
     "account.profile.verification.sent": "If this address can receive email, a verification link is on its way.",
     "account.security.extra.protection": "Extra protection",
     "account.security.footnote": "Passwords, two-step verification and recovery codes are changed on {institution}’s security page in your browser. Proctor never asks for your password.",

@@ -89,6 +89,11 @@ export const profileMessages = Object.freeze({
 		description:
 			'Opens your own person page in Administration, where the details can be changed.'
 	}),
+	username: defineMessage({
+		id: 'account.profile.username',
+		defaultMessage: 'Username',
+		description: 'Account detail: the name the person signs in with.'
+	}),
 	firstName: defineMessage({
 		id: 'account.profile.first.name',
 		defaultMessage: 'First name',

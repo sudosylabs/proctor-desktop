@@ -854,6 +854,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
+    "account.profile.username": {
+      "message": "Username",
+      "description": "Account detail: the name the person signs in with.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
+    },
     "account.profile.verification.sent": {
       "message": "If this address can receive email, a verification link is on its way.",
       "description": "Confirms a verification request without revealing delivery.",
