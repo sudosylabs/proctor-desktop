@@ -408,6 +408,16 @@ export class BoardAdministration implements AdministrationClient {
 					total: 4,
 					totalAtLeast: false
 				});
+			case 'mailMetrics':
+				return data('mailMetrics', {
+					health: 'mail.healthy',
+					queues: [],
+					deliveries: [
+						{ state: 'accepted', count: 1200, outcome: '' },
+						{ state: 'failed', count: 4, outcome: 'mail.bounced' },
+						{ state: 'queued', count: 12, outcome: '' }
+					]
+				});
 			case 'retentionControl':
 				return data('retentionControl', {
 					revision: 3,

@@ -24,8 +24,8 @@ export const JOB_STATE: Readonly<
 	Record<State, { readonly text: AdministrationText; readonly tone: AdminTone }>
 > = {
 	queued: { text: 'jobQueued', tone: 'neutral' },
-	running: { text: 'jobRunning', tone: 'neutral' },
-	cancel_requested: { text: 'jobCancelRequested', tone: 'neutral' },
+	running: { text: 'jobRunning', tone: 'progress' },
+	cancel_requested: { text: 'jobCancelRequested', tone: 'progress' },
 	succeeded: { text: 'jobSucceeded', tone: 'neutral' },
 	failed: { text: 'jobFailed', tone: 'failure' },
 	canceled: { text: 'jobCanceled', tone: 'neutral' }
@@ -96,6 +96,8 @@ export class JobsPage extends Disposable implements PageView {
 				{ status: [...NOT_DONE_STATES] },
 				{
 					label: format.text('jobsTable'),
+					description: format.text('jobsDoneNote'),
+					fixedPageSize: true,
 					filters,
 					columns: [
 						{
@@ -116,7 +118,7 @@ export class JobsPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('jobsStarted'),
-							width: '140px',
+							width: '120px',
 							align: 'end',
 							priority: 2,
 							sort: { key: 'started', first: 'desc' },
@@ -130,24 +132,8 @@ export class JobsPage extends Disposable implements PageView {
 							})
 						},
 						{
-							label: format.text('jobsTook'),
-							width: '80px',
-							align: 'end',
-							priority: 3,
-							cell: (job) => ({
-								kind: 'text',
-								primary:
-									job.startedAt === undefined
-										? ''
-										: job.completedAt === undefined
-											? format.text('jobsStillRunning')
-											: duration(format, job.completedAt - job.startedAt),
-								mono: true
-							})
-						},
-						{
 							label: format.text('jobsAttemptsColumn'),
-							width: '90px',
+							width: '80px',
 							align: 'end',
 							priority: 3,
 							cell: (job) => ({
@@ -161,7 +147,7 @@ export class JobsPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('jobsStatusColumn'),
-							width: '170px',
+							width: '130px',
 							cell: (job) => ({
 								kind: 'status',
 								text: format.text(JOB_STATE[job.status].text),
@@ -170,7 +156,7 @@ export class JobsPage extends Disposable implements PageView {
 						},
 						{
 							label: '',
-							width: '112px',
+							width: '96px',
 							align: 'end',
 							cell: (job) =>
 								job.status === 'failed' || job.status === 'canceled'

@@ -208,7 +208,8 @@ const sharedMessages = Object.freeze({
 	}),
 	jobsDescription: defineMessage({
 		id: 'administration.page.jobs.description',
-		defaultMessage: 'Background work such as imports, previews and key rotation.',
+		defaultMessage:
+			'Work Proctor runs in the background, such as imports, cleanup and key rotation.',
 		description: 'One-line description under the Jobs heading.'
 	}),
 	mailTitle: defineMessage({
@@ -218,12 +219,13 @@ const sharedMessages = Object.freeze({
 	}),
 	mailDescription: defineMessage({
 		id: 'administration.page.mail.description',
-		defaultMessage: 'Whether mail from {institution} is being delivered.',
+		defaultMessage:
+			'Email Proctor sends for {institution}: invitations, verification and sign-in help.',
 		description: 'One-line description under the Mail heading.'
 	}),
 	mailDescriptionGeneric: defineMessage({
 		id: 'administration.page.mail.description.generic',
-		defaultMessage: 'Whether mail is being delivered.',
+		defaultMessage: 'Email Proctor sends: invitations, verification and sign-in help.',
 		description: 'Mail description when the institution name is unknown.'
 	}),
 	importTitle: defineMessage({

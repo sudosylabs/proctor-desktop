@@ -132,8 +132,11 @@
 	.prctr-area-sidebar .prctr-area-sidebar__entry[aria-current='page'] .prctr-area-sidebar__badge {
 		background: var(--prctr-color-background-card);
 	}
-	/* A count of failures is the one loud count: solid red, white figures. */
-	.prctr-area-sidebar .prctr-area-sidebar__badge[data-attention='true'] {
+	/* A count of failures is the one loud count: solid red, white figures, chosen or not. */
+	.prctr-area-sidebar .prctr-area-sidebar__badge[data-attention='true'],
+	.prctr-area-sidebar
+		.prctr-area-sidebar__entry[aria-current='page']
+		.prctr-area-sidebar__badge[data-attention='true'] {
 		background: var(--prctr-color-feedback-errorSolid);
 		color: var(--prctr-color-text-inverse);
 	}

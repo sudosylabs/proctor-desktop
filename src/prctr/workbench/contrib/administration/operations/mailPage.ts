@@ -27,11 +27,12 @@ import {
 } from '../../../browser/authenticated/pages/pageSection.js';
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
-import { readableCode } from '../common/administrationPresentation.js';
 import { strongSignInStep } from '../../../../platform/identity/common/signInStanding.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import type { SignInRequirement } from '../../../browser/authenticated/pages/signInCheck.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
+import { PageStats } from '../../../browser/authenticated/pages/pageStats.js';
+import { PageTabs } from '../../../browser/authenticated/pages/pageTabs.js';
 import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import { DeliveryDialog } from './deliveryDialog.js';
 import {
@@ -68,6 +69,9 @@ export class MailPage extends Disposable implements PageView {
 	private readonly metrics: PageRead<Metrics, AdministrationFailure, AdministrationResponse>;
 	private readonly banner: BannerControl;
 	private readonly health: PageSection;
+	private readonly stats: PageStats;
+	private readonly tabs: PageTabs<'deliveries' | 'keys'>;
+	private readonly filters: PageFilters;
 	private readonly list: AdminList<'mailDeliveries'>;
 	private query: AdminListQuery<'mailDeliveries'> = {};
 	private readonly keys: PageSection;
@@ -94,13 +98,29 @@ export class MailPage extends Disposable implements PageView {
 			})
 		);
 		this._register(test.onDidRequest(() => void this.sendTest(test)));
+		this.tabs = this._register(
+			new PageTabs(
+				body,
+				format.text('mailTitleViews'),
+				[
+					{ id: 'deliveries', label: format.text('mailTabDeliveries') },
+					{ id: 'keys', label: format.text('mailTabKeys') }
+				],
+				'deliveries'
+			)
+		);
+		this._register(this.tabs.onDidChange(() => this.showTab()));
 		this.banner = this._register(new BannerControl(body));
 		this.health = this._register(
 			instantiationService.createInstance(PageSection, body, {
-				title: format.text('mailHealth')
+				title: format.text('mailHealth'),
+				plain: true
 			})
 		);
+		this.health.setState({ kind: 'ready' }, false);
+		this.stats = this._register(new PageStats(this.health.content));
 		const filters = this._register(new PageFilters(body));
+		this.filters = filters;
 		filters.addSelect<State | typeof ANY>(
 			format.text('mailState'),
 			'status.success',
@@ -225,6 +245,18 @@ export class MailPage extends Disposable implements PageView {
 		this.metrics = this._register(adminRead(administration, { kind: 'mailMetrics' }));
 		this._register(this.metrics.onDidChange(() => this.renderHealth()));
 		this.renderHealth();
+		this.showTab();
+	}
+
+	/** Deliveries show the figures, filters and list; Keys shows the encryption keys alone. */
+	private showTab(): void {
+		const keys = this.tabs.value === 'keys';
+		this.health.element.hidden = keys || this.metrics.data === undefined;
+		this.filters.element.hidden = keys;
+		this.list.section.element.hidden = keys;
+		this.keys.element.hidden = !keys;
+		if (keys) this.banner.hide();
+		else this.renderHealth();
 	}
 
 	setVisible(visible: boolean): void {
@@ -236,48 +268,73 @@ export class MailPage extends Disposable implements PageView {
 		}
 	}
 
+	/**
+	 * The last day's email as four figures: sent, the share delivered, bounced and waiting. A
+	 * banner appears only when mail isn't healthy.
+	 */
 	private renderHealth(): void {
 		const metrics = this.metrics.data;
-		this.health.setState(this.metrics.state, false, () => void this.metrics.refresh());
-		if (metrics === undefined) return;
+		const keys = this.tabs.value === 'keys';
+		this.health.element.hidden = keys || metrics === undefined;
+		if (metrics === undefined || keys) return;
 		const health: Readonly<
 			Record<
 				Metrics['health'],
-				{
-					readonly text: AdministrationText;
-					readonly tone: 'neutral' | 'warning' | 'failure';
-				}
+				| { readonly text: AdministrationText; readonly tone: 'warning' | 'failure' }
+				| undefined
 			>
 		> = {
-			'': { text: 'mailUnknown', tone: 'neutral' },
-			'mail.healthy': { text: 'mailHealthy', tone: 'neutral' },
+			'': undefined,
+			'mail.healthy': undefined,
 			'mail.disabled': { text: 'mailDisabled', tone: 'warning' },
 			'mail.smtp_outage': { text: 'mailOutage', tone: 'failure' },
 			'mail.queue_delayed': { text: 'mailDelayed', tone: 'warning' }
 		};
 		const current = health[metrics.health];
-		this.banner.show({
-			tone: current.tone,
-			icon: proctorIconFactory(
-				current.tone === 'neutral' ? 'status.success' : 'status.attention',
-				18
-			),
-			text: this.format.text(current.text)
-		});
-		this.health.setRows(
-			metrics.queues
-				.filter((queue) => queue.count > 0)
-				.map((queue): PageRowModel => ({
-					id: queue.state,
-					glyph: 'admin.mail',
-					title: this.format.text('mailQueue', {
-						state: this.format.text(STATE[queue.state].text),
-						count: this.format.count(queue.count)
-					}),
-					detail: readableCode(queue.health || 'mail.healthy')
-				}))
-		);
-		this.health.hidden = metrics.queues.every((queue) => queue.count === 0);
+		if (current === undefined) this.banner.hide();
+		else
+			this.banner.show({
+				tone: current.tone,
+				icon: proctorIconFactory('status.attention', 18),
+				text: this.format.text(current.text)
+			});
+		const count = (...states: readonly State[]): number =>
+			metrics.deliveries
+				.filter((entry) => states.includes(entry.state))
+				.reduce((sum, entry) => sum + entry.count, 0);
+		const sent = count('accepted', 'failed', 'suppressed');
+		const bounced = count('failed', 'suppressed');
+		const waiting = count('queued', 'sending');
+		const delivered = sent === 0 ? undefined : ((sent - bounced) / sent) * 100;
+		this.stats.set([
+			{ id: 'sent', label: this.format.text('mailStatSent'), value: this.format.count(sent) },
+			{
+				id: 'delivered',
+				label: this.format.text('mailStatDelivered'),
+				value:
+					delivered === undefined
+						? '—'
+						: this.format.text('mailPercent', {
+								value: new Intl.NumberFormat(undefined, {
+									maximumFractionDigits: 1
+								}).format(delivered)
+							}),
+				note: this.format.text('mailStatOfSent')
+			},
+			{
+				id: 'bounced',
+				label: this.format.text('mailStatBounced'),
+				value: this.format.count(bounced),
+				note: this.format.text('mailStatNotRetried'),
+				...(bounced > 0 ? { tone: 'failure' as const } : {})
+			},
+			{
+				id: 'waiting',
+				label: this.format.text('mailStatWaiting'),
+				value: this.format.count(waiting),
+				note: this.format.text('mailStatQueued')
+			}
+		]);
 	}
 
 	private openDelivery(delivery: Delivery): void {

@@ -6456,6 +6456,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.jobs.done.note": {
+      "message": "Finished and routine runs are under Status: Done.",
+      "description": "Explains the Jobs list above its table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.jobs.empty": {
       "message": "No jobs yet",
       "description": "Title of the empty Jobs list.",
@@ -6768,6 +6774,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.mail.percent": {
+      "message": "{value}%",
+      "description": "A percentage: “98.7%”.",
+      "placeholders": [
+        "value"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.mail.queue": {
       "message": "{state}: {count}",
       "description": "How many deliveries are in one state.",
@@ -6801,14 +6815,68 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.mail.stat.bounced": {
+      "message": "Bounced",
+      "description": "Emails that could not be delivered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.delivered": {
+      "message": "Delivered",
+      "description": "Share of sent emails that were delivered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.not.retried": {
+      "message": "Not retried",
+      "description": "Note under bounced emails.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.of.sent": {
+      "message": "Of those sent",
+      "description": "Note under the delivered share.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.queued": {
+      "message": "Queued to send",
+      "description": "Note under waiting emails.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.sent": {
+      "message": "Sent",
+      "description": "Emails Proctor handed to the mail server.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.waiting": {
+      "message": "Waiting",
+      "description": "Emails not yet sent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.mail.suppressed": {
       "message": "Suppressed",
       "description": "Delivery state: the address refuses mail.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.mail.tab.deliveries": {
+      "message": "Deliveries",
+      "description": "Tab listing every email Proctor sent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.tab.keys": {
+      "message": "Keys",
+      "description": "Tab of the keys protecting mail and two-step secrets.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.mail.test": {
-      "message": "Send test email",
+      "message": "Send a test email",
       "description": "Sends a test email to the signed-in person.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -6822,6 +6890,12 @@
     "administration.operations.mail.unknown": {
       "message": "Mail health isn’t known yet.",
       "description": "Mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.views": {
+      "message": "Mail views",
+      "description": "Accessible name of the Mail tabs.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -7148,7 +7222,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.jobs.description": {
-      "message": "Background work such as imports, previews and key rotation.",
+      "message": "Work Proctor runs in the background, such as imports, cleanup and key rotation.",
       "description": "One-line description under the Jobs heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -7160,7 +7234,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.mail.description": {
-      "message": "Whether mail from {institution} is being delivered.",
+      "message": "Email Proctor sends for {institution}: invitations, verification and sign-in help.",
       "description": "One-line description under the Mail heading.",
       "placeholders": [
         "institution"
@@ -7168,7 +7242,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.mail.description.generic": {
-      "message": "Whether mail is being delivered.",
+      "message": "Email Proctor sends: invitations, verification and sign-in help.",
       "description": "Mail description when the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"

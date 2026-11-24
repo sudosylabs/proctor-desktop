@@ -21,6 +21,11 @@ export const operationsMessages = Object.freeze({
 		defaultMessage: 'Done',
 		description: 'Jobs filter choice: jobs that finished or were cancelled.'
 	}),
+	jobsDoneNote: defineMessage({
+		id: 'administration.operations.jobs.done.note',
+		defaultMessage: 'Finished and routine runs are under Status: Done.',
+		description: 'Explains the Jobs list above its table.'
+	}),
 	jobsAny: defineMessage({
 		id: 'administration.operations.jobs.any',
 		defaultMessage: 'Any status',
@@ -151,6 +156,61 @@ export const operationsMessages = Object.freeze({
 		defaultMessage: 'Anyone',
 		description: 'The Recipient filter with nobody chosen.'
 	}),
+	mailTitleViews: defineMessage({
+		id: 'administration.operations.mail.views',
+		defaultMessage: 'Mail views',
+		description: 'Accessible name of the Mail tabs.'
+	}),
+	mailTabDeliveries: defineMessage({
+		id: 'administration.operations.mail.tab.deliveries',
+		defaultMessage: 'Deliveries',
+		description: 'Tab listing every email Proctor sent.'
+	}),
+	mailTabKeys: defineMessage({
+		id: 'administration.operations.mail.tab.keys',
+		defaultMessage: 'Keys',
+		description: 'Tab of the keys protecting mail and two-step secrets.'
+	}),
+	mailStatSent: defineMessage({
+		id: 'administration.operations.mail.stat.sent',
+		defaultMessage: 'Sent',
+		description: 'Emails Proctor handed to the mail server.'
+	}),
+	mailStatDelivered: defineMessage({
+		id: 'administration.operations.mail.stat.delivered',
+		defaultMessage: 'Delivered',
+		description: 'Share of sent emails that were delivered.'
+	}),
+	mailPercent: defineMessage({
+		id: 'administration.operations.mail.percent',
+		defaultMessage: '{value}%',
+		description: 'A percentage: “98.7%”.'
+	}),
+	mailStatOfSent: defineMessage({
+		id: 'administration.operations.mail.stat.of.sent',
+		defaultMessage: 'Of those sent',
+		description: 'Note under the delivered share.'
+	}),
+	mailStatBounced: defineMessage({
+		id: 'administration.operations.mail.stat.bounced',
+		defaultMessage: 'Bounced',
+		description: 'Emails that could not be delivered.'
+	}),
+	mailStatNotRetried: defineMessage({
+		id: 'administration.operations.mail.stat.not.retried',
+		defaultMessage: 'Not retried',
+		description: 'Note under bounced emails.'
+	}),
+	mailStatWaiting: defineMessage({
+		id: 'administration.operations.mail.stat.waiting',
+		defaultMessage: 'Waiting',
+		description: 'Emails not yet sent.'
+	}),
+	mailStatQueued: defineMessage({
+		id: 'administration.operations.mail.stat.queued',
+		defaultMessage: 'Queued to send',
+		description: 'Note under waiting emails.'
+	}),
 	mailHealth: defineMessage({
 		id: 'administration.operations.mail.health',
 		defaultMessage: 'All email, last 24 hours',
@@ -189,7 +249,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	mailSendTest: defineMessage({
 		id: 'administration.operations.mail.test',
-		defaultMessage: 'Send test email',
+		defaultMessage: 'Send a test email',
 		description: 'Sends a test email to the signed-in person.'
 	}),
 	mailTestSent: defineMessage({
