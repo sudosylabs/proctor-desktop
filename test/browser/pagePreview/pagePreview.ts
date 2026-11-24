@@ -102,6 +102,7 @@ const refuse = async (): Promise<never> => {
 		}
 	},
 	account,
+	log() {},
 	administration: new BoardAdministration(),
 	examActivity
 };

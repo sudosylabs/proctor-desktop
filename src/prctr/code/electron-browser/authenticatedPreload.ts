@@ -15,6 +15,7 @@ import {
 	validateAdministrationResponse
 } from '../../platform/administration/common/administrationProtocol.js';
 import { contextBridge, ipcRenderer } from 'electron';
+import { LOG_CHANNEL, validateLogEntry } from '../../platform/log/common/logEntry.js';
 import {
 	AUTHENTICATED_SETTINGS_CHANNELS,
 	WINDOW_CHANNELS
@@ -100,6 +101,12 @@ contextBridge.exposeInMainWorld(
 					)
 				)
 		}),
+		// Fire and forget: a log entry never waits, and a refused one is dropped.
+		log: (level: unknown, area: unknown, message: unknown) => {
+			void ipcRenderer
+				.invoke(LOG_CHANNEL, validateLogEntry({ level, area, message }))
+				.catch(() => undefined);
+		},
 		settings: Object.freeze({
 			projection: async () =>
 				validateUserSettingsProjection(

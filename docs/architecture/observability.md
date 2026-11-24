@@ -9,10 +9,13 @@ telemetry rules; [invariants](./invariants.md) `diagnostics.sensitive-data` and
 ## Logs
 
 - **One service.** Proctor code logs through `ILogService`, never `console`.
-  Electron main writes a bounded, rotated file in the application's logs
-  folder. Each window forwards its entries to main through one closed preload
-  capability that accepts only a level, an area from a fixed list, and a
-  length-bounded message.
+  Electron main writes `proctor.log` in the application's logs folder; past
+  5 MB it becomes `proctor.1.log`, replacing the previous one. Each window
+  forwards its entries to main through one closed preload capability that
+  accepts only a level, an area from the fixed list in `logEntry.ts`, and a
+  message of at most 2,000 characters. The window's logger keeps only the safe
+  form of extra arguments: an error by its name and message, numbers and
+  booleans; anything else is dropped.
 - **Levels.** Error: an operation failed and the person saw a failure.
   Warning: something degraded but recovered, such as a retry or a fallback to
   polling. Info: lifecycle steps such as sign-in, window changes and

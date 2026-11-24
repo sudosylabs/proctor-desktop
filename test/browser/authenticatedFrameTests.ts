@@ -155,6 +155,7 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 				async update() {}
 			},
 			services: authenticatedWindowServices({
+				log() {},
 				async signOut() {
 					signOuts++;
 					throw new Error('sign-out unavailable');

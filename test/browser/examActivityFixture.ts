@@ -136,6 +136,7 @@ export async function mountExamActivityFixture(
 				async update() {}
 			},
 			services: authenticatedWindowServices({
+				log() {},
 				async signOut() {},
 				account: unavailableAccount,
 				administration: unavailableAdministration,
