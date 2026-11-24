@@ -65,6 +65,8 @@ for (const shot of shots) {
 	const launch = developmentLaunch([`${outdir}/main.js`, folder, shot]);
 	const result = spawnSync(launch.command, launch.args, {
 		cwd: repositoryRoot,
+		// The boards give times in UTC.
+		env: { ...process.env, TZ: 'UTC' },
 		stdio: 'inherit'
 	});
 	if (result.status !== 0) process.exitCode = result.status ?? 1;

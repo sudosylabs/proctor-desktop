@@ -4921,9 +4921,35 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
+    "administration.imports.filter.any": {
+      "message": "Any",
+      "description": "The Imports status filter set to every status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.filter.status": {
+      "message": "Status",
+      "description": "Label of the Imports status filter.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.imported.missed": {
+      "message": "Imported, {count} didn’t",
+      "description": "Status of an import where some rows were not imported: “Imported, 2 didn’t”.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
     "administration.imports.importing": {
       "message": "Importing… This page updates on its own.",
       "description": "Shown while the server imports the rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.kept": {
+      "message": "Kept for 30 days. Open one to see its rows or download its report.",
+      "description": "Explains the Imports list above its table.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -4983,15 +5009,15 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.ready": {
-      "message": "Ready",
-      "description": "Count of rows that will import.",
+    "administration.imports.no.match": {
+      "message": "No imports with this status",
+      "description": "The Imports list when the status filter matches nothing.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.recent": {
-      "message": "Recent imports",
-      "description": "Section of files uploaded before.",
+    "administration.imports.ready": {
+      "message": "Ready",
+      "description": "Count of rows that will import.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -5010,6 +5036,12 @@
     "administration.imports.recent.table": {
       "message": "Recent imports",
       "description": "Accessible name of the table of earlier imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.review": {
+      "message": "Review",
+      "description": "Opens an import that is ready to review.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -5177,6 +5209,12 @@
     "administration.imports.unnamed": {
       "message": "A CSV file",
       "description": "An import whose file name isn’t known.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.unreadable": {
+      "message": "Couldn’t read",
+      "description": "Status of an import whose file could not be read as CSV.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },

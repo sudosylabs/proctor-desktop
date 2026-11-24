@@ -106,10 +106,16 @@ const refuse = async (): Promise<never> => {
 await import('../../../src/prctr/code/electron-browser/authenticated.main.ts');
 
 const settle = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-const byText = (selector: string, text: string): HTMLElement | undefined =>
-	[...document.querySelectorAll<HTMLElement>(selector)].find(
-		(element) => element.textContent?.trim() === text
-	);
+/** The control whose own label reads `text`, ignoring a count drawn beside it. */
+const byText = (selector: string, text: string): HTMLElement | undefined => {
+	const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+	for (let node = walker.nextNode(); node !== null; node = walker.nextNode())
+		if (node.textContent?.trim() === text) {
+			const control = node.parentElement?.closest<HTMLElement>(selector);
+			if (control !== null && control !== undefined) return control;
+		}
+	return undefined;
+};
 const AREA_LABELS: Readonly<Record<string, string>> = {
 	administration: 'Admin',
 	account: 'Account',

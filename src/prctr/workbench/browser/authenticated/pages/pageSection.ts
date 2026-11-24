@@ -181,6 +181,7 @@ export class PageSection extends Disposable {
 			hidden: !options.description,
 			textContent: options.description ?? ''
 		});
+		this.heading.hidden = !options.title;
 		const heading = $('div.prctr-page-section__heading', {}, this.heading, this.description);
 		const header = $('div.prctr-page-section__header', {}, heading);
 		if (options.action !== undefined) {
@@ -308,8 +309,8 @@ export class PageSection extends Disposable {
 		this._register(this.pager.onDidRequestPage((page) => this.showPage(page)));
 		this.footer = $('div.prctr-page-section__footer');
 		this.card.append(this.footer);
-		// A section without a title or action, such as a page's only table, shows no header.
-		header.hidden = !options.title && options.action === undefined;
+		// A section without a title, description or action, such as a page's only table, shows no header.
+		header.hidden = !options.title && !options.description && options.action === undefined;
 		this.element = $(
 			'section.prctr-page-section',
 			{ attrs: { 'aria-labelledby': id } },
@@ -349,6 +350,7 @@ export class PageSection extends Disposable {
 	/** Renames the section, such as when an empty page folds two sections into one. */
 	setHeading(title: string, description?: string): void {
 		this.heading.textContent = title;
+		this.heading.hidden = !title;
 		this.description.textContent = description ?? '';
 		this.description.hidden = !description;
 	}

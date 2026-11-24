@@ -165,6 +165,8 @@ export interface AdminListOptions<K extends AdminListKind> {
 	readonly filters?: { readonly element: HTMLElement };
 	/** The list can start from a day: the query fields for "up to the end of this day". */
 	readonly dateJump?: (endOfDay: number) => Partial<AdminListQuery<K>>;
+	/** A short list kept by the server for a while has no page size to choose. */
+	readonly fixedPageSize?: boolean;
 }
 
 /**
@@ -349,7 +351,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 					this.jump
 				)
 			);
-		tools.append(this.pageSizeButton.element);
+		if (options.fixedPageSize !== true) tools.append(this.pageSizeButton.element);
 		this.foot = $(
 			'div.prctr-admin-list__foot',
 			{},
@@ -590,13 +592,14 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 						range: labels.range(
 							first,
 							last,
-							this.total?.count,
+							// A list on one page holds exactly what it shows.
+							this.total?.count ?? (paged ? undefined : last),
 							this.total?.atLeast === true
 						)
 					});
-		// Every counted list says how many it holds; an uncounted one only once it has pages.
-		this.range.hidden = data.items.length === 0 || (!paged && this.total === undefined);
-		this.steps.hidden = !paged;
+		// Every list says how many it shows, and keeps its steps in place, disabled on one page.
+		this.range.hidden = data.items.length === 0;
+		this.steps.hidden = data.items.length === 0;
 		this.previous.setState({
 			label: this.format.text('pagerPrevious'),
 			icon: proctorIconFactory('action.back', 14),

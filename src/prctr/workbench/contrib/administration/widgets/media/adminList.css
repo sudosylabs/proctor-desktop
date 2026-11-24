@@ -293,6 +293,9 @@
 	.prctr-admin-list .prctr-admin-list__status[data-tone='attention'] {
 		color: var(--prctr-color-status-attention);
 	}
+	.prctr-admin-list .prctr-admin-list__status[data-tone='progress'] {
+		color: var(--prctr-color-text-link);
+	}
 	.prctr-admin-list .prctr-admin-list__status[data-tone='failure'] {
 		color: var(--prctr-color-feedback-error);
 	}

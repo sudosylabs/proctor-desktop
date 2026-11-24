@@ -303,11 +303,6 @@ export const importsMessages = Object.freeze({
 		defaultMessage: 'Failed',
 		description: 'Import state.'
 	}),
-	importsRecent: defineMessage({
-		id: 'administration.imports.recent',
-		defaultMessage: 'Recent imports',
-		description: 'Section of files uploaded before.'
-	}),
 	importsRecentTable: defineMessage({
 		id: 'administration.imports.recent.table',
 		defaultMessage: 'Recent imports',
@@ -332,6 +327,41 @@ export const importsMessages = Object.freeze({
 		id: 'administration.imports.column.status',
 		defaultMessage: 'Status',
 		description: 'Column of where an import stands.'
+	}),
+	importsStatus: defineMessage({
+		id: 'administration.imports.filter.status',
+		defaultMessage: 'Status',
+		description: 'Label of the Imports status filter.'
+	}),
+	importsAny: defineMessage({
+		id: 'administration.imports.filter.any',
+		defaultMessage: 'Any',
+		description: 'The Imports status filter set to every status.'
+	}),
+	importsKept: defineMessage({
+		id: 'administration.imports.kept',
+		defaultMessage: 'Kept for 30 days. Open one to see its rows or download its report.',
+		description: 'Explains the Imports list above its table.'
+	}),
+	importsReview: defineMessage({
+		id: 'administration.imports.review',
+		defaultMessage: 'Review',
+		description: 'Opens an import that is ready to review.'
+	}),
+	importsImportedMissed: defineMessage({
+		id: 'administration.imports.imported.missed',
+		defaultMessage: 'Imported, {count} didn’t',
+		description: 'Status of an import where some rows were not imported: “Imported, 2 didn’t”.'
+	}),
+	importsUnreadable: defineMessage({
+		id: 'administration.imports.unreadable',
+		defaultMessage: 'Couldn’t read',
+		description: 'Status of an import whose file could not be read as CSV.'
+	}),
+	importsNoMatch: defineMessage({
+		id: 'administration.imports.no.match',
+		defaultMessage: 'No imports with this status',
+		description: 'The Imports list when the status filter matches nothing.'
 	}),
 	importsRecentEmpty: defineMessage({
 		id: 'administration.imports.recent.empty',

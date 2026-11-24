@@ -229,6 +229,57 @@ function invitation(
 	};
 }
 
+/** The Imports board's files: name, mode, rows, uploaded, state, rows that didn't import. */
+const IMPORTS: readonly (readonly [string, string, number, number, string, number, string?])[] = [
+	[
+		'spring-onboarding.csv',
+		'student_class',
+		412,
+		Date.UTC(2026, 10, 9, 9, 20),
+		'preview_ready',
+		6
+	],
+	['new-teachers.csv', 'teacher_academic_unit', 14, Date.UTC(2026, 10, 9, 8, 2), 'parsing', 0],
+	['autumn-late-joiners.csv', 'student_class', 37, Date.UTC(2026, 10, 5, 10), 'completed', 0],
+	['registry-staff.csv', 'institution', 6, Date.UTC(2026, 10, 2, 10), 'completed_with_errors', 2],
+	[
+		'roster-final.xlsx.csv',
+		'student_class',
+		0,
+		Date.UTC(2026, 10, 1, 10),
+		'failed',
+		0,
+		'onboarding_import.file_invalid'
+	],
+	['test-upload.csv', 'student_class', 3, Date.UTC(2026, 9, 28, 10), 'canceled', 0]
+];
+
+function onboardingImport(
+	[fileName, mode, rows, at, state, missed, failureCode]: (typeof IMPORTS)[number],
+	index: number
+) {
+	return {
+		id: boardId(400 + index),
+		mode,
+		fileName,
+		scopeType: 'institution',
+		scopeId: boardId(900),
+		state,
+		revision: 2,
+		totalRows: rows,
+		validRows: rows - missed,
+		invalidRows: state === 'completed_with_errors' ? 0 : missed,
+		succeededRows: state.startsWith('completed') ? rows - missed : 0,
+		failedRows: state === 'completed_with_errors' ? missed : 0,
+		skippedRows: 0,
+		noOpRows: 0,
+		...(failureCode === undefined ? {} : { failureCode }),
+		createdAt: at,
+		updatedAt: at + 60 * 1000,
+		expiresAt: at + 30 * DAY
+	};
+}
+
 function job(index: number, type: string, at: number) {
 	return {
 		id: boardId(200 + index),
@@ -320,30 +371,14 @@ export class BoardAdministration implements AdministrationClient {
 					state: 'paused',
 					updatedAt: Date.UTC(2026, 10, 2, 10)
 				});
-			case 'onboardingImports':
+			case 'onboardingImports': {
+				const states = intent.state;
 				return data('onboardingImports', {
-					items: [
-						{
-							id: boardId(400),
-							mode: 'academic_administration',
-							fileName: 'Spring onboarding import',
-							scopeType: 'institution',
-							scopeId: boardId(900),
-							state: 'preview_ready',
-							revision: 2,
-							totalRows: 412,
-							validRows: 405,
-							invalidRows: 6,
-							succeededRows: 0,
-							failedRows: 0,
-							skippedRows: 1,
-							noOpRows: 0,
-							createdAt: BOARD_NOW - 20 * 60 * 1000,
-							updatedAt: BOARD_NOW - 18 * 60 * 1000,
-							expiresAt: BOARD_NOW + 2 * DAY
-						}
-					]
+					items: IMPORTS.map(onboardingImport).filter(
+						(item) => states === undefined || states.includes(item.state as never)
+					)
 				});
+			}
 			case 'audits':
 				return data('audits', {
 					items: [
