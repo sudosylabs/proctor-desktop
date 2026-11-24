@@ -52,12 +52,7 @@ const refuse = async (): Promise<never> => {
 				institutionOrigin: 'https://northbridge.example',
 				institutionName: 'Northbridge University',
 				displayName: 'Amara Okafor',
-				availableProductAreas: [
-					'account',
-					'settings',
-					'student_activity',
-					'administration'
-				],
+				availableProductAreas: ['account', 'settings', 'exam_management', 'administration'],
 				noCurrentAffiliation: false,
 				noAssignedAccess: false
 			}

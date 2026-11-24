@@ -143,6 +143,14 @@ export class AdministrationFormatService implements IAdministrationFormatService
 		return this.page.date(time);
 	}
 
+	shortDate(time: number): string {
+		return this.page.shortDate(time);
+	}
+
+	time(time: number): string {
+		return this.page.time(time);
+	}
+
 	dateTime(time: number): string {
 		return this.page.dateTime(time);
 	}

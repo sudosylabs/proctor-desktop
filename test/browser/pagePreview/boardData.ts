@@ -159,6 +159,49 @@ function userEntry(person: Person, index: number) {
 	};
 }
 
+function invitation(index: number, expiresAt: number) {
+	return {
+		id: boardId(100 + index),
+		purpose: 'student_class',
+		state: 'pending',
+		email: `invitee-${index}@northbridge.example`,
+		revision: 1,
+		inviterId: boardId(3),
+		createdAt: BOARD_NOW - 3 * DAY,
+		expiresAt,
+		startAt: BOARD_NOW - 3 * DAY
+	};
+}
+
+function job(index: number, type: string, at: number) {
+	return {
+		id: boardId(200 + index),
+		type,
+		status: 'failed',
+		revision: 3,
+		attempts: 3,
+		maximumAttempts: 3,
+		createdAt: at - HOUR,
+		updatedAt: at,
+		availableAt: at - HOUR,
+		completedAt: at,
+		errorCode: 'job.failed'
+	};
+}
+
+function audit(index: number, summary: string, at: number, reason?: string) {
+	return {
+		id: boardId(600 + index),
+		action: 'change',
+		status: 'success',
+		summary,
+		createdAt: at,
+		resourceType: 'user',
+		resourceId: boardId(index),
+		...(reason === undefined ? {} : { reason })
+	};
+}
+
 function data(resource: string, value: unknown): AdministrationResponse {
 	return { kind: 'data', data: { resource, value } as never };
 }
@@ -167,16 +210,113 @@ function data(resource: string, value: unknown): AdministrationResponse {
 export class BoardAdministration implements AdministrationClient {
 	async request(intent: AdministrationIntent): Promise<AdministrationResponse> {
 		switch (intent.kind) {
-			case 'users':
+			case 'users': {
+				const affiliation = intent.affiliation?.[0];
 				return data('users', {
 					items: PEOPLE.map(userEntry).slice(0, intent.limit),
 					cursor: 'page-2',
-					total: PEOPLE_TOTAL,
+					// Everyone, or the board's 1,201 students and 83 staff (some are both).
+					total:
+						affiliation === 'student'
+							? 1201
+							: affiliation === 'staff'
+								? 113
+								: PEOPLE_TOTAL,
 					totalAtLeast: false
+				});
+			}
+			case 'invitations':
+				return data('invitations', {
+					items: Array.from({ length: Math.min(intent.limit, 18) }, (_, index) =>
+						invitation(
+							index,
+							index < 5 ? BOARD_NOW + (index + 1) * DAY : BOARD_NOW + 20 * DAY
+						)
+					),
+					total: 18,
+					totalAtLeast: false
+				});
+			case 'jobs':
+				return data('jobs', {
+					items: [
+						job(1, 'retention.cleanup', Date.UTC(2026, 10, 9, 9, 16)),
+						job(2, 'mail.rekey', Date.UTC(2026, 10, 9, 9, 12))
+					],
+					total: 2,
+					totalAtLeast: false
+				});
+			case 'mailDeliveries':
+				return data('mailDeliveries', {
+					items: [0, 1, 2, 3].map((index) => ({
+						id: boardId(300 + index),
+						state: 'failed',
+						recipient: `r***@northbridge-alumni.example`,
+						template: 'access.invitation',
+						attempts: 3,
+						createdAt: BOARD_NOW - (index + 2) * HOUR,
+						updatedAt: BOARD_NOW - (index + 1) * HOUR,
+						deadline: BOARD_NOW + DAY,
+						failedAt: BOARD_NOW - (index + 1) * HOUR,
+						failureCode: 'mail.bounced'
+					})),
+					total: 4,
+					totalAtLeast: false
+				});
+			case 'retentionControl':
+				return data('retentionControl', {
+					revision: 3,
+					state: 'paused',
+					updatedAt: Date.UTC(2026, 10, 2, 10)
+				});
+			case 'onboardingImports':
+				return data('onboardingImports', {
+					items: [
+						{
+							id: boardId(400),
+							mode: 'academic_administration',
+							fileName: 'Spring onboarding import',
+							scopeType: 'institution',
+							scopeId: boardId(900),
+							state: 'preview_ready',
+							revision: 2,
+							totalRows: 412,
+							validRows: 405,
+							invalidRows: 6,
+							succeededRows: 0,
+							failedRows: 0,
+							skippedRows: 1,
+							noOpRows: 0,
+							createdAt: BOARD_NOW - 20 * 60 * 1000,
+							updatedAt: BOARD_NOW - 18 * 60 * 1000,
+							expiresAt: BOARD_NOW + 2 * DAY
+						}
+					]
+				});
+			case 'audits':
+				return data('audits', {
+					items: [
+						audit(
+							1,
+							'Grace Adeyemi gave Priya Raman the role Exam manager at Computer Science',
+							Date.UTC(2026, 10, 9, 8, 40)
+						),
+						audit(
+							2,
+							'Kwame Boateng disabled the account of Sofia Novak',
+							Date.UTC(2026, 9, 28, 16, 2),
+							'Left the programme'
+						),
+						audit(
+							3,
+							'Amara Okafor changed the access policy',
+							Date.UTC(2026, 9, 27, 11, 15),
+							'Revision 14 · Proctor password, invited people may set a password'
+						)
+					]
 				});
 			case 'counts':
 				return data('counts', {
-					pendingInvitations: { count: 0, atLeast: false },
+					pendingInvitations: { count: 18, atLeast: false },
 					failedJobs: { count: 2, atLeast: false },
 					failedMailDeliveries: { count: 0, atLeast: false },
 					openImports: { count: 1, atLeast: false }

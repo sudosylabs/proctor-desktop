@@ -131,6 +131,11 @@ const tokenDefinitions = [
 	},
 	{ id: 'color.feedback.errorBackground', kind: 'color', description: 'Error message surface.' },
 	{
+		id: 'color.feedback.errorSolid',
+		kind: 'color',
+		description: 'Solid red under white text: a destructive button, a count of failures.'
+	},
+	{
 		id: 'color.status.safeguard',
 		kind: 'color',
 		description: 'Status word for a safeguard in place on your own account, on its 12% tint.'

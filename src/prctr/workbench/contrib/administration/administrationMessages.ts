@@ -74,12 +74,12 @@ const sharedMessages = Object.freeze({
 	}),
 	overviewDescription: defineMessage({
 		id: 'administration.page.overview.description',
-		defaultMessage: 'What needs your attention at {institution}.',
+		defaultMessage: 'What needs you at {institution} today.',
 		description: 'One-line description under the Overview heading.'
 	}),
 	overviewDescriptionGeneric: defineMessage({
 		id: 'administration.page.overview.description.generic',
-		defaultMessage: 'What needs your attention.',
+		defaultMessage: 'What needs you today.',
 		description: 'Overview description when the institution name is unknown.'
 	}),
 	usersTitle: defineMessage({
@@ -229,16 +229,6 @@ const sharedMessages = Object.freeze({
 		defaultMessage: 'Import',
 		description: 'Heading of one onboarding import before its details load.'
 	}),
-	countInvitationsOne: defineMessage({
-		id: 'administration.sidebar.count.invitations.one',
-		defaultMessage: '{count} pending invitation',
-		description: 'Spoken name of the sidebar count beside Invitations when it is one.'
-	}),
-	countInvitations: defineMessage({
-		id: 'administration.sidebar.count.invitations.many',
-		defaultMessage: '{count} pending invitations',
-		description: 'Spoken name of the sidebar count beside Invitations.'
-	}),
 	countImportsOne: defineMessage({
 		id: 'administration.sidebar.count.imports.one',
 		defaultMessage: '{count} open import',
@@ -258,16 +248,6 @@ const sharedMessages = Object.freeze({
 		id: 'administration.sidebar.count.jobs.many',
 		defaultMessage: '{count} failed jobs',
 		description: 'Spoken name of the sidebar count beside Jobs.'
-	}),
-	countMailOne: defineMessage({
-		id: 'administration.sidebar.count.mail.one',
-		defaultMessage: '{count} email not delivered',
-		description: 'Spoken name of the sidebar count beside Mail when it is one.'
-	}),
-	countMail: defineMessage({
-		id: 'administration.sidebar.count.mail.many',
-		defaultMessage: '{count} emails not delivered',
-		description: 'Spoken name of the sidebar count beside Mail.'
 	}),
 	failureAccessChanged: defineMessage({
 		id: 'administration.failure.accesschanged',

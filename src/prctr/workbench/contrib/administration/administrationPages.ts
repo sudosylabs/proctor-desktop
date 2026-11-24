@@ -90,7 +90,7 @@ export const administrationPageRegistry: Readonly<
 	overview: list(
 		'overviewTitle',
 		(f) => f.institutionText('overviewDescription', 'overviewDescriptionGeneric'),
-		'record',
+		'wide',
 		(i, body, actions) => i.createInstance(OverviewPage, body, actions)
 	),
 	users: list(

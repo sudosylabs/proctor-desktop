@@ -6,6 +6,86 @@ import { defineMessage } from '../../../../base/common/localization.js';
 
 /** Text of the Administration Overview page. */
 export const overviewMessages = Object.freeze({
+	overviewDayTime: defineMessage({
+		id: 'administration.overview.day.time',
+		defaultMessage: '{date}, {time}',
+		description: 'When a change was made, on an earlier day: “28 Oct, 16:02”.'
+	}),
+	overviewPeople: defineMessage({
+		id: 'administration.overview.people',
+		defaultMessage: 'People',
+		description: 'Stat: everyone with an account.'
+	}),
+	overviewPeopleSplit: defineMessage({
+		id: 'administration.overview.people.split',
+		defaultMessage: '{students} students · {staff} staff',
+		description: 'Note under People: how many are students and how many staff.'
+	}),
+	overviewPeopleSplitBoth: defineMessage({
+		id: 'administration.overview.people.split.both',
+		defaultMessage: '{students} students · {staff} staff, some both',
+		description: 'Note under People when some people are both a student and staff.'
+	}),
+	overviewPending: defineMessage({
+		id: 'administration.overview.pending',
+		defaultMessage: 'Pending invitations',
+		description: 'Stat: invitations not yet accepted.'
+	}),
+	overviewExpireWeekOne: defineMessage({
+		id: 'administration.overview.expire.week.one',
+		defaultMessage: '1 expires this week',
+		description: 'Note under Pending invitations: one lapses within seven days.'
+	}),
+	overviewExpireWeek: defineMessage({
+		id: 'administration.overview.expire.week',
+		defaultMessage: '{count} expire this week',
+		description: 'Note under Pending invitations: several lapse within seven days.'
+	}),
+	overviewFailedJobsStat: defineMessage({
+		id: 'administration.overview.failed.jobs.stat',
+		defaultMessage: 'Failed jobs',
+		description: 'Stat: background jobs that failed in the last seven days.'
+	}),
+	overviewSinceToday: defineMessage({
+		id: 'administration.overview.since.today',
+		defaultMessage: 'Since {time} today',
+		description: 'Note under Failed jobs: the earliest failure was today, at this time.'
+	}),
+	overviewSince: defineMessage({
+		id: 'administration.overview.since',
+		defaultMessage: 'Since {date}',
+		description: 'Note under Failed jobs: the earliest failure was on this day.'
+	}),
+	overviewBounced: defineMessage({
+		id: 'administration.overview.bounced',
+		defaultMessage: 'Mail bounced',
+		description: 'Stat: emails that couldn’t be delivered.'
+	}),
+	overviewLastDay: defineMessage({
+		id: 'administration.overview.last.day',
+		defaultMessage: 'Last 24 hours',
+		description: 'Note under Mail bounced: the period counted.'
+	}),
+	overviewImportReady: defineMessage({
+		id: 'administration.overview.import.ready',
+		defaultMessage: '{name} is ready to review',
+		description: 'Attention item: an import was checked and waits for a decision.'
+	}),
+	overviewImportDetail: defineMessage({
+		id: 'administration.overview.import.detail',
+		defaultMessage: '{rows} rows · Uploaded {when}',
+		description: 'Detail of an import waiting for review.'
+	}),
+	overviewReviewImport: defineMessage({
+		id: 'administration.overview.review.import',
+		defaultMessage: 'Review import',
+		description: 'Button: open the import that waits for review.'
+	}),
+	overviewRecentChanges: defineMessage({
+		id: 'administration.overview.recent.changes',
+		defaultMessage: 'Recent changes',
+		description: 'Section with the latest administrative changes.'
+	}),
 	overviewAttention: defineMessage({
 		id: 'administration.overview.attention',
 		defaultMessage: 'Needs attention',

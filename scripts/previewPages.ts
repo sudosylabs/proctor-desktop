@@ -60,6 +60,12 @@ writeFileSync(
 writeFileSync(`${outdir}/package.json`, JSON.stringify({ type: 'module', main: 'main.js' }));
 const folder = resolve(output);
 mkdirSync(folder, { recursive: true });
-const launch = developmentLaunch([`${outdir}/main.js`, folder, ...shots]);
-const result = spawnSync(launch.command, launch.args, { cwd: repositoryRoot, stdio: 'inherit' });
-process.exitCode = result.status ?? 1;
+// One Electron run per page, so no page inherits another's state.
+for (const shot of shots) {
+	const launch = developmentLaunch([`${outdir}/main.js`, folder, shot]);
+	const result = spawnSync(launch.command, launch.args, {
+		cwd: repositoryRoot,
+		stdio: 'inherit'
+	});
+	if (result.status !== 0) process.exitCode = result.status ?? 1;
+}

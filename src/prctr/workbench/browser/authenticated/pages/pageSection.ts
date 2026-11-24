@@ -58,12 +58,16 @@ export function createRowBadge(document: Document, status: PageRowStatus): HTMLE
 
 export interface PageRowModel {
 	readonly id: string;
-	/** A small glyph saying what the row is, such as a laptop or a key. */
-	readonly glyph: ProctorIconId;
+	/** A small glyph saying what the row is, such as a laptop or a key; a plain record has none. */
+	readonly glyph?: ProctorIconId;
+	/** A glyph for something that waits on you is amber; for something that went wrong, red. */
+	readonly glyphTone?: 'attention' | 'failure';
 	readonly title: string;
 	/** Short labels under the title, such as a token's permissions; the first few show. */
 	readonly chips?: readonly string[];
-	readonly detail: string;
+	readonly detail?: string;
+	/** Quiet text at the end of the row, such as when a change was made. */
+	readonly trailing?: string;
 	/** A badge at the end of the row, as for a setting's state. */
 	readonly status?: PageRowStatus;
 	/** A badge right after the title, as for whether an affiliation is current. */
@@ -528,8 +532,15 @@ export class PageSection extends Disposable {
 		row: PageRowModel
 	): HTMLLIElement {
 		const document = this.element.ownerDocument;
-		const glyph = this.rowStore.add(createProctorIcon(document, { id: row.glyph, size: 18 }));
-		glyph.element.classList.add('prctr-page-row__glyph');
+		const leading: HTMLElement[] = [];
+		if (row.glyph !== undefined) {
+			const glyph = this.rowStore.add(
+				createProctorIcon(document, { id: row.glyph, size: 18 })
+			);
+			glyph.element.classList.add('prctr-page-row__glyph');
+			if (row.glyphTone !== undefined) glyph.element.dataset.tone = row.glyphTone;
+			leading.push(glyph.element);
+		}
 		const title = $(
 			'span.prctr-page-row__heading',
 			{},
@@ -541,8 +552,11 @@ export class PageSection extends Disposable {
 		const text = $('span.prctr-page-row__text', {}, title);
 		if (row.chips !== undefined && row.chips.length > 0)
 			text.append(this.createChips($, row.chips));
-		text.append($('span.prctr-page-row__detail', { textContent: row.detail }));
-		const item = $('li.prctr-page-row', { data: { rowId: row.id } }, glyph.element, text);
+		if (row.detail !== undefined && row.detail !== '')
+			text.append($('span.prctr-page-row__detail', { textContent: row.detail }));
+		const item = $('li.prctr-page-row', { data: { rowId: row.id } }, ...leading, text);
+		if (row.trailing !== undefined)
+			item.append($('span.prctr-page-row__trailing', { textContent: row.trailing }));
 		if (row.status !== undefined) item.append(createRowBadge(document, row.status));
 		if (row.button !== undefined) {
 			const action = row.button;

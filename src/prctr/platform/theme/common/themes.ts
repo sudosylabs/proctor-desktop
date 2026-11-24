@@ -153,6 +153,7 @@ const semanticColorRoles = {
 	'color.feedback.errorBackground': 'inputValidation.errorBackground',
 	'color.status.safeguard': 'proctor.statusSafeguardForeground',
 	'color.status.attention': 'proctor.statusAttentionForeground',
+	'color.feedback.errorSolid': 'proctor.errorSolidBackground',
 	'color.feedback.pending': 'proctor.pendingForeground',
 	'color.development.background': 'proctor.developmentBackground',
 	'color.development.stripe': 'proctor.developmentStripe',

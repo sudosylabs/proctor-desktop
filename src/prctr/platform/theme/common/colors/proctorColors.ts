@@ -271,3 +271,17 @@ export const frameItemForeground = registerColor(
 	},
 	localize('proctor.frameItemForeground', 'Rail and sidebar entries on the window frame.')
 );
+
+export const errorSolidBackground = registerColor(
+	'proctor.errorSolidBackground',
+	{
+		light: Color.fromHex(L.redSolid),
+		dark: Color.fromHex(D.redSolid),
+		hcLight: Color.fromHex('#B5200D'),
+		hcDark: Color.fromHex('#F48771')
+	},
+	localize(
+		'proctor.errorSolidBackground',
+		'Solid red under white text, such as a destructive button or a count of failures.'
+	)
+);

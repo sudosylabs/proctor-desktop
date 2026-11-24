@@ -6565,6 +6565,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
+    "administration.overview.bounced": {
+      "message": "Mail bounced",
+      "description": "Stat: emails that couldn’t be delivered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.overview.cleanup.detail": {
       "message": "Records past their retention period wait until cleanup resumes.",
       "description": "Detail of the paused cleanup item.",
@@ -6575,6 +6581,52 @@
       "message": "Record cleanup is paused",
       "description": "Attention item: automatic deletion is paused.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.day.time": {
+      "message": "{date}, {time}",
+      "description": "When a change was made, on an earlier day: “28 Oct, 16:02”.",
+      "placeholders": [
+        "date",
+        "time"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.expire.week": {
+      "message": "{count} expire this week",
+      "description": "Note under Pending invitations: several lapse within seven days.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.expire.week.one": {
+      "message": "1 expires this week",
+      "description": "Note under Pending invitations: one lapses within seven days.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.failed.jobs.stat": {
+      "message": "Failed jobs",
+      "description": "Stat: background jobs that failed in the last seven days.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.import.detail": {
+      "message": "{rows} rows · Uploaded {when}",
+      "description": "Detail of an import waiting for review.",
+      "placeholders": [
+        "rows",
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.import.ready": {
+      "message": "{name} is ready to review",
+      "description": "Attention item: an import was checked and waits for a decision.",
+      "placeholders": [
+        "name"
+      ],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
     "administration.overview.invitations": {
@@ -6633,6 +6685,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
+    "administration.overview.last.day": {
+      "message": "Last 24 hours",
+      "description": "Note under Mail bounced: the period counted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.overview.mail.detail": {
       "message": "Most recent to {recipient}",
       "description": "Detail of the failed mail item.",
@@ -6667,9 +6725,45 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
+    "administration.overview.pending": {
+      "message": "Pending invitations",
+      "description": "Stat: invitations not yet accepted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.people": {
+      "message": "People",
+      "description": "Stat: everyone with an account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.people.split": {
+      "message": "{students} students · {staff} staff",
+      "description": "Note under People: how many are students and how many staff.",
+      "placeholders": [
+        "students",
+        "staff"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.people.split.both": {
+      "message": "{students} students · {staff} staff, some both",
+      "description": "Note under People when some people are both a student and staff.",
+      "placeholders": [
+        "students",
+        "staff"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.overview.recent": {
       "message": "Recent administrative changes",
       "description": "Section with the latest audit events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.recent.changes": {
+      "message": "Recent changes",
+      "description": "Section with the latest administrative changes.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
@@ -6689,6 +6783,28 @@
       "message": "Review cleanup",
       "description": "Opens Data retention.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.review.import": {
+      "message": "Review import",
+      "description": "Button: open the import that waits for review.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.since": {
+      "message": "Since {date}",
+      "description": "Note under Failed jobs: the earliest failure was on this day.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.since.today": {
+      "message": "Since {time} today",
+      "description": "Note under Failed jobs: the earliest failure was today, at this time.",
+      "placeholders": [
+        "time"
+      ],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
     "administration.overview.succeeded": {
@@ -6786,7 +6902,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.overview.description": {
-      "message": "What needs your attention at {institution}.",
+      "message": "What needs you at {institution} today.",
       "description": "One-line description under the Overview heading.",
       "placeholders": [
         "institution"
@@ -6794,7 +6910,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.overview.description.generic": {
-      "message": "What needs your attention.",
+      "message": "What needs you today.",
       "description": "Overview description when the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -8012,22 +8128,6 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
-    "administration.sidebar.count.invitations.many": {
-      "message": "{count} pending invitations",
-      "description": "Spoken name of the sidebar count beside Invitations.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
-    "administration.sidebar.count.invitations.one": {
-      "message": "{count} pending invitation",
-      "description": "Spoken name of the sidebar count beside Invitations when it is one.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
     "administration.sidebar.count.jobs.many": {
       "message": "{count} failed jobs",
       "description": "Spoken name of the sidebar count beside Jobs.",
@@ -8039,22 +8139,6 @@
     "administration.sidebar.count.jobs.one": {
       "message": "{count} failed job",
       "description": "Spoken name of the sidebar count beside Jobs when it is one.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
-    "administration.sidebar.count.mail.many": {
-      "message": "{count} emails not delivered",
-      "description": "Spoken name of the sidebar count beside Mail.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
-    "administration.sidebar.count.mail.one": {
-      "message": "{count} email not delivered",
-      "description": "Spoken name of the sidebar count beside Mail when it is one.",
       "placeholders": [
         "count"
       ],
