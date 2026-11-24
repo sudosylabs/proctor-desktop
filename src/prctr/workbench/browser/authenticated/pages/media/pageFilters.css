@@ -1,0 +1,150 @@
+@layer workbench {
+	.prctr-page-filters {
+		align-items: center;
+		container-type: inline-size;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		/* The table follows 16 pixels below, closer than the page's other blocks. */
+		margin-block-end: -8px;
+	}
+	.prctr-page-filters .prctr-page-filters__find {
+		align-items: center;
+		background: var(--prctr-color-background-card);
+		block-size: 32px;
+		border-radius: var(--prctr-shape-radius-control);
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-field);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-tertiary);
+		display: flex;
+		flex: 0 1 260px;
+		gap: 6px;
+		min-inline-size: 180px;
+		padding: 0 6px 0 10px;
+	}
+	/* The key that jumps to the search, drawn as a key. */
+	.prctr-page-filters .prctr-page-filters__key {
+		border-radius: 4px;
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
+		color: var(--prctr-color-text-secondary);
+		flex: none;
+		font: 400 11.5px/16px var(--prctr-typography-font-monospace);
+		padding: 1px 5px;
+	}
+	.prctr-page-filters .prctr-page-filters__find:focus-within .prctr-page-filters__key {
+		visibility: hidden;
+	}
+	.prctr-page-filters .prctr-page-filters__find:focus-within {
+		box-shadow: inset 0 0 0 2px var(--prctr-color-border-focus);
+	}
+	.prctr-page-filters .prctr-page-filters__input {
+		background: transparent;
+		border: 0;
+		color: var(--prctr-color-text-primary);
+		flex: 1;
+		font: inherit;
+		font-size: 13px;
+		min-inline-size: 0;
+		outline: none;
+	}
+
+	/* Placeholder text is the field's own text colour at 68 percent, legible in both themes. */
+	.prctr-page-filters .prctr-page-filters__input::placeholder {
+		color: currentColor;
+		opacity: 0.68;
+	}
+	.prctr-page-filters .prctr-page-filters__select {
+		display: flex;
+		flex: none;
+	}
+	.prctr-page-filters .prctr-page-filters__spacer {
+		flex: 1;
+	}
+	.prctr-page-filters .prctr-page-filters__note {
+		color: var(--prctr-color-text-tertiary);
+		font-size: 13px;
+	}
+	.prctr-page-filters[data-selecting='true'] > :not(.prctr-page-filters__selection) {
+		display: none;
+	}
+	.prctr-page-filters .prctr-page-filters__selection {
+		align-items: center;
+		background: var(--prctr-color-interaction-selectedRow);
+		block-size: 44px;
+		border-radius: var(--prctr-shape-radius-card);
+		box-shadow: inset 0 0 0 1px
+			color-mix(in srgb, var(--prctr-color-brand-accent) 30%, transparent);
+		box-sizing: border-box;
+		display: flex;
+		flex: 1;
+		gap: 12px;
+		padding: 0 6px 0 14px;
+	}
+	.prctr-page-filters .prctr-page-filters__selection[hidden] {
+		display: none;
+	}
+	.prctr-page-filters .prctr-page-filters__count {
+		color: var(--prctr-color-text-primary);
+		flex: none;
+		font-size: 13.5px;
+		font-weight: var(--prctr-typography-weight-medium);
+	}
+	.prctr-page-filters .prctr-page-filters__link {
+		background: transparent;
+		border: 0;
+		color: var(--prctr-color-brand-link);
+		cursor: pointer;
+		flex: none;
+		font: inherit;
+		font-size: 13px;
+		padding: 0;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+	.prctr-page-filters .prctr-page-filters__link[hidden] {
+		display: none;
+	}
+	.prctr-page-filters .prctr-page-filters__link:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
+	.prctr-page-filters .prctr-page-filters__actions {
+		display: flex;
+		margin-inline-start: auto;
+		flex-wrap: nowrap;
+		gap: 6px;
+		justify-content: flex-end;
+	}
+	.prctr-page-filters .prctr-page-filters__count {
+		white-space: nowrap;
+	}
+	/* Wide, every change is a button; narrow, the less used ones move into ⋯. */
+	.prctr-page-filters .prctr-page-filters__actions > [data-overflow='true'] {
+		display: none;
+	}
+	@container (max-width: 820px) {
+		.prctr-page-filters .prctr-page-filters__actions > [data-secondary='true'] {
+			display: none;
+		}
+		.prctr-page-filters .prctr-page-filters__actions > [data-overflow='true'] {
+			display: inline-flex;
+		}
+	}
+
+	@container (max-width: 560px) {
+		.prctr-page-filters
+			.prctr-page-filters__actions
+			> :not([data-overflow='true']):not([data-keep='true']) {
+			display: none;
+		}
+	}
+	.prctr-page-filters .prctr-page-filters__more[hidden] {
+		display: none;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-page-filters .prctr-page-filters__find {
+			border: 1px solid CanvasText;
+		}
+	}
+}

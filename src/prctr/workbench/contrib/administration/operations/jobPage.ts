@@ -25,7 +25,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminList, type AdminTone } from '../widgets/adminList.js';
 import { adminRead } from '../widgets/adminReads.js';
 import { JOB_STATE } from './jobsPage.js';

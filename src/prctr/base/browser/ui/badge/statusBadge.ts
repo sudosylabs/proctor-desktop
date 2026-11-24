@@ -10,10 +10,11 @@ import './statusBadge.css';
  * - `failure`: something went wrong (red).
  * - `attention`: it waits on you or lapses soon (amber).
  * - `safeguard`: a protection in place on your own account, such as Verified or On (green).
- * - `neutral`: everything else, including work still running (grey).
- * Purple is for actions and selection, never a status.
+ * - `progress`: work Proctor is still doing, such as Checking or Importing (the accent).
+ * - `neutral`: everything else (grey).
+ * Purple otherwise marks actions and selection.
  */
-export type StatusBadgeTone = 'failure' | 'attention' | 'safeguard' | 'neutral';
+export type StatusBadgeTone = 'failure' | 'attention' | 'safeguard' | 'progress' | 'neutral';
 
 /** One status word on a tinted pill, such as Verified or Expired. A status badge never carries an icon. */
 export function createStatusBadge(

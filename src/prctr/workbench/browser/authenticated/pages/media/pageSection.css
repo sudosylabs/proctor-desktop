@@ -18,9 +18,9 @@
 		min-inline-size: 0;
 	}
 	.prctr-page-section .prctr-page-section__title {
-		font-size: 15px;
+		font-size: var(--prctr-typography-title-section-size);
 		font-weight: var(--prctr-typography-weight-semibold);
-		line-height: 22px;
+		line-height: var(--prctr-typography-title-section-lineHeight);
 		margin: 0;
 	}
 	.prctr-page-section .prctr-page-section__title:focus {
@@ -33,19 +33,34 @@
 	}
 	.prctr-page-section .prctr-page-section__description {
 		color: var(--prctr-color-text-secondary);
-		font-size: 13px;
+		font-size: var(--prctr-typography-label-size);
+		line-height: var(--prctr-typography-label-lineHeight);
 		margin: 0;
 		overflow-wrap: anywhere;
+		text-wrap: pretty;
 	}
+	/*
+	 * A section is flat, as the Plum boards draw it: a hairline above and below its rows, no
+	 * border or card of its own. A section showing only a state (empty, failed, no access) sits
+	 * on a tinted panel instead.
+	 */
 	.prctr-page-section .prctr-page-section__card {
-		background: var(--prctr-color-background-card);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
-		border-radius: 10px;
-		overflow: hidden;
+		box-shadow:
+			inset 0 1px 0 var(--prctr-color-border-default),
+			inset 0 -1px 0 var(--prctr-color-border-default);
+	}
+	.prctr-page-section
+		.prctr-page-section__card:not([data-plain='true']):has(
+			> .prctr-page-section__state:not([hidden])
+		):not(:has(> .prctr-page-section__rows > *)) {
+		background: var(--prctr-color-background-raised);
+		border-radius: var(--prctr-shape-radius-card);
+		box-shadow: none;
 	}
 	.prctr-page-section .prctr-page-section__card[data-plain='true'] {
 		background: transparent;
 		border: 0;
+		box-shadow: none;
 		border-radius: 0;
 		overflow: visible;
 	}
@@ -81,8 +96,8 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px 12px;
-		min-block-size: 56px;
-		padding: 10px 10px 10px 16px;
+		min-block-size: 52px;
+		padding: 14px 14px 14px 16px;
 		box-sizing: border-box;
 	}
 	.prctr-page-section .prctr-page-section__state-glyph {
@@ -189,9 +204,9 @@
 	}
 	/* #endregion */
 
-	/* #region Loading: grey rows shaped like the content, shown only after 300 ms */
+	/* #region Loading: grey rows shaped like the content, shown only after 1 s */
 	.prctr-page-section .prctr-page-section__skeleton {
-		animation: prctr-page-skeleton-appear 0s linear 300ms forwards;
+		animation: prctr-page-skeleton-appear 0s linear 1s forwards;
 		opacity: 0;
 	}
 	.prctr-page-section .prctr-page-section__skeleton-row {
@@ -295,8 +310,8 @@
 		box-sizing: border-box;
 		display: flex;
 		gap: 12px;
-		min-block-size: 56px;
-		padding: 8px 10px 8px 16px;
+		min-block-size: 46px;
+		padding: 12px 0;
 	}
 	.prctr-page-section .prctr-page-row + .prctr-page-row {
 		border-block-start: var(--prctr-shape-stroke-default) solid
@@ -304,6 +319,40 @@
 	}
 	.prctr-page-section .prctr-page-row__glyph {
 		color: var(--prctr-color-text-tertiary);
+		flex: none;
+	}
+	.prctr-page-section .prctr-page-row__glyph[data-tone='attention'] {
+		color: var(--prctr-color-status-attention);
+	}
+	.prctr-page-section .prctr-page-row__glyph[data-tone='failure'] {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-page-section .prctr-page-row__word {
+		color: var(--prctr-color-text-secondary);
+		flex: none;
+		font-size: 13px;
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: 18px;
+		white-space: nowrap;
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='attention'] {
+		color: var(--prctr-color-status-attention);
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='failure'] {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='safeguard'] {
+		color: var(--prctr-color-status-safeguard);
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='progress'] {
+		color: var(--prctr-color-text-link);
+	}
+	.prctr-page-section .prctr-page-row__trailing {
+		color: var(--prctr-color-text-secondary);
+		flex: none;
+		font-size: var(--prctr-typography-label-size);
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
 	}
 	.prctr-page-section .prctr-page-row__text {
 		display: flex;
@@ -319,54 +368,41 @@
 		min-inline-size: 0;
 	}
 	.prctr-page-section .prctr-page-row__title {
-		font-size: 14px;
+		font-size: var(--prctr-typography-body-size);
 		font-weight: var(--prctr-typography-weight-medium);
+		line-height: var(--prctr-typography-body-lineHeight);
 		overflow-wrap: anywhere;
 	}
 	.prctr-page-section .prctr-page-row__detail {
 		color: var(--prctr-color-text-secondary);
-		font-size: 13px;
+		font-size: var(--prctr-typography-label-size);
+		line-height: var(--prctr-typography-label-lineHeight);
 		overflow-wrap: anywhere;
 	}
 	/* Short labels under a row's title; .prctr-page-section a row with chips keeps 4 px between its lines. */
-	.prctr-page-section .prctr-page-row__text:has(> .prctr-page-row__chips) {
-		gap: 4px;
-	}
+	/* What a row holds, such as a token's permissions, as one quiet line: "A, B, C and 7 more". */
 	.prctr-page-section .prctr-page-row__chips {
-		align-items: center;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 4px;
-	}
-	.prctr-page-section .prctr-page-row__chip,
-	.prctr-page-section .prctr-page-row__chip-more {
-		align-items: center;
-		block-size: 22px;
-		border-radius: 6px;
-		box-sizing: border-box;
-		display: inline-flex;
-		font-size: 12px;
-		font-weight: var(--prctr-typography-weight-medium);
-		padding: 0 8px;
-		white-space: nowrap;
-	}
-	.prctr-page-section .prctr-page-row__chip {
-		background: var(--prctr-color-background-raised);
 		color: var(--prctr-color-text-secondary);
+		display: block;
+		font-size: 13px;
+		line-height: 18px;
+	}
+	.prctr-page-section .prctr-page-row__chip:has(~ .prctr-page-row__chip:not([hidden]))::after {
+		content: ', ';
 	}
 	.prctr-page-section .prctr-page-row__chip-more {
 		background: transparent;
 		border: 0;
-		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
-		color: var(--prctr-color-text-primary);
-		cursor: default;
-		font-family: inherit;
-	}
-	.prctr-page-section .prctr-page-row__chip-more[aria-expanded='true'] {
-		background: var(--prctr-color-interaction-hover);
+		border-radius: 4px;
+		color: var(--prctr-color-text-link);
+		cursor: pointer;
+		font: inherit;
+		font-weight: var(--prctr-typography-weight-medium);
+		margin-inline-start: 4px;
+		padding: 0;
 	}
 	.prctr-page-section .prctr-page-row__chip-more:hover {
-		background: var(--prctr-color-interaction-hover);
+		text-decoration: underline;
 	}
 	.prctr-page-section .prctr-page-row__chip-more:focus-visible {
 		outline: 2px solid var(--prctr-color-border-focus);
@@ -399,7 +435,9 @@
 	}
 
 	@media (forced-colors: active) {
-		.prctr-page-section .prctr-page-section__card,
+		.prctr-page-section .prctr-page-section__card {
+			border-block: 1px solid CanvasText;
+		}
 		.prctr-page-section .prctr-page-section__note {
 			border: 1px solid CanvasText;
 		}

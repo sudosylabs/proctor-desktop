@@ -50,7 +50,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, administration, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account, administration and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account, administration and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "18294d16ad267339c44bd27a3e6aafa03f33e4bf9477a9dbb0c17b101c9cfdd3"
+      "localSha256": "2b898e09dc3ac54865b427145ee1a5dfc7c313281e6fad9fc89bef7a6cdadef2"
     },
     {
       "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
@@ -60,7 +60,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, administration, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account, administration and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account, administration and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "18294d16ad267339c44bd27a3e6aafa03f33e4bf9477a9dbb0c17b101c9cfdd3",
+      "localSha256": "2b898e09dc3ac54865b427145ee1a5dfc7c313281e6fad9fc89bef7a6cdadef2",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",

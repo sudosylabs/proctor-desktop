@@ -2,7 +2,6 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
@@ -24,7 +23,12 @@ import {
 } from '../../../../platform/theme/browser/proctorIcon.js';
 import { IWorkbenchOverlayService } from '../../workbenchServices.js';
 import { IPageFormatService } from './pageFormat.js';
-import { IPagePaneContext, PagePaneContext, type PageHeading } from './pagePaneContext.js';
+import {
+	IPagePaneContext,
+	PagePaneContext,
+	type PageHeading,
+	type PageRecordPart
+} from './pagePaneContext.js';
 import './media/pagePane.css';
 
 /** One page in the content area. Its pane shows it and says when it is visible. */
@@ -38,8 +42,11 @@ export interface PageContent {
 	readonly id: string;
 	readonly title: string;
 	readonly description: string;
-	/** Tables and wide lists use the wider column; reading pages keep the narrow one. */
-	readonly width?: 'narrow' | 'wide';
+	/**
+	 * The page column: `narrow` (760) for Account's reading pages, `record` (880) for one record,
+	 * `wide` (1080) for tables and lists.
+	 */
+	readonly width?: 'narrow' | 'record' | 'wide';
 	/** Builds the page into the pane's body and header actions with the pane's services. */
 	create(
 		instantiationService: IInstantiationService,
@@ -68,6 +75,7 @@ export class PagePane extends Disposable {
 	private readonly scroll: DomScrollableElement;
 	private readonly heading: HTMLHeadingElement;
 	private readonly description: HTMLElement;
+	private readonly record: HTMLElement;
 	private readonly headerActions: HTMLElement;
 	private readonly body: HTMLElement;
 	private readonly trail: HTMLElement;
@@ -91,6 +99,7 @@ export class PagePane extends Disposable {
 		const $ = createElementFactory(document);
 		this.heading = $('h1.prctr-page-pane__title', { tabIndex: -1 });
 		this.description = $('p.prctr-page-pane__description');
+		this.record = $('p.prctr-page-pane__record', { hidden: true });
 		this.headerActions = $('div.prctr-page-pane__header-actions');
 		this.body = $('div.prctr-page-pane__body');
 		this.trail = $('nav.prctr-page-pane__trail', {
@@ -110,6 +119,7 @@ export class PagePane extends Disposable {
 				'div.prctr-page-pane__heading',
 				{},
 				$('div.prctr-page-pane__title-row', {}, this.heading, this.status),
+				this.record,
 				this.description
 			),
 			this.headerActions
@@ -238,18 +248,36 @@ export class PagePane extends Disposable {
 		} else this.initials.textContent = heading.initials ?? '';
 		this.initials.hidden = heading.initials === undefined && heading.photo === undefined;
 		const status = heading.status;
-		this.status.replaceChildren(
-			...(status === undefined
-				? []
-				: [
-						createStatusBadge(this.status.ownerDocument, {
-							text: status.text,
-							tone: status.tone
-						})
-					])
-		);
+		this.status.textContent = status?.text ?? '';
+		this.status.dataset.tone = status?.tone ?? 'neutral';
 		this.status.hidden = status === undefined;
+		this.renderRecord(heading.record ?? []);
 		this.renderTrail(heading.trail ?? []);
+	}
+
+	private renderRecord(record: readonly PageRecordPart[]): void {
+		const $ = createElementFactory(this.record.ownerDocument);
+		this.record.replaceChildren();
+		record.forEach((part, index) => {
+			if (index > 0)
+				this.record.append(
+					$('span.prctr-page-pane__record-separator', {
+						textContent: '·',
+						attrs: { 'aria-hidden': 'true' }
+					})
+				);
+			this.record.append(
+				typeof part === 'string'
+					? $('span', { textContent: part })
+					: 'mono' in part
+						? $('span.prctr-page-pane__record-mono', { textContent: part.text })
+						: $('span.prctr-page-pane__record-word', {
+								textContent: part.text,
+								data: { tone: part.tone }
+							})
+			);
+		});
+		this.record.hidden = record.length === 0;
 	}
 
 	private renderTrail(trail: NonNullable<PageHeading['trail']>): void {

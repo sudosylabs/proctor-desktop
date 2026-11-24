@@ -21,7 +21,7 @@ import { IAuthenticatedNavigationService } from '../../../services/authenticated
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { IMPORT_MODE_TEXT } from './importText.js';
 import { AdminChanges } from '../widgets/adminChanges.js';
-import { adminField } from '../widgets/adminForm.js';
+import { pageField } from '../../../browser/authenticated/pages/pageForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 import './media/uploadImportDialog.css';
 
@@ -73,7 +73,7 @@ export class UploadImportDialog extends Disposable {
 		const form = $('div.prctr-admin-import-form');
 		this.dialog.body.append(form);
 
-		const modeField = adminField(form, format.text('importsMode'));
+		const modeField = pageField(form, format.text('importsMode'));
 		this.mode = this._register(
 			new SelectControl<Mode>(modeField.element, {
 				label: format.text('importsMode'),
@@ -91,20 +91,20 @@ export class UploadImportDialog extends Disposable {
 		);
 		this._register(this.mode.onDidChange(() => this.update()));
 
-		const unitField = adminField(form, format.text('inviteUnit'));
+		const unitField = pageField(form, format.text('inviteUnit'));
 		this.unitField = unitField.element;
 		this.unit = this._register(this.picker(unitField.element, format.text('inviteUnit')));
 		this._register(this.unit.onDidChange((unit) => void this.loadClasses(unit)));
-		const classField = adminField(form, format.text('inviteClass'));
+		const classField = pageField(form, format.text('inviteClass'));
 		this.classField = classField.element;
 		this.klass = this._register(this.picker(classField.element, format.text('inviteClass')));
 		this._register(this.klass.onDidChange(() => this.update()));
-		const roleField = adminField(form, format.text('inviteRoleLabel'));
+		const roleField = pageField(form, format.text('inviteRoleLabel'));
 		this.roleField = roleField.element;
 		this.role = this._register(this.picker(roleField.element, format.text('inviteRoleLabel')));
 		this._register(this.role.onDidChange(() => this.update()));
 
-		const fileField = adminField(
+		const fileField = pageField(
 			form,
 			format.text('importsFile'),
 			format.text('importsFileHint')

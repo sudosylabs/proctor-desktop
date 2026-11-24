@@ -68,7 +68,9 @@ export class UnitTree extends Disposable {
 			.map((unit) => ({ unit, depth: 0, children: undefined, expanded: false }));
 		for (const node of this.roots) {
 			const before = previous.find((candidate) => candidate.unit.id === node.unit.id);
-			if (before?.expanded) await this.expand(node, false);
+			// One root, usually the institution itself, starts open so its units show at once.
+			if (before?.expanded || (before === undefined && this.roots.length === 1))
+				await this.expand(node, false);
 		}
 		this.render();
 		return this.roots.length === 0 ? 'empty' : 'ready';
@@ -173,7 +175,7 @@ export class UnitTree extends Disposable {
 					caret.element,
 					$('span.prctr-admin-unit-tree__label', { textContent: node.unit.displayName })
 				);
-				item.style.paddingInlineStart = `${4 + node.depth * 16}px`;
+				item.style.paddingInlineStart = `${4 + node.depth * 14}px`;
 				this.rowStore.add(
 					addDisposableListener(caret.element, 'click', (event) => {
 						event.stopPropagation();
@@ -181,7 +183,11 @@ export class UnitTree extends Disposable {
 					})
 				);
 				this.rowStore.add(
-					addDisposableListener(item, 'click', () => this.select(node.unit.id))
+					// Choosing a unit also opens it, so its sub-units show beside its details.
+					addDisposableListener(item, 'click', () => {
+						this.select(node.unit.id);
+						if (!node.expanded) void this.expand(node, true);
+					})
 				);
 				return item;
 			})

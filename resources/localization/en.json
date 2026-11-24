@@ -854,6 +854,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
+    "account.profile.username": {
+      "message": "Username",
+      "description": "Account detail: the name the person signs in with.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
+    },
     "account.profile.verification.sent": {
       "message": "If this address can receive email, a verification link is on its way.",
       "description": "Confirms a verification request without revealing delivery.",
@@ -3225,6 +3231,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.audits.note": {
+      "message": "Each line is written by Proctor, naming who did what. The line under it is the reason they gave, when there is one.",
+      "description": "Explains the audit list above its table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
     "administration.audits.period": {
       "message": "Period",
       "description": "Filter of how far back the audit log reaches.",
@@ -3264,7 +3276,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.audits.where": {
-      "message": "Where",
+      "message": "From",
       "description": "Column of the app and address an event came from.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -4674,6 +4686,84 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
     },
+    "administration.desktop.any": {
+      "message": "Any release",
+      "description": "No oldest release is set.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.availability": {
+      "message": "Availability",
+      "description": "Section of whether exams are open on Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.blocked": {
+      "message": "Blocked builds",
+      "description": "Section of builds that cannot sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.blocked.note": {
+      "message": "A blocked build can’t sign in, whatever the oldest release allowed.",
+      "description": "Explains blocked builds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.build": {
+      "message": "Build",
+      "description": "Column of a blocked build.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.exams": {
+      "message": "Exams on Proctor Desktop",
+      "description": "Whether exams can start on Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.message": {
+      "message": "Message for candidates",
+      "description": "Shown in Proctor Desktop during maintenance.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.no.new": {
+      "message": "No new exams start",
+      "description": "Note beside maintenance.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.none.blocked": {
+      "message": "No builds are blocked.",
+      "description": "Shown when no build is blocked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.oldest": {
+      "message": "Oldest release allowed",
+      "description": "Older releases are asked to update.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.open": {
+      "message": "Open",
+      "description": "Exams can start on Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.releases": {
+      "message": "Releases",
+      "description": "Section of which releases may connect.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.why": {
+      "message": "Why",
+      "description": "Column of why a build is blocked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.duration.hours": {
       "message": "{count} h",
       "description": "A short duration in hours, as in \"2 h\".",
@@ -4782,6 +4872,398 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.import.banner.checking": {
+      "message": "Checking every row against the people and classes already here. Nothing changes yet, and you can leave this page: the import waits for you under Imports.",
+      "description": "Shown while the server checks an import file.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.done": {
+      "message": "{imported} people were imported. {missed} rows didn’t import: {left} left out at review and {failed} that failed while importing. The report lists every one.",
+      "description": "Shown on a finished import where some rows did not import.",
+      "placeholders": [
+        "imported",
+        "missed",
+        "left",
+        "failed"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.failed": {
+      "message": "This import stopped before it finished. Upload the file again to try once more.",
+      "description": "Shown on an import that failed for another reason.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.importing": {
+      "message": "Imported {done} of {total} people. Each one is added as soon as they’re ready; you can leave this page.",
+      "description": "Shown while an import runs.",
+      "placeholders": [
+        "done",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.left.out": {
+      "message": "{count} rows can’t be imported and will be left out. Fix them in the file and upload it again, or import the rest now.",
+      "description": "Shown on an import ready to review with rows that will be left out.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.left.out.one": {
+      "message": "{count} row can’t be imported and will be left out. Fix it in the file and upload it again, or import the rest now.",
+      "description": "Shown on an import ready to review with one row that will be left out.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.unreadable": {
+      "message": "This file couldn’t be read as CSV, so nothing was imported. Save it from your spreadsheet as “CSV UTF-8” and upload it again.",
+      "description": "Shown on an import whose file could not be read.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.found": {
+      "message": "What Proctor found",
+      "description": "Column of what is wrong with a row.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.outcome": {
+      "message": "Outcome",
+      "description": "Column of what happens to a row.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.person": {
+      "message": "Person",
+      "description": "Column of who a row is about.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.row": {
+      "message": "Row",
+      "description": "Column of the row number in the file.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.why": {
+      "message": "Why",
+      "description": "Column of why a row failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.commit.people": {
+      "message": "Import {count} people",
+      "description": "Imports the ready rows of an import.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.commit.people.one": {
+      "message": "Import {count} person",
+      "description": "Imports the one ready row of an import.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.each.row": {
+      "message": "Each row after",
+      "description": "What every later row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.each.row.value": {
+      "message": "One person",
+      "description": "What every later row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.first.row": {
+      "message": "First row",
+      "description": "What the first row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.first.row.value": {
+      "message": "Column names: email, first name, last name",
+      "description": "What the first row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.format": {
+      "message": "Format",
+      "description": "The file format an import needs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.format.value": {
+      "message": "CSV, saved as “CSV UTF-8”",
+      "description": "The file format an import needs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.title": {
+      "message": "What Proctor expects",
+      "description": "Heading of how an import file should look.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.failed.title": {
+      "message": "Rows that failed while importing",
+      "description": "Heading of an import’s rows that failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.found.already": {
+      "message": "Already in place, so nothing changes",
+      "description": "A row that needs no change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.found.unknown": {
+      "message": "This row can’t be imported",
+      "description": "A row with an unknown problem.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.look.description": {
+      "message": "Left out first, then skipped. Everything else imports as written.",
+      "description": "Explains the rows that need a look.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.look.title": {
+      "message": "Rows that need a look",
+      "description": "Heading of an import’s rows that won’t import as written.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.outcome.left.out": {
+      "message": "Left out",
+      "description": "A row that won’t be imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.outcome.skipped": {
+      "message": "Skipped",
+      "description": "A row with nothing to change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.finished": {
+      "message": "Finished {when}",
+      "description": "When an import finished: “Finished today at 09:31”.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.people": {
+      "message": "{count} people",
+      "description": "How many people an import is adding.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.people.one": {
+      "message": "{count} person",
+      "description": "An import adding one person.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.rows": {
+      "message": "{count} rows",
+      "description": "How many rows an import file has.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.rows.one": {
+      "message": "{count} row",
+      "description": "An import file with one row.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.started": {
+      "message": "Started {when}",
+      "description": "When an import started: “Started 1 minute ago”.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.uploaded": {
+      "message": "Uploaded {when}",
+      "description": "When an import file was uploaded: “Uploaded 20 minutes ago”.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.already": {
+      "message": "Already there",
+      "description": "Note under skipped rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.as.written": {
+      "message": "Imported as written",
+      "description": "Note under the ready rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.checked": {
+      "message": "Checked",
+      "description": "Rows checked so far.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.didnt": {
+      "message": "Didn’t import",
+      "description": "Rows that failed while importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.failed.importing": {
+      "message": "Failed while importing",
+      "description": "Rows that failed while importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.fix.upload": {
+      "message": "Fix and upload again",
+      "description": "Note under rows left out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.imported": {
+      "message": "Imported",
+      "description": "Rows imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.in.order": {
+      "message": "In order",
+      "description": "Note under waiting rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.in.report": {
+      "message": "In the report",
+      "description": "Note under rows left out at review.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.left.out": {
+      "message": "Left out",
+      "description": "Rows that can’t be imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.left.out.review": {
+      "message": "Left out at review",
+      "description": "Rows left out before importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.listed.below": {
+      "message": "Listed below",
+      "description": "Note under rows that failed while importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.need.look": {
+      "message": "Need a look",
+      "description": "Rows with a problem found so far.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.new": {
+      "message": "New accounts and enrolments",
+      "description": "Note under rows that add people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.of": {
+      "message": "Of {total} rows",
+      "description": "Note under the rows checked so far.",
+      "placeholders": [
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.ready": {
+      "message": "Ready",
+      "description": "Rows that will import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.ready.so.far": {
+      "message": "Ready so far",
+      "description": "Rows ready while checking continues.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.skipped": {
+      "message": "Skipped",
+      "description": "Rows with nothing to change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.so.far": {
+      "message": "So far",
+      "description": "Note under a figure still growing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.waiting": {
+      "message": "Waiting",
+      "description": "Rows not yet imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.yet": {
+      "message": "Yet",
+      "description": "Note under rows that failed so far.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.step.import": {
+      "message": "Import",
+      "description": "The last step of an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.step.review": {
+      "message": "Review",
+      "description": "The second step of an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.step.upload": {
+      "message": "Upload",
+      "description": "The first step of an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.steps": {
+      "message": "Steps",
+      "description": "Accessible name of an import’s steps.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
     "administration.imports.cancel": {
       "message": "Cancel import",
       "description": "Cancels an import after confirming.",
@@ -4809,12 +5291,6 @@
     "administration.imports.cancelled": {
       "message": "The import is cancelled",
       "description": "Toast after an import is cancelled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.checking": {
-      "message": "Checking the rows… This page updates on its own.",
-      "description": "Shown while the server reads the file.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -4848,14 +5324,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.commit.all": {
-      "message": "Import {count} rows",
-      "description": "Imports every row; count is how many.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
     "administration.imports.commit.body": {
       "message": "Accounts, enrolments and invitations are created as the rows say. Rows with errors are left out.",
       "description": "Confirmation body before importing.",
@@ -4865,35 +5333,6 @@
     "administration.imports.commit.title": {
       "message": "Import these rows?",
       "description": "Confirmation title before importing.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.commit.valid": {
-      "message": "Import the {count} ready rows",
-      "description": "Imports only the rows without errors.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.description": {
-      "message": "{rows} rows · Uploaded {when}",
-      "description": "Description of one import.",
-      "placeholders": [
-        "rows",
-        "when"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.errors": {
-      "message": "Errors",
-      "description": "Count of rows that will be left out.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.failed": {
-      "message": "Failed",
-      "description": "Count of rows that failed to import.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -4921,18 +5360,30 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.importing": {
-      "message": "Importing… This page updates on its own.",
-      "description": "Shown while the server imports the rows.",
+    "administration.imports.filter.any": {
+      "message": "Any",
+      "description": "The Imports status filter set to every status.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.left.out": {
-      "message": "{count} rows can’t be imported and will be left out. Fix them in the file and upload it again, or import the rest now.",
-      "description": "Notice when some rows have errors.",
+    "administration.imports.filter.status": {
+      "message": "Status",
+      "description": "Label of the Imports status filter.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.imported.missed": {
+      "message": "Imported, {count} didn’t",
+      "description": "Status of an import where some rows were not imported: “Imported, 2 didn’t”.",
       "placeholders": [
         "count"
       ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.kept": {
+      "message": "Kept for 30 days. Open one to see its rows or download its report.",
+      "description": "Explains the Imports list above its table.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
     "administration.imports.mode": {
@@ -4983,15 +5434,9 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.ready": {
-      "message": "Ready",
-      "description": "Count of rows that will import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.recent": {
-      "message": "Recent imports",
-      "description": "Section of files uploaded before.",
+    "administration.imports.no.match": {
+      "message": "No imports with this status",
+      "description": "The Imports list when the status filter matches nothing.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -5013,86 +5458,9 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.row": {
-      "message": "Row {row} · {reference}",
-      "description": "Title of one row of an import.",
-      "placeholders": [
-        "row",
-        "reference"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.code": {
-      "message": "{code}",
-      "description": "The server’s code for a row’s problem.",
-      "placeholders": [
-        "code"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.done": {
-      "message": "Imported",
-      "description": "Row status after import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.duplicate": {
-      "message": "Duplicate",
-      "description": "Row status: repeats an earlier row.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.failed": {
-      "message": "Failed",
-      "description": "Row status after a failed import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.invalid": {
-      "message": "Left out",
-      "description": "Row status: it has an error.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.skipped": {
-      "message": "Skipped",
-      "description": "Row status: left out.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.valid": {
-      "message": "Ready",
-      "description": "Row status.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows": {
-      "message": "Rows that need a look",
-      "description": "Section with the rows that have a problem.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows.description": {
-      "message": "Errors first. Everything else imports as written.",
-      "description": "Description of the rows section.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows.more": {
-      "message": "Only the first 100 rows are shown.",
-      "description": "Shown when the preview has more rows.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows.none": {
-      "message": "Every row is ready to import.",
-      "description": "Shown when no row has a problem.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.skipped": {
-      "message": "Skipped",
-      "description": "Count of rows left out or already done.",
+    "administration.imports.review": {
+      "message": "Review",
+      "description": "Opens an import that is ready to review.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -5150,24 +5518,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.succeeded": {
-      "message": "Imported",
-      "description": "Count of rows imported.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.summary": {
-      "message": "Summary",
-      "description": "Section with the counts of an import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.total": {
-      "message": "Rows",
-      "description": "Count of all rows in the file.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
     "administration.imports.trail": {
       "message": "Imports",
       "description": "The trail step back to Imports.",
@@ -5177,6 +5527,12 @@
     "administration.imports.unnamed": {
       "message": "A CSV file",
       "description": "An import whose file name isn’t known.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.unreadable": {
+      "message": "Couldn’t read",
+      "description": "Status of an import whose file could not be read as CSV.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -5204,6 +5560,30 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
+    "administration.institution.description.label": {
+      "message": "Description",
+      "description": "The institution’s description.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.institution.identity": {
+      "message": "Identity",
+      "description": "Section of the institution’s name and description.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.institution.name": {
+      "message": "Name",
+      "description": "The institution’s name.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.institution.server": {
+      "message": "Server",
+      "description": "Where Proctor Desktop connects for this institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.invitations.action.resend": {
       "message": "Resend email",
       "description": "Row action that sends the invitation email again.",
@@ -5213,6 +5593,18 @@
     "administration.invitations.action.revoke": {
       "message": "Revoke",
       "description": "Row action that revokes an invitation after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.by.former": {
+      "message": "A former user",
+      "description": "Invited by: the sender’s account was removed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.by.you": {
+      "message": "You",
+      "description": "Invited by: the signed-in person sent this invitation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -5291,7 +5683,7 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.filter.any.kind": {
-      "message": "Any invitation",
+      "message": "Any",
       "description": "Kind filter choice that shows every invitation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5309,7 +5701,7 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.find": {
-      "message": "Find by exact email",
+      "message": "Find by email",
       "description": "Search field above the list of invitations; the server matches whole addresses.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5565,13 +5957,13 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.kind.student": {
-      "message": "Student in a class",
+      "message": "Student",
       "description": "Invitation to join a class as a student.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.kind.teacher": {
-      "message": "Teacher in a unit",
+      "message": "Teacher",
       "description": "Invitation to teach in an academic unit.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5625,7 +6017,7 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.state.bounced": {
-      "message": "Not delivered",
+      "message": "Bounced",
       "description": "The invitation email could not be delivered.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -6178,6 +6570,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.jobs.done.note": {
+      "message": "Finished and routine runs are under Status: Done.",
+      "description": "Explains the Jobs list above its table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.jobs.empty": {
       "message": "No jobs yet",
       "description": "Title of the empty Jobs list.",
@@ -6490,6 +6888,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.mail.percent": {
+      "message": "{value}%",
+      "description": "A percentage: “98.7%”.",
+      "placeholders": [
+        "value"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.mail.queue": {
       "message": "{state}: {count}",
       "description": "How many deliveries are in one state.",
@@ -6523,14 +6929,68 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.mail.stat.bounced": {
+      "message": "Bounced",
+      "description": "Emails that could not be delivered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.delivered": {
+      "message": "Delivered",
+      "description": "Share of sent emails that were delivered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.not.retried": {
+      "message": "Not retried",
+      "description": "Note under bounced emails.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.of.sent": {
+      "message": "Of those sent",
+      "description": "Note under the delivered share.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.queued": {
+      "message": "Queued to send",
+      "description": "Note under waiting emails.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.sent": {
+      "message": "Sent",
+      "description": "Emails Proctor handed to the mail server.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.stat.waiting": {
+      "message": "Waiting",
+      "description": "Emails not yet sent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.mail.suppressed": {
       "message": "Suppressed",
       "description": "Delivery state: the address refuses mail.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.mail.tab.deliveries": {
+      "message": "Deliveries",
+      "description": "Tab listing every email Proctor sent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.tab.keys": {
+      "message": "Keys",
+      "description": "Tab of the keys protecting mail and two-step secrets.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.mail.test": {
-      "message": "Send test email",
+      "message": "Send a test email",
       "description": "Sends a test email to the signed-in person.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -6544,6 +7004,12 @@
     "administration.operations.mail.unknown": {
       "message": "Mail health isn’t known yet.",
       "description": "Mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.views": {
+      "message": "Mail views",
+      "description": "Accessible name of the Mail tabs.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -6565,6 +7031,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
+    "administration.overview.bounced": {
+      "message": "Mail bounced",
+      "description": "Stat: emails that couldn’t be delivered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.overview.cleanup.detail": {
       "message": "Records past their retention period wait until cleanup resumes.",
       "description": "Detail of the paused cleanup item.",
@@ -6575,6 +7047,52 @@
       "message": "Record cleanup is paused",
       "description": "Attention item: automatic deletion is paused.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.day.time": {
+      "message": "{date}, {time}",
+      "description": "When a change was made, on an earlier day: “28 Oct, 16:02”.",
+      "placeholders": [
+        "date",
+        "time"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.expire.week": {
+      "message": "{count} expire this week",
+      "description": "Note under Pending invitations: several lapse within seven days.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.expire.week.one": {
+      "message": "1 expires this week",
+      "description": "Note under Pending invitations: one lapses within seven days.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.failed.jobs.stat": {
+      "message": "Failed jobs",
+      "description": "Stat: background jobs that failed in the last seven days.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.import.detail": {
+      "message": "{rows} rows · Uploaded {when}",
+      "description": "Detail of an import waiting for review.",
+      "placeholders": [
+        "rows",
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.import.ready": {
+      "message": "{name} is ready to review",
+      "description": "Attention item: an import was checked and waits for a decision.",
+      "placeholders": [
+        "name"
+      ],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
     "administration.overview.invitations": {
@@ -6633,6 +7151,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
+    "administration.overview.last.day": {
+      "message": "Last 24 hours",
+      "description": "Note under Mail bounced: the period counted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.overview.mail.detail": {
       "message": "Most recent to {recipient}",
       "description": "Detail of the failed mail item.",
@@ -6667,9 +7191,45 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
+    "administration.overview.pending": {
+      "message": "Pending invitations",
+      "description": "Stat: invitations not yet accepted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.people": {
+      "message": "People",
+      "description": "Stat: everyone with an account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.people.split": {
+      "message": "{students} students · {staff} staff",
+      "description": "Note under People: how many are students and how many staff.",
+      "placeholders": [
+        "students",
+        "staff"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.people.split.both": {
+      "message": "{students} students · {staff} staff, some both",
+      "description": "Note under People when some people are both a student and staff.",
+      "placeholders": [
+        "students",
+        "staff"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.overview.recent": {
       "message": "Recent administrative changes",
       "description": "Section with the latest audit events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.recent.changes": {
+      "message": "Recent changes",
+      "description": "Section with the latest administrative changes.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
@@ -6691,6 +7251,28 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
+    "administration.overview.review.import": {
+      "message": "Review import",
+      "description": "Button: open the import that waits for review.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.since": {
+      "message": "Since {date}",
+      "description": "Note under Failed jobs: the earliest failure was on this day.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.since.today": {
+      "message": "Since {time} today",
+      "description": "Note under Failed jobs: the earliest failure was today, at this time.",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.overview.succeeded": {
       "message": "Done",
       "description": "A change that succeeded.",
@@ -6698,7 +7280,7 @@
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
     "administration.page.audits.description": {
-      "message": "Everything that changed at {institution}, who did it and when.",
+      "message": "Everything done at {institution}, by whom and from where.",
       "description": "One-line description under the Audits heading.",
       "placeholders": [
         "institution"
@@ -6706,7 +7288,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.audits.description.generic": {
-      "message": "Everything that changed, who did it and when.",
+      "message": "Everything done, by whom and from where.",
       "description": "Audits description when the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6723,6 +7305,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.page.desktop.description": {
+      "message": "Which releases of Proctor Desktop may connect, and whether exams are open on Desktop right now.",
+      "description": "One-line description under the Proctor Desktop heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.desktop.title": {
+      "message": "Proctor Desktop",
+      "description": "Heading of the Proctor Desktop page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.page.import.title": {
       "message": "Import",
       "description": "Heading of one onboarding import before its details load.",
@@ -6730,7 +7324,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.imports.description": {
-      "message": "Add many people at once from a spreadsheet, and review each row before anything changes.",
+      "message": "Add many people at once from a spreadsheet. Proctor checks every row first, and nothing changes until you review it.",
       "description": "One-line description under the Imports heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6741,8 +7335,28 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.page.institution.description": {
+      "message": "How {institution} appears in Proctor.",
+      "description": "One-line description under the Institution heading.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.institution.description.generic": {
+      "message": "How your institution appears in Proctor.",
+      "description": "Institution description when the name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.institution.title": {
+      "message": "Institution",
+      "description": "Heading of the Institution page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.page.invitations.description": {
-      "message": "Invitations to join classes, units and roles, and how their emails are doing.",
+      "message": "People asked to join, and what they were invited to.",
       "description": "One-line description under the Invitations heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6754,7 +7368,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.jobs.description": {
-      "message": "Background work such as imports, previews and key rotation.",
+      "message": "Work Proctor runs in the background, such as imports, cleanup and key rotation.",
       "description": "One-line description under the Jobs heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6766,7 +7380,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.mail.description": {
-      "message": "Whether mail from {institution} is being delivered.",
+      "message": "Email Proctor sends for {institution}: invitations, verification and sign-in help.",
       "description": "One-line description under the Mail heading.",
       "placeholders": [
         "institution"
@@ -6774,7 +7388,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.mail.description.generic": {
-      "message": "Whether mail is being delivered.",
+      "message": "Email Proctor sends: invitations, verification and sign-in help.",
       "description": "Mail description when the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6786,7 +7400,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.overview.description": {
-      "message": "What needs your attention at {institution}.",
+      "message": "What needs you at {institution} today.",
       "description": "One-line description under the Overview heading.",
       "placeholders": [
         "institution"
@@ -6794,7 +7408,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.overview.description.generic": {
-      "message": "What needs your attention.",
+      "message": "What needs you today.",
       "description": "Overview description when the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6806,7 +7420,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.periods.description": {
-      "message": "The terms and years that classes and enrolments belong to.",
+      "message": "Terms and years that classes run in. A class belongs to one period, and exams are planned inside it.",
       "description": "One-line description under the Academic periods heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6850,7 +7464,7 @@
       "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
     },
     "administration.page.retention.description": {
-      "message": "How long exam records are kept, and what is deleted when.",
+      "message": "How long Proctor keeps examination records, and when it may delete them.",
       "description": "One-line description under the Data retention heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6862,7 +7476,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.roles.description": {
-      "message": "What each role lets people do, and where.",
+      "message": "What each role lets people do. Built-in roles can’t be changed; custom roles can.",
       "description": "One-line description under the Roles heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6874,7 +7488,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.structure.description": {
-      "message": "Academic units, their programmes and levels, and the classes in them.",
+      "message": "Faculties, departments, programmes and classes, as your institution is organised.",
       "description": "One-line description under the Structure heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -7473,7 +8087,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.audits.column.event": {
-      "message": "Event",
+      "message": "What happened",
       "description": "Audit column.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -7617,7 +8231,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.audit": {
-      "message": "Audit events",
+      "message": "Audits",
       "description": "Retention period.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -7678,6 +8292,14 @@
       "message": "Enter a whole number of days from 0 to 36500.",
       "description": "Error for an invalid number of days.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.days.one": {
+      "message": "{count} day",
+      "description": "One day.",
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.draft.apply": {
@@ -7837,7 +8459,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.grace": {
-      "message": "Grace before deleting",
+      "message": "Grace period",
       "description": "Days records wait after becoming eligible.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -7873,7 +8495,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.notices": {
-      "message": "Tell candidates",
+      "message": "Tell candidates first",
       "description": "Whether candidates are told when their records will be deleted.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -7996,6 +8618,94 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
+    "administration.records.retention.years": {
+      "message": "{count} years",
+      "description": "A number of years records are kept.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.years.one": {
+      "message": "{count} year",
+      "description": "One year records are kept.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.roles.grid.browser": {
+      "message": "Browser activity",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.change": {
+      "message": "Change",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.classes": {
+      "message": "Classes",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.create": {
+      "message": "Create",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.exams": {
+      "message": "Exams",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.export": {
+      "message": "Export",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.publish": {
+      "message": "Publish",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.records": {
+      "message": "Records",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.review": {
+      "message": "Review",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.sittings": {
+      "message": "Sittings",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.submissions": {
+      "message": "Submissions",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.view": {
+      "message": "View",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
     "administration.sidebar.count.imports.many": {
       "message": "{count} open imports",
       "description": "Spoken name of the sidebar count beside Imports.",
@@ -8012,22 +8722,6 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
-    "administration.sidebar.count.invitations.many": {
-      "message": "{count} pending invitations",
-      "description": "Spoken name of the sidebar count beside Invitations.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
-    "administration.sidebar.count.invitations.one": {
-      "message": "{count} pending invitation",
-      "description": "Spoken name of the sidebar count beside Invitations when it is one.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
     "administration.sidebar.count.jobs.many": {
       "message": "{count} failed jobs",
       "description": "Spoken name of the sidebar count beside Jobs.",
@@ -8039,22 +8733,6 @@
     "administration.sidebar.count.jobs.one": {
       "message": "{count} failed job",
       "description": "Spoken name of the sidebar count beside Jobs when it is one.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
-    "administration.sidebar.count.mail.many": {
-      "message": "{count} emails not delivered",
-      "description": "Spoken name of the sidebar count beside Mail.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
-    },
-    "administration.sidebar.count.mail.one": {
-      "message": "{count} email not delivered",
-      "description": "Spoken name of the sidebar count beside Mail when it is one.",
       "placeholders": [
         "count"
       ],
@@ -8326,9 +9004,21 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
+    "administration.structure.column.programme": {
+      "message": "Programme",
+      "description": "Column of a unit’s programmes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
     "administration.structure.column.students": {
       "message": "Students",
       "description": "Column of a unit's classes: how many students each has.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.column.years": {
+      "message": "Years",
+      "description": "Column of how many years (levels) a programme has.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
@@ -8528,6 +9218,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
+    "administration.structure.periods.next": {
+      "message": "Next",
+      "description": "Status of the soonest academic period still to start.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.owned.note": {
+      "message": "A period owned by a unit is only offered to that unit’s classes.",
+      "description": "Explains academic periods above their table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
     "administration.structure.periods.owner": {
       "message": "Belongs to",
       "description": "Field: the institution or a unit.",
@@ -8562,9 +9264,17 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.periods.upcoming": {
-      "message": "Upcoming",
+      "message": "Planned",
       "description": "A period starting later.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.programme.actions": {
+      "message": "Actions for {name}",
+      "description": "Accessible name of a programme’s ⋯ menu.",
+      "placeholders": [
+        "name"
+      ],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.programme.new": {
@@ -8937,25 +9647,6 @@
       "message": "Current",
       "description": "Status of an affiliation or role that applies now.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
-    },
-    "administration.user.description": {
-      "message": "{email} · Username {username} · Member since {date}",
-      "description": "Description under a user’s name; email may be absent.",
-      "placeholders": [
-        "email",
-        "username",
-        "date"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
-    },
-    "administration.user.description.no.email": {
-      "message": "Username {username} · Member since {date}",
-      "description": "Description under a user’s name when they have no email.",
-      "placeholders": [
-        "username",
-        "date"
-      ],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.disable.reason": {
@@ -9386,6 +10077,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
+    "administration.user.since": {
+      "message": "Since {date}",
+      "description": "When a person joined, on their record line: “Since September 2025”.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
     "administration.user.starts": {
       "message": "Starts",
       "description": "Field: when something starts; empty means now.",
@@ -9541,7 +10240,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.affiliation.any": {
-      "message": "Any affiliation",
+      "message": "Any",
       "description": "The affiliation filter shows everyone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -9771,7 +10470,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.filter.active.any": {
-      "message": "Any time",
+      "message": "Any",
       "description": "Users filter choice: no filter on when people were last active.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -9801,7 +10500,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.filter.role.any": {
-      "message": "Any role",
+      "message": "Any",
       "description": "Users filter choice: no role filter.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -9825,7 +10524,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.filter.status.any": {
-      "message": "Any status",
+      "message": "Any",
       "description": "Users filter choice: active and disabled accounts.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -10169,7 +10868,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.unit.any": {
-      "message": "Any unit",
+      "message": "Any",
       "description": "The unit filter shows everyone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -10310,6 +11009,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },
+    "authenticated.nav.administration.desktop": {
+      "message": "Proctor Desktop",
+      "description": "Administration sidebar page for which Desktop releases may connect.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
     "authenticated.nav.administration.group.access": {
       "message": "Access",
       "description": "Administration sidebar heading over Roles and Access policy.",
@@ -10343,6 +11048,12 @@
     "authenticated.nav.administration.imports": {
       "message": "Imports",
       "description": "Administration sidebar page for onboarding imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.institution": {
+      "message": "Institution",
+      "description": "Administration sidebar page for how the institution appears.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },
@@ -12245,6 +12956,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
+    "page.field.refused": {
+      "message": "The server didn’t accept this. Check it and try again.",
+      "description": "Shown under a form field the server refused.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.field.required": {
+      "message": "This is required.",
+      "description": "Shown under a required form field left empty.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
     "page.pager.compact": {
       "message": "Page {page} of {count}",
       "description": "The pager's narrow form, as in \"Page 12 of 25\".",
@@ -12355,7 +13078,7 @@
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
     "page.row.chips.more": {
-      "message": "{count} more",
+      "message": "and {count} more",
       "description": "Opens the labels not shown in the row, such as \"7 more\".",
       "placeholders": [
         "count"

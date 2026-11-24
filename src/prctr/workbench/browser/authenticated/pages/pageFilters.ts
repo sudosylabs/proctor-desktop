@@ -16,7 +16,7 @@ import {
 	proctorIconFactory
 } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
-import './media/adminFilters.css';
+import './media/pageFilters.css';
 
 /** Typing settles for this long before a search is sent. */
 const SEARCH_SETTLE_MS = 300;
@@ -26,7 +26,7 @@ const SEARCH_SETTLE_MS = 300;
  * short note at the end, such as how many rows a page shows. While rows are chosen, the bar
  * shows how many and the changes that apply to all of them instead.
  */
-export class AdminFilters extends Disposable {
+export class PageFilters extends Disposable {
 	readonly element: HTMLElement;
 	/** Where the owner puts the changes for chosen rows. */
 	readonly selectionActions: HTMLElement;
@@ -46,18 +46,18 @@ export class AdminFilters extends Disposable {
 	constructor(host: HTMLElement) {
 		super();
 		const $ = createElementFactory(host.ownerDocument);
-		this.note = $('span.prctr-admin-filters__note', { attrs: { 'aria-live': 'polite' } });
-		this.selectionCount = $('span.prctr-admin-filters__count', {
+		this.note = $('span.prctr-page-filters__note', { attrs: { 'aria-live': 'polite' } });
+		this.selectionCount = $('span.prctr-page-filters__count', {
 			attrs: { 'aria-live': 'polite' }
 		});
-		this.selectionActions = $('div.prctr-admin-filters__actions');
-		this.selectionLink = $('button.prctr-admin-filters__link', {
+		this.selectionActions = $('div.prctr-page-filters__actions');
+		this.selectionLink = $('button.prctr-page-filters__link', {
 			type: 'button',
 			hidden: true
 		});
 		this._register(addDisposableListener(this.selectionLink, 'click', () => this.linkRun?.()));
 		this.selection = $(
-			'div.prctr-admin-filters__selection',
+			'div.prctr-page-filters__selection',
 			{ attrs: { role: 'toolbar' } },
 			this.selectionCount,
 			this.selectionLink,
@@ -65,9 +65,9 @@ export class AdminFilters extends Disposable {
 		);
 		this.selection.hidden = true;
 		this.element = $(
-			'div.prctr-admin-filters',
+			'div.prctr-page-filters',
 			{},
-			$('span.prctr-admin-filters__spacer'),
+			$('span.prctr-page-filters__spacer'),
 			this.note,
 			this.selection
 		);
@@ -96,11 +96,11 @@ export class AdminFilters extends Disposable {
 	/** A place in the bar for a filter another control draws, such as a person picker. */
 	addSlot(): HTMLElement {
 		const holder = createElementFactory(this.element.ownerDocument)(
-			'span.prctr-admin-filters__select'
+			'span.prctr-page-filters__select'
 		);
 		this.element.insertBefore(
 			holder,
-			this.element.querySelector('.prctr-admin-filters__spacer')
+			this.element.querySelector('.prctr-page-filters__spacer')
 		);
 		return holder;
 	}
@@ -115,16 +115,35 @@ export class AdminFilters extends Disposable {
 		const icon = this._register(
 			createProctorIcon(this.element.ownerDocument, { id: 'action.search', size: 14 })
 		);
-		const input = $('input.prctr-admin-filters__input', {
+		const input = $('input.prctr-page-filters__input', {
 			type: 'search',
 			placeholder: label,
 			attrs: { 'aria-label': label, maxlength: '100' }
 		});
-		const field = $('label.prctr-admin-filters__find', {}, icon.element, input);
-		this.element.insertBefore(
-			field,
-			this.element.querySelector('.prctr-admin-filters__spacer')
+		const key = $('kbd.prctr-page-filters__key', {
+			textContent: '/',
+			attrs: { 'aria-hidden': 'true' }
+		});
+		input.setAttribute('aria-keyshortcuts', '/');
+		const field = $('label.prctr-page-filters__find', {}, icon.element, input, key);
+		// "/" jumps to the search from anywhere on the page that isn't already taking text.
+		this._register(
+			addDisposableListener(this.element.ownerDocument, 'keydown', (event) => {
+				if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+				const target = event.target;
+				if (
+					(target instanceof Element &&
+						target.closest('input, textarea, select, [contenteditable="true"]') !==
+							null) ||
+					!this.element.isConnected ||
+					this.element.closest('[hidden]') !== null
+				)
+					return;
+				event.preventDefault();
+				input.focus();
+			})
 		);
+		this.element.insertBefore(field, this.element.querySelector('.prctr-page-filters__spacer'));
 		let timer: ReturnType<typeof setTimeout> | undefined;
 		let last: string | undefined;
 		const settle = (): void => {
@@ -164,21 +183,24 @@ export class AdminFilters extends Disposable {
 		more = false
 	): SelectControl<T> {
 		const holder = createElementFactory(this.element.ownerDocument)(
-			'span.prctr-admin-filters__select'
+			'span.prctr-page-filters__select'
 		);
 		holder.hidden = more;
 		this.element.insertBefore(
 			holder,
-			this.element.querySelector('.prctr-admin-filters__spacer')
+			this.element.querySelector('.prctr-page-filters__spacer')
 		);
 		const select = this._register(
 			new SelectControl(holder, {
 				label,
 				choices,
 				value,
-				icon: proctorIconFactory(icon, 16),
-				caret: proctorIconFactory('action.expand', 14),
-				fit: 'content'
+				icon: proctorIconFactory(icon, 14),
+				caret: proctorIconFactory('action.expand', 12),
+				fit: 'content',
+				prefix: label,
+				// A filter set to anything but its no-filter choice is filled, so the narrowing shows.
+				unset: value
 			})
 		);
 		this._register(
@@ -202,11 +224,11 @@ export class AdminFilters extends Disposable {
 	 */
 	addMoreFilters(label: string, menu: MenuControl): void {
 		const holder = createElementFactory(this.element.ownerDocument)(
-			'span.prctr-admin-filters__more'
+			'span.prctr-page-filters__more'
 		);
 		this.element.insertBefore(
 			holder,
-			this.element.querySelector('.prctr-admin-filters__spacer')
+			this.element.querySelector('.prctr-page-filters__spacer')
 		);
 		const button = this._register(
 			new ButtonControl(holder, {

@@ -50,13 +50,11 @@ remaining adapters and verified release capability.
   co-located CSS, with Proctor-owned controls and the
   [design system](../architecture/design-system.md) across every window.
 - Treating local folders, the local filesystem, or a local PTY as the primary
-  application model. Attempt resources are remote-first. Code execution is
-  deferred; a Run capability is planned before the first release.
+  application model. Attempt resources are remote-first, and code runs only in
+  the server's per-Attempt execution environment.
 - Treating the desktop client as the authority for durable institutional,
   authorization, examination, or submission state.
 - Hiding platform-specific behavior behind a false cross-platform abstraction
   before two real adapters require a seam.
 - Shipping speculative frameworks, registries, or contribution points without
   a product use case.
-- Shipping the AI agent in the first release. Its policy, provider, model,
-  tool, network, privacy, and evidence boundaries remain deferred.

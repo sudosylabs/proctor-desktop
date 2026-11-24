@@ -92,6 +92,16 @@ export const authenticatedMessages = Object.freeze({
 		defaultMessage: 'Roles',
 		description: 'Administration sidebar page for roles.'
 	}),
+	adminInstitution: defineMessage({
+		id: 'authenticated.nav.administration.institution',
+		defaultMessage: 'Institution',
+		description: 'Administration sidebar page for how the institution appears.'
+	}),
+	adminDesktop: defineMessage({
+		id: 'authenticated.nav.administration.desktop',
+		defaultMessage: 'Proctor Desktop',
+		description: 'Administration sidebar page for which Desktop releases may connect.'
+	}),
 	adminPolicy: defineMessage({
 		id: 'authenticated.nav.administration.policy',
 		defaultMessage: 'Access policy',

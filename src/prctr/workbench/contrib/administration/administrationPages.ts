@@ -7,7 +7,9 @@ import type { PageView } from '../../browser/authenticated/pages/pagePane.js';
 import type { AdministrationPage } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import type { IAdministrationFormatService } from './administrationFormat.js';
 import type { AdministrationMessage } from './administrationMessages.js';
+import { DesktopPage } from './desktop/desktopPage.js';
 import { ImportPage } from './imports/importPage.js';
+import { InstitutionPage } from './institution/institutionPage.js';
 import { ImportsPage } from './imports/importsPage.js';
 import { ClassPage } from './class/classPage.js';
 import { InvitationsPage } from './invitations/invitationsPage.js';
@@ -31,7 +33,7 @@ export interface AdministrationPageDescriptor {
 	readonly title: AdministrationMessage;
 	description(format: IAdministrationFormatService): string;
 	/** Tables use the wide column. */
-	readonly width: 'narrow' | 'wide';
+	readonly width: 'record' | 'wide';
 	/** Builds the page; a record's page is given the record's id. */
 	create(
 		instantiationService: IInstantiationService,
@@ -61,7 +63,7 @@ function emptyPage(): PageView {
 function list(
 	title: AdministrationMessage,
 	description: (format: IAdministrationFormatService) => string,
-	width: 'narrow' | 'wide',
+	width: 'record' | 'wide',
 	create: Create
 ): AdministrationPageDescriptor {
 	return { title, description, width, create };
@@ -69,7 +71,7 @@ function list(
 
 function record(
 	title: AdministrationMessage,
-	width: 'narrow' | 'wide',
+	width: 'record' | 'wide',
 	create: CreateRecord
 ): AdministrationPageDescriptor {
 	return {
@@ -90,7 +92,7 @@ export const administrationPageRegistry: Readonly<
 	overview: list(
 		'overviewTitle',
 		(f) => f.institutionText('overviewDescription', 'overviewDescriptionGeneric'),
-		'narrow',
+		'wide',
 		(i, body, actions) => i.createInstance(OverviewPage, body, actions)
 	),
 	users: list(
@@ -99,7 +101,7 @@ export const administrationPageRegistry: Readonly<
 		'wide',
 		(i, body, actions) => i.createInstance(UsersPage, body, actions)
 	),
-	user: record('userTitle', 'narrow', (i, body, actions, id) =>
+	user: record('userTitle', 'record', (i, body, actions, id) =>
 		i.createInstance(UserPage, body, actions, id)
 	),
 	invitations: list(
@@ -114,8 +116,14 @@ export const administrationPageRegistry: Readonly<
 		'wide',
 		(i, body, actions) => i.createInstance(ImportsPage, body, actions)
 	),
-	import: record('importTitle', 'narrow', (i, body, actions, id) =>
+	import: record('importTitle', 'record', (i, body, actions, id) =>
 		i.createInstance(ImportPage, body, actions, id)
+	),
+	institution: list(
+		'institutionTitle',
+		(f) => f.institutionText('institutionDescription', 'institutionDescriptionGeneric'),
+		'record',
+		(i, body, actions) => i.createInstance(InstitutionPage, body, actions)
 	),
 	structure: list(
 		'structureTitle',
@@ -138,7 +146,7 @@ export const administrationPageRegistry: Readonly<
 		'wide',
 		(i, body, actions) => i.createInstance(ProgressionPage, body, actions)
 	),
-	progressionReview: record('reviewTitle', 'narrow', (i, body, actions, id) =>
+	progressionReview: record('reviewTitle', 'record', (i, body, actions, id) =>
 		i.createInstance(ProgressionReviewPage, body, actions, id)
 	),
 	roles: list(
@@ -150,8 +158,14 @@ export const administrationPageRegistry: Readonly<
 	policy: list(
 		'policyTitle',
 		(f) => f.institutionText('policyDescription', 'policyDescriptionGeneric'),
-		'narrow',
+		'record',
 		(i, body, actions) => i.createInstance(PolicyPage, body, actions)
+	),
+	desktop: list(
+		'desktopTitle',
+		(f) => f.text('desktopDescription'),
+		'record',
+		(i, body, actions) => i.createInstance(DesktopPage, body, actions)
 	),
 	audits: list(
 		'auditsTitle',
@@ -162,7 +176,7 @@ export const administrationPageRegistry: Readonly<
 	retention: list(
 		'retentionTitle',
 		(f) => f.text('retentionDescription'),
-		'narrow',
+		'record',
 		(i, body, actions) => i.createInstance(RetentionPage, body, actions)
 	),
 	jobs: list(
@@ -171,7 +185,7 @@ export const administrationPageRegistry: Readonly<
 		'wide',
 		(i, body, actions) => i.createInstance(JobsPage, body, actions)
 	),
-	job: record('jobTitle', 'narrow', (i, body, actions, id) =>
+	job: record('jobTitle', 'record', (i, body, actions, id) =>
 		i.createInstance(JobPage, body, actions, id)
 	),
 	mail: list(

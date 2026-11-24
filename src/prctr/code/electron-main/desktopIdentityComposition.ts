@@ -1,4 +1,5 @@
-import { shell, net, powerMonitor } from 'electron';
+import { app, shell, net, powerMonitor } from 'electron';
+import { RotatingFileLog } from '../../platform/log/electron-main/rotatingFileLog.js';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DisposableStore } from '../../base/common/lifecycle.js';
@@ -136,7 +137,9 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				account,
 				administration,
 				examActivity,
-				settings: new UserSettingsServer(authorization)
+				settings: new UserSettingsServer(authorization),
+				// One bounded log file in the application's logs folder, for every window.
+				log: new RotatingFileLog(app.getPath('logs'))
 			}),
 			{
 				accept: (_descriptor, intent) => {

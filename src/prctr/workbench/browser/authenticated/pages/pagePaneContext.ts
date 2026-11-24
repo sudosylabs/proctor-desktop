@@ -20,11 +20,22 @@ export interface PageHeading {
 	readonly trail?: readonly { readonly label: string; open(): void }[];
 	/** A status word beside the title, coloured only when it needs attention. */
 	readonly status?: { readonly text: string; readonly tone: StatusBadgeTone };
+	/**
+	 * The record line under the title: short facts joined by "·", such as an identifier in mono,
+	 * a kind and when it was made. Shown in place of the description.
+	 */
+	readonly record?: readonly PageRecordPart[];
 	/** Initials shown before the title, as for a person, until `photo` arrives. */
 	readonly initials?: string;
 	/** The person's picture as a data URL, shown in place of the initials. */
 	readonly photo?: string;
 }
+
+/** One fact on a record line: plain text, an identifier in mono, or a status word in its tone. */
+export type PageRecordPart =
+	| string
+	| { readonly text: string; readonly mono: true }
+	| { readonly text: string; readonly tone: StatusBadgeTone };
 
 /** A failed result's detail and, when it can be repeated, how to try again. */
 export interface PageToastFailure {

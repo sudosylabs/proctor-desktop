@@ -236,7 +236,7 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 		// A whole page chosen from a longer list offers everyone matching; nothing is sent.
 		root.querySelector<HTMLInputElement>('thead .prctr-admin-list__select')!.click();
 		const link = (): HTMLButtonElement | null =>
-			root.querySelector<HTMLButtonElement>('.prctr-admin-filters__link:not([hidden])');
+			root.querySelector<HTMLButtonElement>('.prctr-page-filters__link:not([hidden])');
 		await wait(() => link() !== null, 'select all matching link');
 		check(
 			link()!.textContent === 'Select all 14 matching these filters',
@@ -245,7 +245,7 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 		const before = administration.intents.length;
 		link()!.click();
 		await wait(
-			() => visibleText('.prctr-admin-filters__count').join() === 'All 14 matching',
+			() => visibleText('.prctr-page-filters__count').join() === 'All 14 matching',
 			'everyone chosen'
 		);
 		check(administration.intents.length === before, 'Choosing everyone sends nothing');
@@ -290,8 +290,12 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 			'The trail leads back to Users'
 		);
 		check(
-			visibleText('.prctr-page-pane__status').join() === 'Active',
-			'The status reads Active'
+			visibleText('.prctr-page-pane__status').join() === '',
+			'An active account shows no status word'
+		);
+		check(
+			visibleText('.prctr-page-pane__record span').some((text) => text.startsWith('Since')),
+			'The record line says since when'
 		);
 		await wait(
 			() => visibleText('.prctr-page-row__title').includes('Student'),
@@ -303,7 +307,7 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 		);
 
 		// Disabling asks first, then sends the change and shows the new status.
-		const more = root.querySelector<HTMLButtonElement>('.prctr-admin-menu-button')!;
+		const more = root.querySelector<HTMLButtonElement>('.prctr-page-menu-button')!;
 		more.click();
 		const disable = [...document.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(
 			(item) => item.textContent?.includes('Disable account')

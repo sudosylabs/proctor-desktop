@@ -29,10 +29,10 @@ import { IAuthenticatedNavigationService } from '../../../services/authenticated
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { UserActions, type AdminUser } from '../users/userActions.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminFormDialog, type AdminFormOptions } from '../widgets/adminFormDialog.js';
 import { initialsOf } from '../widgets/adminList.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { strongSignInStep } from '../../../../platform/identity/common/signInStanding.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import { adminRead, readPages, readUnitTree } from '../widgets/adminReads.js';
@@ -121,7 +121,7 @@ export class UserPage extends Disposable implements PageView {
 		);
 		this._register(this.resetButton.onDidRequest(() => this.resetTwoStep()));
 		this._register(
-			new AdminMenuButton(
+			new PageMenuButton(
 				headerActions,
 				format.text('userMore'),
 				() => this.menuActions(),
@@ -171,7 +171,13 @@ export class UserPage extends Disposable implements PageView {
 
 		this._register(this.user.onDidChange(() => this.renderUser()));
 		this._register(this.photo.onDidChange(() => this.renderUser()));
-		this._register(this.affiliations.onDidChange(() => this.renderAffiliations()));
+		this._register(
+			this.affiliations.onDidChange(() => {
+				this.renderAffiliations();
+				// The record line names what they are here.
+				this.renderUser();
+			})
+		);
 		this._register(this.bindings.onDidChange(() => this.renderRoles()));
 		this._register(this.sessions.onDidChange(() => this.renderSessions()));
 		this.renderUser();
@@ -282,27 +288,33 @@ export class UserPage extends Disposable implements PageView {
 			});
 			return;
 		}
-		const since = this.format.date(user.createdAt);
+		const current = this.affiliations.data?.items.find(
+			(affiliation) =>
+				affiliation.endAt === undefined || affiliation.endAt > this.format.now()
+		);
 		this.pane.setHeading({
 			title: user.displayName,
-			description:
-				user.email === undefined
-					? this.format.text('userDescriptionNoEmail', {
-							username: user.username,
-							date: since
-						})
-					: this.format.text('userDescription', {
-							email: user.email,
-							username: user.username,
-							date: since
-						}),
+			description: '',
+			// The record line: username, what they are here, and since when.
+			record: [
+				{ text: user.username, mono: true },
+				...(current === undefined
+					? []
+					: [this.format.text(AFFILIATION_TEXT[current.kind])]),
+				this.format.text('userSince', {
+					date: new Intl.DateTimeFormat(undefined, {
+						month: 'long',
+						year: 'numeric'
+					}).format(user.createdAt)
+				})
+			],
 			trail: [this.usersStep()],
 			initials: initialsOf(user.displayName),
 			...(this.photo.data === undefined ? {} : { photo: this.photo.data.dataUrl }),
-			status:
-				user.disabledAt === undefined
-					? { text: this.format.text('userActive'), tone: 'neutral' }
-					: { text: this.format.text('userDisabled'), tone: 'neutral' }
+			// Only a disabled account says so; an active one is the ordinary case.
+			...(user.disabledAt === undefined
+				? {}
+				: { status: { text: this.format.text('userDisabled'), tone: 'neutral' as const } })
 		});
 		const none = this.format.text('userNone');
 		const value = (text: string | undefined) =>
@@ -310,7 +322,6 @@ export class UserPage extends Disposable implements PageView {
 		renderDetails(this.profileSection.content, [
 			{ label: this.format.text('userFirstName'), ...value(user.firstName) },
 			{ label: this.format.text('userLastName'), ...value(user.lastName) },
-			{ label: this.format.text('userDisplayName'), ...value(user.displayName) },
 			{ label: this.format.text('userUsername'), value: user.username },
 			{
 				label: this.format.text('userEmail'),
@@ -377,7 +388,7 @@ export class UserPage extends Disposable implements PageView {
 					glyph: 'object.institution',
 					title: this.format.text(AFFILIATION_TEXT[affiliation.kind]),
 					detail: this.period(affiliation.startAt, affiliation.endAt),
-					titleBadge: this.periodStatus(affiliation.startAt, affiliation.endAt),
+					status: this.periodStatus(affiliation.startAt, affiliation.endAt),
 					actions: ended
 						? []
 						: [
@@ -465,7 +476,7 @@ export class UserPage extends Disposable implements PageView {
 						this.scopeName(binding.scopeType, binding.scopeId),
 						this.period(binding.startAt, binding.endAt)
 					),
-					titleBadge: this.periodStatus(binding.startAt, binding.endAt),
+					status: this.periodStatus(binding.startAt, binding.endAt),
 					actions
 				};
 			})

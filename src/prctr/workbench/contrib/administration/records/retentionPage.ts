@@ -27,7 +27,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminFormDialog, type AdminFormValues } from '../widgets/adminFormDialog.js';
 import { AdminList } from '../widgets/adminList.js';
 import { adminRead, readOnce } from '../widgets/adminReads.js';
@@ -277,10 +277,15 @@ export class RetentionPage extends Disposable implements PageView {
 		this.records.setActive(visible);
 	}
 
+	/** A period as people say it: "6 years", "1 year", "90 days". */
 	private days(value: number): string {
-		return value === 0
-			? this.format.text('retentionNever')
-			: this.format.text('retentionDays', { count: this.format.count(value) });
+		if (value === 0) return this.format.text('retentionNever');
+		const years = Math.round(value / 365.25);
+		if (years >= 1 && Math.abs(value - years * 365.25) <= 1)
+			return this.format.counted('retentionYears', years, {
+				count: this.format.count(years)
+			});
+		return this.format.counted('retentionDays', value, { count: this.format.count(value) });
 	}
 
 	private renderPolicy(): void {

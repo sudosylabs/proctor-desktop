@@ -111,7 +111,7 @@ void test('three product windows use isolated capability-specific preloads and l
 	// Reduce Transparency keeps the window opaque, but transparent so glass can return later.
 	assert.deepEqual(result.windowChromeOptions.darwinReducedTransparency, {
 		...launchFrame,
-		backgroundColor: '#fbfbfa',
+		backgroundColor: '#fbf6fd',
 		transparent: true,
 		titleBarStyle: 'hidden',
 		titleBarOverlay: true,
@@ -121,12 +121,12 @@ void test('three product windows use isolated capability-specific preloads and l
 		const options = result.windowChromeOptions[platform]!;
 		assert.equal(options.frame, false);
 		assert.equal(options.title, 'Proctor');
-		assert.equal(options.backgroundColor, '#1b1c1f');
+		assert.equal(options.backgroundColor, '#1b171d');
 		assert.equal(options.titleBarStyle, 'hidden');
 		// LaunchWindow keeps the design's 32 px title bar; the overlay leaves its bottom pixel to the page.
 		assert.deepEqual(options.titleBarOverlay, {
-			color: '#1b1c1f',
-			symbolColor: '#ededee',
+			color: '#1b171d',
+			symbolColor: '#f1eaf3',
 			height: 31
 		});
 	}
@@ -135,7 +135,7 @@ void test('three product windows use isolated capability-specific preloads and l
 	assert.equal(result.windowChromeOptions.win32Mica!.backgroundColor, '#00000000');
 	assert.deepEqual(result.windowChromeOptions.win32Mica!.titleBarOverlay, {
 		color: '#00000000',
-		symbolColor: '#ededee',
+		symbolColor: '#f1eaf3',
 		height: 31
 	});
 	// AuthenticatedWindow shows the same material, stays resizable, and keeps its own title bar.
@@ -161,7 +161,7 @@ void test('three product windows use isolated capability-specific preloads and l
 		backgroundMaterial: 'mica',
 		frame: false,
 		titleBarStyle: 'hidden',
-		titleBarOverlay: { color: '#00000000', symbolColor: '#ededee', height: 31 }
+		titleBarOverlay: { color: '#00000000', symbolColor: '#f1eaf3', height: 31 }
 	});
 	assert.deepEqual(result.windowChromeOptions.candidate, {
 		width: 1280,

@@ -30,13 +30,10 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
-import { AdminFormDialog } from '../widgets/adminFormDialog.js';
 import { adminRead } from '../widgets/adminReads.js';
 import './media/policyPage.css';
 
 type Policy = AdministrationValue<'accessPolicy'>;
-type Desktop = AdministrationValue<'desktopCompatibility'>;
 type Mode = (typeof providerAdmissionModes)[number];
 type Flag =
 	| 'localLogin'
@@ -103,13 +100,11 @@ const MODE_TEXT: Readonly<Record<Mode, AdministrationText>> = {
  */
 export class PolicyPage extends Disposable implements PageView {
 	private readonly policy: PageRead<Policy, AdministrationFailure, AdministrationResponse>;
-	private readonly desktop: PageRead<Desktop, AdministrationFailure, AdministrationResponse>;
 	private readonly banner: BannerControl;
 	private readonly signIn: PageSection;
 	private readonly providers: PageSection;
 	private readonly after: PageSection;
 	private readonly history: PageSection;
-	private readonly desktopSection: PageSection;
 	private readonly apply: ButtonControl;
 	private readonly discard: ButtonControl;
 	private readonly changes: AdminChanges;
@@ -161,22 +156,13 @@ export class PolicyPage extends Disposable implements PageView {
 		this.providers = section('policyProviders');
 		this.after = section('policyAfterApply');
 		this.history = section('policyHistory');
-		this.desktopSection = section('policyDesktopSection', {
-			label: format.text('policyDesktopEdit'),
-			icon: 'action.edit'
-		});
-		this._register(this.desktopSection.onDidRequestAction(() => this.editDesktop()));
 		this.policy = this._register(adminRead(administration, { kind: 'accessPolicy' }));
-		this.desktop = this._register(adminRead(administration, { kind: 'desktopCompatibility' }));
 		this._register(this.policy.onDidChange(() => this.renderPolicy()));
-		this._register(this.desktop.onDidChange(() => this.renderDesktop()));
 		this.renderPolicy();
-		this.renderDesktop();
 	}
 
 	setVisible(visible: boolean): void {
 		this.policy.setActive(visible);
-		this.desktop.setActive(visible);
 	}
 
 	private fresh(policy: Policy): Draft {
@@ -464,9 +450,11 @@ export class PolicyPage extends Disposable implements PageView {
 		});
 		this.discard.setState({
 			label: this.format.text('policyDiscard'),
-			icon: proctorIconFactory('action.close'),
 			disabled: !changed || this.working
 		});
+		// As the board draws it: the page's actions appear only while a change is previewed.
+		this.apply.element.hidden = !changed && !this.working;
+		this.discard.element.hidden = !changed && !this.working;
 	}
 
 	private intent(): Omit<AdministrationIntentOf<'replaceAccessPolicy'>, 'kind'> | undefined {
@@ -646,126 +634,5 @@ export class PolicyPage extends Disposable implements PageView {
 		if (code === 'last_system_administrator_path')
 			return this.format.text('policyBlockerAdmin');
 		return this.format.text('policyBlockerOther', { code: readableCode(code) });
-	}
-
-	private renderDesktop(): void {
-		const desktop = this.desktop.data;
-		this.desktopSection.setState(this.desktop.state, false, () => void this.desktop.refresh());
-		this.desktopSection.setAction(desktop !== undefined);
-		if (desktop === undefined) return;
-		const none = this.format.text('policyNone');
-		renderDetails(this.desktopSection.content, [
-			{
-				label: this.format.text('policyAvailability'),
-				value: this.format.text(
-					desktop.availability === 'ready' ? 'policyAvailable' : 'policyMaintenance'
-				)
-			},
-			{
-				label: this.format.text('policyMinimum'),
-				value: desktop.minimumRelease || none,
-				empty: desktop.minimumRelease === ''
-			},
-			{
-				label: this.format.text('policyRevoked'),
-				value:
-					desktop.revokedBuilds.length === 0
-						? none
-						: desktop.revokedBuilds.map((build) => build.buildId).join(', '),
-				empty: desktop.revokedBuilds.length === 0
-			},
-			{
-				label: this.format.text('policyMessage'),
-				value: desktop.message || none,
-				empty: desktop.message === ''
-			}
-		]);
-	}
-
-	private editDesktop(): void {
-		const desktop = this.desktop.data;
-		if (desktop === undefined) return;
-		this.dialog.value = this.instantiationService.createInstance(AdminFormDialog, {
-			title: this.format.text('policyDesktopEditTitle'),
-			confirmLabel: this.format.text('structureSave'),
-			confirmIcon: 'action.confirm',
-			fields: [
-				{
-					kind: 'select',
-					id: 'availability',
-					label: this.format.text('policyAvailability'),
-					value: desktop.availability,
-					choices: [
-						{ value: 'ready', label: this.format.text('policyAvailable') },
-						{ value: 'maintenance', label: this.format.text('policyMaintenance') }
-					]
-				},
-				{
-					kind: 'text',
-					id: 'minimumRelease',
-					label: this.format.text('policyMinimum'),
-					value: desktop.minimumRelease,
-					required: true
-				},
-				{
-					kind: 'longText',
-					id: 'message',
-					label: this.format.text('policyMessage'),
-					value: desktop.message
-				},
-				{
-					kind: 'longText',
-					id: 'revoked',
-					label: this.format.text('policyRevoked'),
-					value: desktop.revokedBuilds.map((build) => build.buildId).join('\n'),
-					hint: this.format.text('policyRevokedHint')
-				},
-				{
-					kind: 'text',
-					id: 'revokedReason',
-					label: this.format.text('policyRevokedReason'),
-					hint: this.format.text('policyRevokedReasonHint')
-				}
-			],
-			submit: (values) => {
-				// A build already blocked keeps its reason; the reason field covers new ones.
-				const kept = new Map(
-					desktop.revokedBuilds.map((build) => [build.buildId, build.reason])
-				);
-				const reason = values.revokedReason as string | undefined;
-				const ids = [
-					...new Set(
-						String(values.revoked ?? '')
-							.split(/\s+/u)
-							.filter((build) => build !== '')
-					)
-				];
-				if (reason === undefined && ids.some((id) => !kept.has(id)))
-					return {
-						field: 'revokedReason',
-						error: this.format.text('policyRevokedReasonRequired')
-					};
-				return {
-					kind: 'replaceDesktopCompatibility',
-					expectedRevision: desktop.revision,
-					availability: values.availability === 'maintenance' ? 'maintenance' : 'ready',
-					minimumRelease: values.minimumRelease as string,
-					message: (values.message as string | undefined) ?? '',
-					revokedBuilds: ids.map((buildId) => ({
-						buildId,
-						reason: kept.get(buildId) ?? reason ?? ''
-					}))
-				};
-			},
-			summary: () => [this.format.text('policyDesktopEditTitle')],
-			onDidComplete: (result) => {
-				this.pane.toast(
-					result.kind === 'error'
-						? this.format.failure(result.reason)
-						: this.format.text('policyDesktopSaved')
-				);
-				void this.desktop.refresh();
-			}
-		});
 	}
 }

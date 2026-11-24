@@ -155,6 +155,7 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 				async update() {}
 			},
 			services: authenticatedWindowServices({
+				log() {},
 				async signOut() {
 					signOuts++;
 					throw new Error('sign-out unavailable');
@@ -241,7 +242,7 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 		const bounds = root.getBoundingClientRect();
 		const contentBounds = content.getBoundingClientRect();
 		close(rail.getBoundingClientRect().width, 76, 'rail width');
-		close(sidebar.getBoundingClientRect().width, 232, 'default sidebar width');
+		close(sidebar.getBoundingClientRect().width, 236, 'default sidebar width');
 		const rtl = document.defaultView!.getComputedStyle(root).direction === 'rtl';
 		const sidebarBounds = sidebar.getBoundingClientRect();
 		close(
@@ -403,7 +404,7 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 			'Width is saved'
 		);
 		key(sash, 'Home');
-		check(sash.getAttribute('aria-valuenow') === '232', 'Home restores the default width');
+		check(sash.getAttribute('aria-valuenow') === '236', 'Home restores the default width');
 
 		step(
 			'Narrow windows hide the sidebar without overwriting the preference, then overlay it.'

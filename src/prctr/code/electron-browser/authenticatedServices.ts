@@ -2,6 +2,16 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { setUnexpectedErrorHandler } from '../../base/common/errors.js';
+import {
+	ForwardingLogService,
+	type LogForwarder
+} from '../../platform/log/browser/forwardingLogService.js';
+import { ILogService } from '../../platform/log/common/log.js';
+import {
+	IProctorTelemetryService,
+	LogOnlyTelemetryService
+} from '../../platform/telemetry/browser/proctorTelemetry.js';
 import {
 	AdministrationListsService,
 	IAdministrationListsService
@@ -65,6 +75,8 @@ export interface AuthenticatedPreloadCapabilities {
 	readonly clipboard: SettingsClipboardClient;
 	/** Present when the window was given the product pages. */
 	readonly examActivity?: ExamActivityClient;
+	/** Sends one log entry to main's log. */
+	readonly log: LogForwarder;
 }
 
 /**
@@ -78,6 +90,13 @@ export function authenticatedWindowServices(
 		services.set(
 			IAuthenticatedHostService,
 			new AuthenticatedHostService(preload, preload.examActivity !== undefined)
+		);
+		const log = new ForwardingLogService(preload.log);
+		services.set(ILogService, log);
+		services.set(IProctorTelemetryService, new SyncDescriptor(LogOnlyTelemetryService));
+		// An error nobody caught reaches the log, by its name and message only.
+		setUnexpectedErrorHandler((error) =>
+			log.error(error instanceof Error ? error : 'Unexpected error')
 		);
 		services.set(IAccountService, new SyncDescriptor(AccountService, [preload.account]));
 		services.set(

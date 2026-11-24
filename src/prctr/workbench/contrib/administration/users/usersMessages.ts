@@ -43,12 +43,12 @@ export const usersMessages = Object.freeze({
 	}),
 	usersRoleAny: defineMessage({
 		id: 'administration.users.filter.role.any',
-		defaultMessage: 'Any role',
+		defaultMessage: 'Any',
 		description: 'Users filter choice: no role filter.'
 	}),
 	usersLastActiveAny: defineMessage({
 		id: 'administration.users.filter.active.any',
-		defaultMessage: 'Any time',
+		defaultMessage: 'Any',
 		description: 'Users filter choice: no filter on when people were last active.'
 	}),
 	usersLastActiveNever: defineMessage({
@@ -73,7 +73,7 @@ export const usersMessages = Object.freeze({
 	}),
 	usersStatusAny: defineMessage({
 		id: 'administration.users.filter.status.any',
-		defaultMessage: 'Any status',
+		defaultMessage: 'Any',
 		description: 'Users filter choice: active and disabled accounts.'
 	}),
 	usersTable: defineMessage({
@@ -205,7 +205,7 @@ export const usersMessages = Object.freeze({
 	}),
 	usersAffiliationAny: defineMessage({
 		id: 'administration.users.affiliation.any',
-		defaultMessage: 'Any affiliation',
+		defaultMessage: 'Any',
 		description: 'The affiliation filter shows everyone.'
 	}),
 	usersUnit: defineMessage({
@@ -215,7 +215,7 @@ export const usersMessages = Object.freeze({
 	}),
 	usersUnitAny: defineMessage({
 		id: 'administration.users.unit.any',
-		defaultMessage: 'Any unit',
+		defaultMessage: 'Any',
 		description: 'The unit filter shows everyone.'
 	}),
 	usersColumnRoles: defineMessage({

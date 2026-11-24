@@ -125,10 +125,8 @@ class AdministrationContribution extends Disposable {
 						{ count: `${count.count}${count.atLeast ? '+' : ''}` }
 					)
 				};
-			this.navigation.setAdministrationCount(
-				'invitations',
-				labelled(counts.pendingInvitations, 'countInvitationsOne', 'countInvitations')
-			);
+			// Counts only where something waits for the person: an import to review, jobs that
+			// failed. Pending invitations and bounced mail live on Overview instead.
 			this.navigation.setAdministrationCount(
 				'imports',
 				labelled(counts.openImports, 'countImportsOne', 'countImports')
@@ -136,10 +134,6 @@ class AdministrationContribution extends Disposable {
 			this.navigation.setAdministrationCount(
 				'jobs',
 				labelled(counts.failedJobs, 'countJobsOne', 'countJobs', true)
-			);
-			this.navigation.setAdministrationCount(
-				'mail',
-				labelled(counts.failedMailDeliveries, 'countMailOne', 'countMail', true)
 			);
 		};
 		subscription = this.administration.observe({ kind: 'counts' }, deliver);

@@ -24,6 +24,12 @@ export interface PageFormat {
 	/** The locale's plural category for a count, as in "one" for 1 in English. */
 	plural(count: number): Intl.LDMLPluralRule;
 	date(time: number): string;
+	/** "27 Oct" within this year, "27 Oct 2025" otherwise. */
+	shortDate(time: number): string;
+	/** Two days as one compact range: "15 Sep – 12 Dec 2026", "16 – 27 Aug 2027". */
+	dateRange(start: number, end: number): string;
+	/** The time of day, as "09:12". */
+	time(time: number): string;
 	dateTime(time: number): string;
 	/** "today, 08:41", "yesterday, 17:20", or a date, for use inside a sentence. */
 	relative(time: number): string;
@@ -136,13 +142,32 @@ export class PageFormatService implements IPageFormatService {
 		};
 	}
 
+	time(time: number): string {
+		return new Intl.DateTimeFormat(this.locale, { timeStyle: 'short' }).format(time);
+	}
+
+	dateRange(start: number, end: number): string {
+		return new Intl.DateTimeFormat(this.locale, {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric'
+		}).formatRange(start, end);
+	}
+
+	shortDate(time: number): string {
+		const sameYear = new Date(time).getFullYear() === new Date(this.now()).getFullYear();
+		return sameYear
+			? new Intl.DateTimeFormat(this.locale, { day: 'numeric', month: 'short' }).format(time)
+			: this.date(time);
+	}
+
 	private relativeTime(
 		time: number,
 		today: 'relativeToday' | 'relativeTodayStandalone',
 		yesterday: 'relativeYesterday' | 'relativeYesterdayStandalone'
 	): string {
 		const day = relativeDay(time, this.now());
-		if (day === 'other') return this.date(time);
+		if (day === 'other') return this.shortDate(time);
 		const clock = new Intl.DateTimeFormat(this.locale, { timeStyle: 'short' }).format(time);
 		return this.text(day === 'today' ? today : yesterday, { time: clock });
 	}

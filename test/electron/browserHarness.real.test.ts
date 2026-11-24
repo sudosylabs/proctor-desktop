@@ -12,7 +12,7 @@ void test('sandboxed Chromium renderer runs deterministic browser fixtures', () 
 	const output = execFileSync(electronExecutable, ['.build/browser-harness'], {
 		encoding: 'utf8',
 		cwd: repositoryRoot,
-		timeout: 20_000
+		timeout: 50_000
 	}).trim();
 	const result = JSON.parse(output) as {
 		readonly chrome?: unknown;

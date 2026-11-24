@@ -84,15 +84,17 @@ const sidebarAreas: readonly SidebarArea[] = Object.freeze([
 			{ id: 'invitations', label: 'adminInvitations', icon: 'admin.invitations' },
 			{ id: 'imports', label: 'adminImports', icon: 'admin.imports' },
 			{
-				id: 'structure',
-				label: 'adminStructure',
-				icon: 'admin.structure',
+				id: 'institution',
+				label: 'adminInstitution',
+				icon: 'object.institution',
 				group: 'adminGroupOrganisation'
 			},
+			{ id: 'structure', label: 'adminStructure', icon: 'admin.structure' },
 			{ id: 'periods', label: 'adminPeriods', icon: 'admin.periods' },
 			{ id: 'progression', label: 'adminProgression', icon: 'admin.progression' },
 			{ id: 'roles', label: 'adminRoles', icon: 'admin.roles', group: 'adminGroupAccess' },
 			{ id: 'policy', label: 'adminPolicy', icon: 'admin.policy' },
+			{ id: 'desktop', label: 'adminDesktop', icon: 'device.desktop' },
 			{
 				id: 'audits',
 				label: 'adminAudits',

@@ -24,6 +24,9 @@
 	.prctr-status-badge[data-tone='attention'] {
 		--prctr-status-badge-ink: var(--prctr-color-status-attention);
 	}
+	.prctr-status-badge[data-tone='progress'] {
+		--prctr-status-badge-ink: var(--prctr-color-text-link);
+	}
 	.prctr-status-badge[data-tone='failure'] {
 		--prctr-status-badge-ink: var(--prctr-color-feedback-error);
 	}

@@ -21,8 +21,8 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { parseEmails } from '../common/administrationPresentation.js';
 import { AdminChanges } from '../widgets/adminChanges.js';
-import { AdminChips } from '../widgets/adminChips.js';
-import { adminField } from '../widgets/adminForm.js';
+import { PageChips } from '../../../browser/authenticated/pages/pageChips.js';
+import { pageField } from '../../../browser/authenticated/pages/pageForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 
 type InviteKind = 'students' | 'teachers' | 'role';
@@ -40,7 +40,7 @@ const DEFAULT_EXPIRY_DAYS = 7;
  */
 export class InviteDialog extends Disposable {
 	private readonly dialog: PageDialog;
-	private readonly emails: AdminChips;
+	private readonly emails: PageChips;
 	private readonly emailHint: HTMLElement;
 	private readonly expiry: SelectControl<string>;
 	private readonly unit: SelectControl<string>;
@@ -74,7 +74,7 @@ export class InviteDialog extends Disposable {
 			})
 		);
 		const body = this.dialog.body;
-		const kindField = adminField(body, format.text('inviteKind'));
+		const kindField = pageField(body, format.text('inviteKind'));
 		// One control for one choice, as in Upload.
 		const kinds = this._register(
 			new SelectControl<InviteKind>(kindField.element, {
@@ -90,13 +90,13 @@ export class InviteDialog extends Disposable {
 		);
 		this._register(kinds.onDidChange((kind) => this.setKind(kind)));
 
-		const emailField = adminField(
+		const emailField = pageField(
 			body,
 			format.text('inviteEmails'),
 			format.text('inviteChipsHint')
 		);
 		this.emails = this._register(
-			new AdminChips(emailField.element, {
+			new PageChips(emailField.element, {
 				label: format.text('inviteEmails'),
 				removeLabel: (chip) => format.text('inviteRemove', { address: chip.label }),
 				describedBy: emailField.hint.id,
@@ -123,24 +123,24 @@ export class InviteDialog extends Disposable {
 		this.emailHint = emailField.hint;
 		this._register(this.emails.onDidChange(() => this.update()));
 
-		const unitField = adminField(body, format.text('inviteUnit'));
+		const unitField = pageField(body, format.text('inviteUnit'));
 		this.unitField = unitField.element;
 		this.unit = this._register(this.select(unitField, format.text('inviteUnit')));
 		this._register(this.unit.onDidChange((unit) => void this.loadClasses(unit)));
 
-		const classField = adminField(body, format.text('inviteClass'));
+		const classField = pageField(body, format.text('inviteClass'));
 		this.classField = classField.element;
 		this.klass = this._register(this.select(classField, format.text('inviteClass')));
 		classField.element.append(classField.hint);
 		this.classHint = classField.hint;
 		this._register(this.klass.onDidChange(() => this.update()));
 
-		const roleField = adminField(body, format.text('inviteRoleLabel'));
+		const roleField = pageField(body, format.text('inviteRoleLabel'));
 		this.roleField = roleField.element;
 		this.role = this._register(this.select(roleField, format.text('inviteRoleLabel')));
 		this._register(this.role.onDidChange(() => this.update()));
 
-		const expiryField = adminField(body, format.text('inviteExpires'));
+		const expiryField = pageField(body, format.text('inviteExpires'));
 		const day = 24 * 60 * 60 * 1000;
 		this.expiry = this._register(
 			new SelectControl<string>(expiryField.element, {
@@ -181,7 +181,7 @@ export class InviteDialog extends Disposable {
 		void this.loadChoices();
 	}
 
-	private select(field: ReturnType<typeof adminField>, label: string): SelectControl<string> {
+	private select(field: ReturnType<typeof pageField>, label: string): SelectControl<string> {
 		return new SelectControl<string>(field.element, {
 			label,
 			choices: [{ value: NONE, label: this.format.text('inviteLoading') }],

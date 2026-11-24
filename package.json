@@ -69,7 +69,8 @@
     "hooks:disable": "node scripts/hooks.ts --disable",
     "dev": "node scripts/developDesktop.ts",
     "test:desktop-identity": "node scripts/test.ts desktop-identity",
-    "api:sync": "node scripts/syncServerApi.ts"
+    "api:sync": "node scripts/syncServerApi.ts",
+    "preview:pages": "node scripts/previewPages.ts"
   },
   "allowScripts": {
     "esbuild": true

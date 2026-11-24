@@ -1,5 +1,44 @@
-/* Finding one person for a filter: a list of matches, each a name over an address. */
+/* Finding one person for a filter: a pill in the filter bar like the others, and a list of
+ * matches, each a name over an address. */
 @layer contributions {
+	.prctr-admin-person-filter[data-part='pill'] {
+		align-items: center;
+		background: var(--prctr-color-background-card);
+		block-size: 32px;
+		border: 0;
+		border-radius: var(--prctr-shape-radius-control);
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-primary);
+		cursor: pointer;
+		display: inline-flex;
+		flex: none;
+		font: 13px/18px var(--prctr-typography-font-application);
+		gap: 6px;
+		padding: 0 10px;
+	}
+	.prctr-admin-person-filter[data-part='pill']:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+	.prctr-admin-person-filter[data-part='pill']:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 0;
+	}
+	.prctr-admin-person-filter[data-part='pill'][data-set='true'] {
+		background: var(--prctr-color-interaction-selectedRow);
+		box-shadow: inset 0 0 0 1px
+			color-mix(in srgb, var(--prctr-color-brand-accent) 35%, transparent);
+	}
+	.prctr-admin-person-filter[data-part='pill'] > .prctr-icon {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-admin-person-filter .prctr-admin-person-filter__prefix {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-admin-person-filter[data-set='true'] .prctr-admin-person-filter__prefix {
+		color: var(--prctr-color-text-primary);
+		font-weight: var(--prctr-typography-weight-medium);
+	}
 	.prctr-admin-person-filter .prctr-admin-person-filter__results {
 		display: flex;
 		flex-direction: column;

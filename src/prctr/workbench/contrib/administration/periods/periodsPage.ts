@@ -15,7 +15,7 @@ import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneC
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import { AdminFormDialog, type AdminFormValues } from '../widgets/adminFormDialog.js';
 import { AdminList, type AdminListItem, type AdminTone } from '../widgets/adminList.js';
 import { readOnce, readUnitTree, unitLabel } from '../widgets/adminReads.js';
@@ -28,6 +28,7 @@ export class PeriodsPage extends Disposable implements PageView {
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private readonly unitNames = new Map<string, string>();
+	private nextId: string | undefined;
 
 	constructor(
 		body: HTMLElement,
@@ -47,7 +48,7 @@ export class PeriodsPage extends Disposable implements PageView {
 			})
 		);
 		this._register(create.onDidRequest(() => void this.edit(undefined)));
-		const filters = this._register(new AdminFilters(body));
+		const filters = this._register(new PageFilters(body));
 		filters.addSearch(format.text('periodsFind'), (q) =>
 			this.list.setQuery(q === undefined ? {} : { q })
 		);
@@ -59,43 +60,36 @@ export class PeriodsPage extends Disposable implements PageView {
 				{},
 				{
 					label: format.text('periodsTable'),
+					description: format.text('periodsOwnedNote'),
+					fixedPageSize: true,
 					columns: [
 						{
 							label: format.text('periodsName'),
-							width: '32%',
+							min: 220,
 							cell: (period) => ({
 								kind: 'text',
 								primary: period.displayName,
+								secondary:
+									period.ownerType === 'institution'
+										? (format.institution ?? format.text('periodsInstitution'))
+										: (this.unitNames.get(period.ownerId) ??
+											format.text('userScopeUnit')),
 								strong: true
 							})
 						},
 						{
-							label: format.text('periodsOwner'),
-							width: '24%',
-							cell: (period) => ({
-								kind: 'text',
-								primary:
-									period.ownerType === 'institution'
-										? format.text('periodsInstitution')
-										: (this.unitNames.get(period.ownerId) ??
-											format.text('userScopeUnit'))
-							})
-						},
-						{
 							label: format.text('periodsDates'),
-							width: '26%',
+							width: '220px',
+							priority: 2,
 							cell: (period) => ({
 								kind: 'text',
 								mono: true,
-								primary: format.text('periodsDateRange', {
-									start: format.date(period.startAt),
-									end: format.date(period.endAt)
-								})
+								primary: format.dateRange(period.startAt, period.endAt)
 							})
 						},
 						{
 							label: format.text('periodsStatus'),
-							width: '120px',
+							width: '90px',
 							cell: (period) => this.status(period)
 						}
 					],
@@ -131,6 +125,19 @@ export class PeriodsPage extends Disposable implements PageView {
 				}
 			)
 		);
+		// The soonest period still to start reads "Next"; later ones read "Planned".
+		this._register(
+			this.list.onDidLoad((periods) => {
+				const now = format.now();
+				const upcoming = periods
+					.filter((period) => period.archivedAt === undefined && period.startAt > now)
+					.sort((a, b) => a.startAt - b.startAt);
+				const next = upcoming[0]?.id;
+				if (next === this.nextId) return;
+				this.nextId = next;
+				this.list.redraw();
+			})
+		);
 		void this.loadUnits();
 	}
 
@@ -154,7 +161,13 @@ export class PeriodsPage extends Disposable implements PageView {
 				tone: 'neutral'
 			};
 		if (period.startAt > now)
-			return { kind: 'status', text: this.format.text('periodsUpcoming'), tone: 'neutral' };
+			return {
+				kind: 'status',
+				text: this.format.text(
+					period.id === this.nextId ? 'periodsNext' : 'periodsUpcoming'
+				),
+				tone: 'neutral'
+			};
 		if (period.endAt < now)
 			return { kind: 'status', text: this.format.text('periodsPast'), tone: 'neutral' };
 		return { kind: 'status', text: this.format.text('periodsCurrent'), tone: 'neutral' };

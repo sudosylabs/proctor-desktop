@@ -63,8 +63,8 @@
 		color: var(--prctr-color-text-primary);
 	}
 	.prctr-button[data-variant='danger'] {
-		background: var(--prctr-color-feedback-error);
-		border-color: var(--prctr-color-feedback-error);
+		background: var(--prctr-color-feedback-errorSolid);
+		border-color: var(--prctr-color-feedback-errorSolid);
 		color: var(--prctr-color-text-inverse);
 		font-weight: var(--prctr-typography-weight-semibold);
 	}

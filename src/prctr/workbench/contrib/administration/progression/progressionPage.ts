@@ -25,10 +25,10 @@ export const PROGRESSION_STATE: Readonly<
 		}
 	>
 > = {
-	uploading: { text: 'stateChecking', tone: 'neutral' },
-	parsing: { text: 'stateChecking', tone: 'neutral' },
+	uploading: { text: 'stateChecking', tone: 'progress' },
+	parsing: { text: 'stateChecking', tone: 'progress' },
 	preview_ready: { text: 'stateReady', tone: 'attention' },
-	executing: { text: 'stateMoving', tone: 'neutral' },
+	executing: { text: 'stateMoving', tone: 'progress' },
 	completed: { text: 'stateMoved', tone: 'neutral' },
 	completed_with_errors: { text: 'stateMovedWithProblems', tone: 'failure' },
 	canceled: { text: 'stateCancelled', tone: 'neutral' },
@@ -81,6 +81,7 @@ export class ProgressionPage extends Disposable implements PageView {
 				{},
 				{
 					label: format.text('progressionTable'),
+					fixedPageSize: true,
 					columns: [
 						{
 							label: format.text('progressionMove'),
@@ -96,7 +97,7 @@ export class ProgressionPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('progressionMovesOn'),
-							width: '120px',
+							width: '110px',
 							align: 'end',
 							priority: 2,
 							cell: (progression) => ({
@@ -110,7 +111,7 @@ export class ProgressionPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('progressionStudents'),
-							width: '96px',
+							width: '80px',
 							align: 'end',
 							priority: 3,
 							cell: (progression) => ({
@@ -121,7 +122,7 @@ export class ProgressionPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('progressionStatus'),
-							width: '170px',
+							width: '130px',
 							cell: (progression) => {
 								const state = PROGRESSION_STATE[progression.state];
 								return {
@@ -133,7 +134,7 @@ export class ProgressionPage extends Disposable implements PageView {
 						},
 						{
 							label: '',
-							width: '104px',
+							width: '96px',
 							align: 'end',
 							cell: (progression) =>
 								progression.state === 'preview_ready'

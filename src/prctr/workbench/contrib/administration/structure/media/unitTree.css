@@ -2,12 +2,12 @@
 	.prctr-admin-unit-tree .prctr-admin-unit-tree__list {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 1px;
 	}
 	.prctr-admin-unit-tree .prctr-admin-unit-tree__item {
 		align-items: center;
-		border-radius: 8px;
-		color: var(--prctr-color-text-secondary);
+		border-radius: var(--prctr-shape-radius-control);
+		color: var(--prctr-color-text-primary);
 		cursor: pointer;
 		display: flex;
 		font-size: 13.5px;
@@ -19,7 +19,7 @@
 		background: var(--prctr-color-interaction-hover);
 	}
 	.prctr-admin-unit-tree .prctr-admin-unit-tree__item[aria-selected='true'] {
-		background: var(--prctr-color-interaction-hover);
+		background: var(--prctr-color-interaction-selected);
 		color: var(--prctr-color-text-primary);
 		font-weight: var(--prctr-typography-weight-medium);
 	}
@@ -30,7 +30,8 @@
 	.prctr-admin-unit-tree .prctr-admin-unit-tree__caret {
 		color: var(--prctr-color-text-tertiary);
 		flex: none;
-		inline-size: 16px;
+		display: flex;
+		inline-size: 14px;
 		justify-content: center;
 	}
 	.prctr-admin-unit-tree .prctr-admin-unit-tree__caret[data-leaf='true'] {

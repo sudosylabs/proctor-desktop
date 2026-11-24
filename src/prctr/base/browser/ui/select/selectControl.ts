@@ -25,6 +25,13 @@ export interface SelectOptions<T extends string> {
 	readonly disabled?: boolean;
 	/** As wide as the chosen value, as a filter in a bar is; otherwise at least 200 pixels. */
 	readonly fit?: 'content';
+	/**
+	 * A filter pill: the filter's name shown before its value, as "Status Any", in one
+	 * bordered pill that sizes to its content.
+	 */
+	readonly prefix?: string;
+	/** The pill's no-filter choice; any other value draws the pill as set. */
+	readonly unset?: T;
 }
 
 /**
@@ -37,6 +44,7 @@ export class SelectControl<T extends string> extends Disposable {
 	private readonly changeEmitter = this._register(new Emitter<T>());
 	/** The person chose a different value. */
 	readonly onDidChange: Event<T> = this.changeEmitter.event;
+	private readonly unset: T | undefined;
 
 	constructor(host: HTMLElement, options: SelectOptions<T>) {
 		super();
@@ -54,16 +62,28 @@ export class SelectControl<T extends string> extends Disposable {
 			icon.element.classList.add('prctr-select__icon');
 			this.element.append(icon.element);
 		}
+		this.unset = options.unset;
+		if (options.prefix !== undefined) {
+			this.element.dataset.pill = 'true';
+			this.element.append(
+				$('span.prctr-select__prefix', {
+					textContent: options.prefix,
+					attrs: { 'aria-hidden': 'true' }
+				})
+			);
+		}
 		const caret = this._register(options.caret(document));
 		caret.element.classList.add('prctr-select__caret');
 		this.element.append(this.select, caret.element);
 		this.element.toggleAttribute('data-icon', options.icon !== undefined);
 		this.element.toggleAttribute('data-fit', options.fit === 'content');
 		this._register(
-			addDisposableListener(this.select, 'change', () =>
-				this.changeEmitter.fire(this.select.value as T)
-			)
+			addDisposableListener(this.select, 'change', () => {
+				this.markSet();
+				this.changeEmitter.fire(this.select.value as T);
+			})
 		);
+		this.markSet();
 		host.append(this.element);
 	}
 
@@ -73,6 +93,12 @@ export class SelectControl<T extends string> extends Disposable {
 
 	setValue(value: T): void {
 		this.select.value = value;
+		this.markSet();
+	}
+
+	private markSet(): void {
+		if (this.unset !== undefined)
+			this.element.dataset.set = String(this.select.value !== this.unset);
 	}
 
 	setChoices(choices: readonly SelectChoice<T>[], value: T): void {
@@ -87,6 +113,7 @@ export class SelectControl<T extends string> extends Disposable {
 			)
 		);
 		this.select.value = value;
+		this.markSet();
 	}
 
 	setDisabled(disabled: boolean): void {

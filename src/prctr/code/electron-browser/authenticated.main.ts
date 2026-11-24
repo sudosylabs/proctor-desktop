@@ -16,6 +16,7 @@ import { settingsContribution } from '../../workbench/contrib/settings/settings.
 import type { SettingsRendererClient } from '../../workbench/services/settings/common/settingsRendererClient.js';
 import { commonWorkbenchContributions } from '../../workbench/workbench.common.main.js';
 import { authenticatedWindowServices } from './authenticatedServices.js';
+import type { LogForwarder } from '../../platform/log/browser/forwardingLogService.js';
 import { createDesktopWorkbenchContribution } from './workbench.desktop.main.js';
 
 interface AuthenticatedPreloadApi {
@@ -28,6 +29,7 @@ interface AuthenticatedPreloadApi {
 	readonly account: AccountClient;
 	readonly administration: AdministrationClient;
 	readonly examActivity: ExamActivityClient;
+	log: LogForwarder;
 }
 const api = (globalThis as unknown as { readonly proctorAuthenticated?: AuthenticatedPreloadApi })
 	.proctorAuthenticated;
@@ -54,7 +56,8 @@ const authenticatedWindow = await bootstrapWorkbench(
 			administration: preload.administration,
 			settings: preload.settings,
 			clipboard: preload.settingsNative.clipboard,
-			examActivity: preload.examActivity
+			examActivity: preload.examActivity,
+			log: preload.log
 		})
 	}
 );

@@ -188,6 +188,22 @@ class and nothing outlives `dispose()`.
 - **Scoped services:** a service bound to one pane's DOM, such as its row menu
   and toasts, lives in a child instantiation service the pane creates
   (`IAccountPaneContext`). Everything else is window-scoped.
+- **One implementation:** a list, dialog, confirmation, form, row menu, pager,
+  filter, tab strip, badge, toast or change runner exists once. Pure controls
+  live in `base/browser/ui`; page pieces that need services live in
+  `workbench/browser/authenticated/pages` and are created with
+  `createInstance`. A contribution owns only its page's composition, messages
+  and failure wording; when it needs more from a shared piece, it extends that
+  piece rather than writing its own.
+- **Server data:** a page reads and changes server data only through
+  `IServerDataService`. It never imports a capability client or a preload API;
+  `source.server-data-path` rejects that.
+- **Observability:** log through `ILogService` with an area from the closed
+  list, at the lowest level that answers "what happened": ids, operations,
+  reasons and timings, never names, emails, credentials or content. A product
+  event is reported only through a declared telemetry event whose every field
+  is classified. A `catch` that cannot answer with a closed reason passes the
+  error to `onUnexpectedError`. `console` is not used.
 
 The step is complete when every dependency of a class appears, typed, in its
 constructor.
@@ -225,5 +241,9 @@ done:
 6. Where does each user-visible string come from?
 7. How do keyboard, focus, screen reader, zoom, high contrast and reduced motion
    behave? (`develop-accessible-ui` owns the detail.)
+8. Which shared piece does this use or extend, and why is nothing here a second
+   copy of one?
+9. How does it read and change server data, and what does it log or report when
+   something fails?
 
 A change that cannot answer one of these is not finished.

@@ -4,7 +4,6 @@
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import {
@@ -166,6 +165,8 @@ export interface AdminListOptions<K extends AdminListKind> {
 	readonly filters?: { readonly element: HTMLElement };
 	/** The list can start from a day: the query fields for "up to the end of this day". */
 	readonly dateJump?: (endOfDay: number) => Partial<AdminListQuery<K>>;
+	/** A short list kept by the server for a while has no page size to choose. */
+	readonly fixedPageSize?: boolean;
 }
 
 /**
@@ -297,7 +298,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		});
 		this.previous = this._register(
 			new ButtonControl(this.steps, {
-				variant: 'secondary',
+				variant: 'ghost',
 				size: 'small',
 				label: format.text('pagerPrevious'),
 				icon: proctorIconFactory('action.back', 14)
@@ -305,10 +306,10 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		);
 		this.next = this._register(
 			new ButtonControl(this.steps, {
-				variant: 'secondary',
+				variant: 'ghost',
 				size: 'small',
 				label: format.text('pagerNext'),
-				icon: proctorIconFactory('action.forward', 14)
+				trailingIcon: proctorIconFactory('action.forward', 14)
 			})
 		);
 		this.pageSizeButton = this._register(
@@ -316,7 +317,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 				variant: 'ghost',
 				size: 'small',
 				label: format.text('listPageSize', { count: format.count(this.pageSize) }),
-				icon: proctorIconFactory('action.expand', 14)
+				trailingIcon: proctorIconFactory('action.expand', 12)
 			})
 		);
 		this._register(this.pageSizeButton.onDidRequest(() => this.choosePageSize()));
@@ -350,7 +351,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 					this.jump
 				)
 			);
-		tools.append(this.pageSizeButton.element);
+		if (options.fixedPageSize !== true) tools.append(this.pageSizeButton.element);
 		this.foot = $(
 			'div.prctr-admin-list__foot',
 			{},
@@ -430,7 +431,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		this.pageSize = size;
 		this.pageSizeButton.setState({
 			label: this.format.text('listPageSize', { count: this.format.count(size) }),
-			icon: proctorIconFactory('action.expand', 14)
+			trailingIcon: proctorIconFactory('action.expand', 12)
 		});
 		this.restart();
 	}
@@ -591,13 +592,14 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 						range: labels.range(
 							first,
 							last,
-							this.total?.count,
+							// A list on one page holds exactly what it shows.
+							this.total?.count ?? (paged ? undefined : last),
 							this.total?.atLeast === true
 						)
 					});
-		// Every counted list says how many it holds; an uncounted one only once it has pages.
-		this.range.hidden = data.items.length === 0 || (!paged && this.total === undefined);
-		this.steps.hidden = !paged;
+		// Every list says how many it shows, and keeps its steps in place, disabled on one page.
+		this.range.hidden = data.items.length === 0;
+		this.steps.hidden = data.items.length === 0;
 		this.previous.setState({
 			label: this.format.text('pagerPrevious'),
 			icon: proctorIconFactory('action.back', 14),
@@ -605,7 +607,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		});
 		this.next.setState({
 			label: this.format.text('pagerNext'),
-			icon: proctorIconFactory('action.forward', 14),
+			trailingIcon: proctorIconFactory('action.forward', 14),
 			disabled: !hasNext
 		});
 		this.updateFoot();
@@ -851,6 +853,8 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	}
 
 	private updatePageAll(): void {
+		// While anything is chosen, every row shows its checkbox in place of its picture.
+		this.table.dataset.choosing = String(this.chosen.size > 0);
 		if (this.pageAll === undefined) return;
 		const ids = this.shownItems().map((item) => this.options.rowId(item));
 		const count = ids.filter((id) => this.chosen.has(id)).length;
@@ -916,9 +920,9 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 							])
 				);
 			case 'status':
-				return createStatusBadge(this.body.ownerDocument, {
-					text: cell.text,
-					tone: cell.tone
+				return $('span.prctr-admin-list__status', {
+					textContent: cell.text,
+					data: { tone: cell.tone }
 				});
 			case 'check': {
 				const element = $('span.prctr-admin-list__check', {

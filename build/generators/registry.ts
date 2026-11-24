@@ -3,6 +3,7 @@ import { serverApiGenerator } from './serverApi.ts';
 import { serverRealtimeGenerator } from './serverRealtime.ts';
 import { productMetadataGenerator } from './productMetadata.ts';
 import { bundledThemesGenerator } from './bundledThemes.ts';
+import { plumPaletteGenerator } from './plumPalette.ts';
 import { phosphorIconsGenerator } from './phosphorIcons.ts';
 import type { Repository } from '../checks/types.ts';
 import { nativeAgentProtocolGenerator } from './nativeAgentProtocol.ts';
@@ -23,6 +24,8 @@ const productGenerators: readonly Generator[] = [
 	serverRealtimeGenerator,
 	tokenCustomizationsGenerator,
 	productMetadataGenerator,
+	// Writes the Proctor themes that theme.resources then bundles.
+	plumPaletteGenerator,
 	bundledThemesGenerator,
 	phosphorIconsGenerator,
 	localizationCatalogGenerator,

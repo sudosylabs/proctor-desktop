@@ -74,12 +74,12 @@ const sharedMessages = Object.freeze({
 	}),
 	overviewDescription: defineMessage({
 		id: 'administration.page.overview.description',
-		defaultMessage: 'What needs your attention at {institution}.',
+		defaultMessage: 'What needs you at {institution} today.',
 		description: 'One-line description under the Overview heading.'
 	}),
 	overviewDescriptionGeneric: defineMessage({
 		id: 'administration.page.overview.description.generic',
-		defaultMessage: 'What needs your attention.',
+		defaultMessage: 'What needs you today.',
 		description: 'Overview description when the institution name is unknown.'
 	}),
 	usersTitle: defineMessage({
@@ -109,8 +109,7 @@ const sharedMessages = Object.freeze({
 	}),
 	invitationsDescription: defineMessage({
 		id: 'administration.page.invitations.description',
-		defaultMessage:
-			'Invitations to join classes, units and roles, and how their emails are doing.',
+		defaultMessage: 'People asked to join, and what they were invited to.',
 		description: 'One-line description under the Invitations heading.'
 	}),
 	importsTitle: defineMessage({
@@ -121,7 +120,7 @@ const sharedMessages = Object.freeze({
 	importsDescription: defineMessage({
 		id: 'administration.page.imports.description',
 		defaultMessage:
-			'Add many people at once from a spreadsheet, and review each row before anything changes.',
+			'Add many people at once from a spreadsheet. Proctor checks every row first, and nothing changes until you review it.',
 		description: 'One-line description under the Imports heading.'
 	}),
 	structureTitle: defineMessage({
@@ -131,7 +130,8 @@ const sharedMessages = Object.freeze({
 	}),
 	structureDescription: defineMessage({
 		id: 'administration.page.structure.description',
-		defaultMessage: 'Academic units, their programmes and levels, and the classes in them.',
+		defaultMessage:
+			'Faculties, departments, programmes and classes, as your institution is organised.',
 		description: 'One-line description under the Structure heading.'
 	}),
 	classTitle: defineMessage({
@@ -146,7 +146,8 @@ const sharedMessages = Object.freeze({
 	}),
 	periodsDescription: defineMessage({
 		id: 'administration.page.periods.description',
-		defaultMessage: 'The terms and years that classes and enrolments belong to.',
+		defaultMessage:
+			'Terms and years that classes run in. A class belongs to one period, and exams are planned inside it.',
 		description: 'One-line description under the Academic periods heading.'
 	}),
 	rolesTitle: defineMessage({
@@ -156,7 +157,8 @@ const sharedMessages = Object.freeze({
 	}),
 	rolesDescription: defineMessage({
 		id: 'administration.page.roles.description',
-		defaultMessage: 'What each role lets people do, and where.',
+		defaultMessage:
+			'What each role lets people do. Built-in roles can’t be changed; custom roles can.',
 		description: 'One-line description under the Roles heading.'
 	}),
 	policyTitle: defineMessage({
@@ -181,12 +183,12 @@ const sharedMessages = Object.freeze({
 	}),
 	auditsDescription: defineMessage({
 		id: 'administration.page.audits.description',
-		defaultMessage: 'Everything that changed at {institution}, who did it and when.',
+		defaultMessage: 'Everything done at {institution}, by whom and from where.',
 		description: 'One-line description under the Audits heading.'
 	}),
 	auditsDescriptionGeneric: defineMessage({
 		id: 'administration.page.audits.description.generic',
-		defaultMessage: 'Everything that changed, who did it and when.',
+		defaultMessage: 'Everything done, by whom and from where.',
 		description: 'Audits description when the institution name is unknown.'
 	}),
 	retentionTitle: defineMessage({
@@ -196,7 +198,7 @@ const sharedMessages = Object.freeze({
 	}),
 	retentionDescription: defineMessage({
 		id: 'administration.page.retention.description',
-		defaultMessage: 'How long exam records are kept, and what is deleted when.',
+		defaultMessage: 'How long Proctor keeps examination records, and when it may delete them.',
 		description: 'One-line description under the Data retention heading.'
 	}),
 	jobsTitle: defineMessage({
@@ -206,8 +208,120 @@ const sharedMessages = Object.freeze({
 	}),
 	jobsDescription: defineMessage({
 		id: 'administration.page.jobs.description',
-		defaultMessage: 'Background work such as imports, previews and key rotation.',
+		defaultMessage:
+			'Work Proctor runs in the background, such as imports, cleanup and key rotation.',
 		description: 'One-line description under the Jobs heading.'
+	}),
+	institutionTitle: defineMessage({
+		id: 'administration.page.institution.title',
+		defaultMessage: 'Institution',
+		description: 'Heading of the Institution page.'
+	}),
+	institutionDescription: defineMessage({
+		id: 'administration.page.institution.description',
+		defaultMessage: 'How {institution} appears in Proctor.',
+		description: 'One-line description under the Institution heading.'
+	}),
+	institutionDescriptionGeneric: defineMessage({
+		id: 'administration.page.institution.description.generic',
+		defaultMessage: 'How your institution appears in Proctor.',
+		description: 'Institution description when the name is unknown.'
+	}),
+	institutionIdentity: defineMessage({
+		id: 'administration.institution.identity',
+		defaultMessage: 'Identity',
+		description: 'Section of the institution’s name and description.'
+	}),
+	institutionName: defineMessage({
+		id: 'administration.institution.name',
+		defaultMessage: 'Name',
+		description: 'The institution’s name.'
+	}),
+	institutionDescriptionLabel: defineMessage({
+		id: 'administration.institution.description.label',
+		defaultMessage: 'Description',
+		description: 'The institution’s description.'
+	}),
+	institutionServer: defineMessage({
+		id: 'administration.institution.server',
+		defaultMessage: 'Server',
+		description: 'Where Proctor Desktop connects for this institution.'
+	}),
+	desktopTitle: defineMessage({
+		id: 'administration.page.desktop.title',
+		defaultMessage: 'Proctor Desktop',
+		description: 'Heading of the Proctor Desktop page.'
+	}),
+	desktopDescription: defineMessage({
+		id: 'administration.page.desktop.description',
+		defaultMessage:
+			'Which releases of Proctor Desktop may connect, and whether exams are open on Desktop right now.',
+		description: 'One-line description under the Proctor Desktop heading.'
+	}),
+	desktopAvailability: defineMessage({
+		id: 'administration.desktop.availability',
+		defaultMessage: 'Availability',
+		description: 'Section of whether exams are open on Desktop.'
+	}),
+	desktopExams: defineMessage({
+		id: 'administration.desktop.exams',
+		defaultMessage: 'Exams on Proctor Desktop',
+		description: 'Whether exams can start on Desktop.'
+	}),
+	desktopOpen: defineMessage({
+		id: 'administration.desktop.open',
+		defaultMessage: 'Open',
+		description: 'Exams can start on Desktop.'
+	}),
+	desktopNoNewExams: defineMessage({
+		id: 'administration.desktop.no.new',
+		defaultMessage: 'No new exams start',
+		description: 'Note beside maintenance.'
+	}),
+	desktopMessage: defineMessage({
+		id: 'administration.desktop.message',
+		defaultMessage: 'Message for candidates',
+		description: 'Shown in Proctor Desktop during maintenance.'
+	}),
+	desktopReleases: defineMessage({
+		id: 'administration.desktop.releases',
+		defaultMessage: 'Releases',
+		description: 'Section of which releases may connect.'
+	}),
+	desktopOldest: defineMessage({
+		id: 'administration.desktop.oldest',
+		defaultMessage: 'Oldest release allowed',
+		description: 'Older releases are asked to update.'
+	}),
+	desktopAnyRelease: defineMessage({
+		id: 'administration.desktop.any',
+		defaultMessage: 'Any release',
+		description: 'No oldest release is set.'
+	}),
+	desktopBlocked: defineMessage({
+		id: 'administration.desktop.blocked',
+		defaultMessage: 'Blocked builds',
+		description: 'Section of builds that cannot sign in.'
+	}),
+	desktopBlockedNote: defineMessage({
+		id: 'administration.desktop.blocked.note',
+		defaultMessage: 'A blocked build can’t sign in, whatever the oldest release allowed.',
+		description: 'Explains blocked builds.'
+	}),
+	desktopNoneBlocked: defineMessage({
+		id: 'administration.desktop.none.blocked',
+		defaultMessage: 'No builds are blocked.',
+		description: 'Shown when no build is blocked.'
+	}),
+	desktopBuild: defineMessage({
+		id: 'administration.desktop.build',
+		defaultMessage: 'Build',
+		description: 'Column of a blocked build.'
+	}),
+	desktopWhy: defineMessage({
+		id: 'administration.desktop.why',
+		defaultMessage: 'Why',
+		description: 'Column of why a build is blocked.'
 	}),
 	mailTitle: defineMessage({
 		id: 'administration.page.mail.title',
@@ -216,28 +330,19 @@ const sharedMessages = Object.freeze({
 	}),
 	mailDescription: defineMessage({
 		id: 'administration.page.mail.description',
-		defaultMessage: 'Whether mail from {institution} is being delivered.',
+		defaultMessage:
+			'Email Proctor sends for {institution}: invitations, verification and sign-in help.',
 		description: 'One-line description under the Mail heading.'
 	}),
 	mailDescriptionGeneric: defineMessage({
 		id: 'administration.page.mail.description.generic',
-		defaultMessage: 'Whether mail is being delivered.',
+		defaultMessage: 'Email Proctor sends: invitations, verification and sign-in help.',
 		description: 'Mail description when the institution name is unknown.'
 	}),
 	importTitle: defineMessage({
 		id: 'administration.page.import.title',
 		defaultMessage: 'Import',
 		description: 'Heading of one onboarding import before its details load.'
-	}),
-	countInvitationsOne: defineMessage({
-		id: 'administration.sidebar.count.invitations.one',
-		defaultMessage: '{count} pending invitation',
-		description: 'Spoken name of the sidebar count beside Invitations when it is one.'
-	}),
-	countInvitations: defineMessage({
-		id: 'administration.sidebar.count.invitations.many',
-		defaultMessage: '{count} pending invitations',
-		description: 'Spoken name of the sidebar count beside Invitations.'
 	}),
 	countImportsOne: defineMessage({
 		id: 'administration.sidebar.count.imports.one',
@@ -258,16 +363,6 @@ const sharedMessages = Object.freeze({
 		id: 'administration.sidebar.count.jobs.many',
 		defaultMessage: '{count} failed jobs',
 		description: 'Spoken name of the sidebar count beside Jobs.'
-	}),
-	countMailOne: defineMessage({
-		id: 'administration.sidebar.count.mail.one',
-		defaultMessage: '{count} email not delivered',
-		description: 'Spoken name of the sidebar count beside Mail when it is one.'
-	}),
-	countMail: defineMessage({
-		id: 'administration.sidebar.count.mail.many',
-		defaultMessage: '{count} emails not delivered',
-		description: 'Spoken name of the sidebar count beside Mail.'
 	}),
 	failureAccessChanged: defineMessage({
 		id: 'administration.failure.accesschanged',

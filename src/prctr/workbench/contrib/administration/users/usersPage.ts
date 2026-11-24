@@ -19,7 +19,7 @@ import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneC
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { InviteDialog } from '../invitations/inviteDialog.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import {
 	AdminList,
 	type AdminCell,
@@ -28,10 +28,10 @@ import {
 } from '../widgets/adminList.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 import { BulkUserChanges } from './bulkUserChanges.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { UserActions, type AdminUser } from './userActions.js';
 import { SaveViewDialog } from './saveViewDialog.js';
-import { AdminTabs } from '../widgets/adminTabs.js';
+import { PageTabs } from '../../../browser/authenticated/pages/pageTabs.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import {
 	MAX_SAVED_USER_VIEWS,
@@ -61,7 +61,7 @@ export const AFFILIATION_TEXT: Readonly<Record<AffiliationKind, AdministrationTe
 /** Everyone with an account, found by name, email or username, ten at a time. */
 export class UsersPage extends Disposable implements PageView {
 	private readonly list: AdminList<'users'>;
-	private readonly filters: AdminFilters;
+	private readonly filters: PageFilters;
 	private readonly unit: SelectControl<string>;
 	private readonly status: SelectControl<Status>;
 	private readonly role: SelectControl<string>;
@@ -75,7 +75,7 @@ export class UsersPage extends Disposable implements PageView {
 	private readonly viewTools: HTMLElement;
 	private readonly saveView: ButtonControl;
 	private readonly removeView: ButtonControl;
-	private readonly viewTabs = this._register(new MutableDisposable<AdminTabs<string>>());
+	private readonly viewTabs = this._register(new MutableDisposable<PageTabs<string>>());
 	private readonly viewDialog = this._register(new MutableDisposable<SaveViewDialog>());
 	/** The tab shown: Everyone, or a saved view by its place. */
 	private currentView = EVERYONE;
@@ -85,7 +85,7 @@ export class UsersPage extends Disposable implements PageView {
 	private enableButton: ButtonControl | undefined;
 	private disableButton: ButtonControl | undefined;
 	private readonly invite = this._register(new MutableDisposable<InviteDialog>());
-	private query: AdminListQuery<'users'> = {};
+	private query: AdminListQuery<'users'> = { includeDisabled: true };
 	/** Each person's picture, read once: their own or the default the server draws. Bounded. */
 	private readonly photos = new Map<string, string>();
 
@@ -123,14 +123,14 @@ export class UsersPage extends Disposable implements PageView {
 		const $ = createElementFactory(body.ownerDocument);
 		this.tabsHolder = $('div.prctr-admin-users-views__tabs');
 		this.viewTools = $('div.prctr-admin-users-views__tools');
-		this.viewsHost = $('div.prctr-admin-users-views', {}, this.tabsHolder, this.viewTools);
+		this.viewsHost = $('div.prctr-admin-users-views', {}, this.tabsHolder);
 		body.append(this.viewsHost);
 		this.saveView = this._register(
 			new ButtonControl(this.viewTools, {
 				variant: 'ghost',
 				size: 'small',
 				label: format.text('viewsSaveAs'),
-				icon: proctorIconFactory('action.add', 14)
+				icon: proctorIconFactory('action.saveView', 14)
 			})
 		);
 		this.removeView = this._register(
@@ -144,14 +144,16 @@ export class UsersPage extends Disposable implements PageView {
 		this._register(this.saveView.onDidRequest(() => this.openSaveView()));
 		this._register(this.removeView.onDidRequest(() => void this.removeCurrentView()));
 		this._register(this.lists.onDidChange(() => this.renderViews()));
-		this.filters = this._register(new AdminFilters(body));
+		this.filters = this._register(new PageFilters(body));
 		const filters = this.filters;
+		// Save as view and Remove view end the filter row.
+		filters.element.append(this.viewTools);
 		this.search = filters.addSearch(format.text('usersFind'), (q) => this.setQuery({ q }));
 		this.status = filters.addSelect<Status>(
 			format.text('usersStatus'),
 			'status.success',
 			this.statusChoices(false),
-			'active',
+			'any',
 			(status) =>
 				// Only an Institution-wide viewer may ask for disabled accounts alone.
 				this.setQuery(
@@ -321,7 +323,7 @@ export class UsersPage extends Disposable implements PageView {
 		const views = this.lists.userViews;
 		if (this.currentView !== EVERYONE && Number(this.currentView) >= views.length)
 			this.currentView = EVERYONE;
-		const tabs = new AdminTabs<string>(
+		const tabs = new PageTabs<string>(
 			this.tabsHolder,
 			this.format.text('viewsLabel'),
 			[
@@ -363,9 +365,14 @@ export class UsersPage extends Disposable implements PageView {
 		const views = this.lists.userViews;
 		const filtered = Object.keys(this.savedFilter()).length > 0;
 		const onView = this.currentView !== EVERYONE;
-		this.saveView.element.hidden = !filtered || onView || views.length >= MAX_SAVED_USER_VIEWS;
+		// Save as view stays on Everyone, as the boards draw it; saving needs a filter set.
+		this.saveView.element.hidden = onView || views.length >= MAX_SAVED_USER_VIEWS;
+		this.saveView.setState({
+			label: this.format.text('viewsSaveAs'),
+			icon: proctorIconFactory('action.saveView', 14),
+			disabled: !filtered
+		});
 		this.removeView.element.hidden = !onView;
-		this.viewsHost.hidden = views.length === 0 && this.saveView.element.hidden;
 		if (this.currentView === EVERYONE) {
 			const total = this.list.totalCount;
 			if (total !== undefined)
@@ -385,7 +392,7 @@ export class UsersPage extends Disposable implements PageView {
 			...(this.affiliation.value === ANY ? {} : { affiliation: [this.affiliation.value] }),
 			...(this.unit.value === ANY ? {} : { academicUnitId: this.unit.value }),
 			...(this.role.value === ANY ? {} : { roleIds: [this.role.value] }),
-			...(status === 'active' ? {} : { status }),
+			...(status === 'any' ? {} : { status }),
 			...(this.lastActive.value === 'any' ? {} : { lastActive: this.lastActive.value })
 		};
 	}
@@ -399,11 +406,12 @@ export class UsersPage extends Disposable implements PageView {
 				? {}
 				: { academicUnitId: filter.academicUnitId }),
 			...(filter.roleIds === undefined ? {} : { roleIds: filter.roleIds }),
+			// Everyone, whatever their status, unless the view narrows it.
 			...(filter.status === 'disabled'
 				? { state: 'disabled' as const }
-				: filter.status === 'any'
-					? { includeDisabled: true }
-					: {}),
+				: filter.status === 'active'
+					? {}
+					: { includeDisabled: true }),
 			...(filter.lastActive === 'never' ? { neverSignedIn: true } : {}),
 			...(filter.lastActive === 'recent' ? { lastActiveAfter: now - 30 * DAY } : {}),
 			...(filter.lastActive === 'idle' ? { lastActiveBefore: now - 90 * DAY } : {})
@@ -415,7 +423,7 @@ export class UsersPage extends Disposable implements PageView {
 		this.currentView = id;
 		const filter = id === EVERYONE ? {} : (this.lists.userViews[Number(id)]?.filter ?? {});
 		this.search.value = filter.q ?? '';
-		this.status.setValue(filter.status ?? 'active');
+		this.status.setValue(filter.status ?? 'any');
 		this.affiliation.setValue(filter.affiliation?.[0] ?? ANY);
 		this.unit.setValue(filter.academicUnitId ?? ANY);
 		this.role.setValue(filter.roleIds?.[0] ?? ANY);
@@ -572,7 +580,7 @@ export class UsersPage extends Disposable implements PageView {
 		);
 		this.disableButton.element.dataset.secondary = 'true';
 		const more = this._register(
-			new AdminMenuButton(
+			new PageMenuButton(
 				host,
 				format.text('usersBulkMore'),
 				() => {

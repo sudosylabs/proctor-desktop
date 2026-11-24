@@ -24,16 +24,38 @@ import {
 	type PageRowAction
 } from '../../../browser/authenticated/pages/pageSection.js';
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
-import { IAdministrationFormatService } from '../administrationFormat.js';
+import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { permissionMatrix, readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
-import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { readPages } from '../widgets/adminReads.js';
 import './media/rolesPage.css';
 
 type Role = AdministrationValue<'roles'>['items'][number];
+
+/** The board's verbs across the permission grid; publish and release share a column. */
+const GRID_VERBS: readonly {
+	readonly codes: readonly string[];
+	readonly label: AdministrationText;
+}[] = [
+	{ codes: ['view'], label: 'rolesVerbView' },
+	{ codes: ['create'], label: 'rolesVerbCreate' },
+	{ codes: ['manage'], label: 'rolesVerbChange' },
+	{ codes: ['publish', 'release'], label: 'rolesVerbPublish' },
+	{ codes: ['review'], label: 'rolesVerbReview' },
+	{ codes: ['export'], label: 'rolesVerbExport' }
+];
+/** The board's areas down the permission grid. */
+const GRID_AREAS: readonly { readonly code: string; readonly label: AdministrationText }[] = [
+	{ code: 'exam', label: 'rolesAreaExams' },
+	{ code: 'exam_sitting', label: 'rolesAreaSittings' },
+	{ code: 'submission', label: 'rolesAreaSubmissions' },
+	{ code: 'record', label: 'rolesAreaRecords' },
+	{ code: 'browser_activity', label: 'rolesAreaBrowser' },
+	{ code: 'class', label: 'rolesAreaClasses' }
+];
 
 /**
  * What each role allows: the roles listed beside the chosen one's details and a grid of its
@@ -46,7 +68,7 @@ export class RolesPage extends Disposable implements PageView {
 	private readonly listStore = this._register(new DisposableStore());
 	private readonly details: PageSection;
 	private readonly permissions: PageSection;
-	private readonly menu: AdminMenuButton;
+	private readonly menu: PageMenuButton;
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private readonly gridStore = this._register(new DisposableStore());
@@ -73,7 +95,7 @@ export class RolesPage extends Disposable implements PageView {
 		);
 		this._register(create.onDidRequest(() => this.edit(undefined)));
 		this.menu = this._register(
-			new AdminMenuButton(
+			new PageMenuButton(
 				headerActions,
 				format.text('classMore'),
 				() => this.menuActions(),
@@ -305,30 +327,79 @@ export class RolesPage extends Disposable implements PageView {
 			: this.format.counted('rolesPlaces', count);
 	}
 
-	/** The role's permissions as areas by verbs, a tick where it allows the pair. */
+	/**
+	 * The role's permissions as the board's grid: areas down, verbs across, in the order people
+	 * think of them. A tick where the role allows the pair, a dash where it doesn't, and a quieter
+	 * dash where Proctor has no such permission. Areas and verbs Proctor adds later follow.
+	 */
 	private renderGrid(role: Role): void {
 		this.gridStore.clear();
-		// Only the areas the role reaches, and only the verbs those areas offer, so the grid fits.
-		const areas = new Set(
-			role.permissions.map((code) => code.slice(0, Math.max(0, code.lastIndexOf('.'))))
-		);
-		const matrix = permissionMatrix(
-			this.catalogue().filter((code) =>
-				areas.has(code.slice(0, Math.max(0, code.lastIndexOf('.'))))
-			),
-			role.permissions
-		);
-		this.permissions.setState(
-			{ kind: 'ready' },
-			role.permissions.length === 0 ? this.format.text('rolesNoPermissions') : false
-		);
-		const $ = createElementFactory(this.permissions.content.ownerDocument);
-		if (role.permissions.length === 0) {
-			this.permissions.content.replaceChildren();
-			return;
+		const matrix = permissionMatrix(this.catalogue(), role.permissions);
+		const verbOrder = (verb: string): number => {
+			const index = GRID_VERBS.findIndex((entry) => entry.codes.includes(verb));
+			return index < 0 ? GRID_VERBS.length : index;
+		};
+		const areaOrder = (area: string): number => {
+			const index = GRID_AREAS.findIndex((entry) => entry.code === area);
+			return index < 0 ? GRID_AREAS.length : index;
+		};
+		// Verbs that share a column, such as publish and release, read as one.
+		const columns: { readonly label: string; readonly verbs: readonly string[] }[] = [];
+		for (const verb of [...matrix.verbs].sort((x, y) => verbOrder(x) - verbOrder(y))) {
+			const known = GRID_VERBS.find((entry) => entry.codes.includes(verb));
+			const label = known === undefined ? readableCode(verb) : this.format.text(known.label);
+			const column = columns.find((candidate) => candidate.label === label);
+			if (column === undefined) columns.push({ label, verbs: [verb] });
+			else (column.verbs as string[]).push(verb);
 		}
+		this.permissions.setState({ kind: 'ready' }, false);
+		const $ = createElementFactory(this.permissions.content.ownerDocument);
 		const allowed = this.format.text('rolesAllowed');
 		const notAllowed = this.format.text('rolesNotAllowed');
+		const rows = [...matrix.areas]
+			.sort((x, y) => areaOrder(x.area) - areaOrder(y.area))
+			.map((area) => {
+				const known = GRID_AREAS.find((entry) => entry.code === area.area);
+				const name =
+					known === undefined ? readableCode(area.area) : this.format.text(known.label);
+				return $(
+					'tr',
+					{},
+					$('th', { textContent: name, attrs: { scope: 'row' } }),
+					...columns.map((column) => {
+						const cells = column.verbs.map(
+							(verb) => area.cells[matrix.verbs.indexOf(verb)]
+						);
+						const cell = cells.includes('allowed')
+							? 'allowed'
+							: cells.includes('denied')
+								? 'denied'
+								: 'absent';
+						const td = $('td', { data: { align: 'center', cell } });
+						if (cell === 'allowed') {
+							const icon = this.gridStore.add(
+								createProctorIcon(td.ownerDocument, {
+									id: 'action.confirm',
+									size: 14
+								})
+							);
+							icon.element.setAttribute('role', 'img');
+							icon.element.setAttribute('aria-label', `${column.label}: ${allowed}`);
+							td.append(icon.element);
+						} else
+							td.append(
+								$('span', {
+									textContent: '—',
+									attrs:
+										cell === 'denied'
+											? { 'aria-label': `${column.label}: ${notAllowed}` }
+											: { 'aria-hidden': 'true' }
+								})
+							);
+						return td;
+					})
+				);
+			});
 		const table = $(
 			'table.prctr-admin-roles__grid',
 			{ attrs: { 'aria-label': this.format.text('rolesPermissions') } },
@@ -342,57 +413,16 @@ export class RolesPage extends Disposable implements PageView {
 						textContent: this.format.text('rolesArea'),
 						attrs: { scope: 'col' }
 					}),
-					...matrix.verbs.map((verb) =>
+					...columns.map((column) =>
 						$('th', {
-							textContent: readableCode(verb),
+							textContent: column.label,
 							attrs: { scope: 'col' },
 							data: { align: 'center' }
 						})
 					)
 				)
 			),
-			$(
-				'tbody',
-				{},
-				...matrix.areas
-					.filter((area) => area.cells.some((cell) => cell === 'allowed'))
-					.map((area) =>
-						$(
-							'tr',
-							{},
-							$('th', {
-								textContent: readableCode(area.area),
-								attrs: { scope: 'row' }
-							}),
-							...area.cells.map((cell, index) => {
-								const td = $('td', { data: { align: 'center' } });
-								if (cell === 'allowed') {
-									const icon = this.gridStore.add(
-										createProctorIcon(td.ownerDocument, {
-											id: 'action.confirm',
-											size: 16
-										})
-									);
-									icon.element.setAttribute('role', 'img');
-									icon.element.setAttribute(
-										'aria-label',
-										`${readableCode(matrix.verbs[index]!)}: ${allowed}`
-									);
-									td.append(icon.element);
-								} else if (cell === 'denied')
-									td.append(
-										$('span', {
-											textContent: '—',
-											attrs: {
-												'aria-label': `${readableCode(matrix.verbs[index]!)}: ${notAllowed}`
-											}
-										})
-									);
-								return td;
-							})
-						)
-					)
-			)
+			$('tbody', {}, ...rows)
 		);
 		this.permissions.content.replaceChildren(table);
 	}

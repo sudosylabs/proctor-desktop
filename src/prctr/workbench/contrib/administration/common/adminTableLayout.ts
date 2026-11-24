@@ -4,10 +4,11 @@
 
 /**
  * What an Administration status means, as the status badge shows it: red when something went
- * wrong, amber when it waits on you or lapses soon, grey for everything else. Administration
- * never shows green: a safeguard is green only on your own account.
+ * wrong, amber when it waits on you or lapses soon, the accent while Proctor is still working on
+ * it (checking or importing), grey for everything else. Administration never shows green: a
+ * safeguard is green only on your own account.
  */
-export type AdminTone = 'failure' | 'attention' | 'neutral';
+export type AdminTone = 'failure' | 'attention' | 'progress' | 'neutral';
 
 /** How one Administration table column behaves as the table narrows. */
 export interface AdminColumnLayout {

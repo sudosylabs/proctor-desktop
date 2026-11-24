@@ -6,6 +6,66 @@ import { defineMessage } from '../../../../base/common/localization.js';
 
 /** Text of the Roles and Access policy pages. */
 export const rolesMessages = Object.freeze({
+	rolesVerbView: defineMessage({
+		id: 'administration.roles.grid.view',
+		defaultMessage: 'View',
+		description: 'A column of the permission grid.'
+	}),
+	rolesVerbCreate: defineMessage({
+		id: 'administration.roles.grid.create',
+		defaultMessage: 'Create',
+		description: 'A column of the permission grid.'
+	}),
+	rolesVerbChange: defineMessage({
+		id: 'administration.roles.grid.change',
+		defaultMessage: 'Change',
+		description: 'A column of the permission grid.'
+	}),
+	rolesVerbPublish: defineMessage({
+		id: 'administration.roles.grid.publish',
+		defaultMessage: 'Publish',
+		description: 'A column of the permission grid.'
+	}),
+	rolesVerbReview: defineMessage({
+		id: 'administration.roles.grid.review',
+		defaultMessage: 'Review',
+		description: 'A column of the permission grid.'
+	}),
+	rolesVerbExport: defineMessage({
+		id: 'administration.roles.grid.export',
+		defaultMessage: 'Export',
+		description: 'A column of the permission grid.'
+	}),
+	rolesAreaExams: defineMessage({
+		id: 'administration.roles.grid.exams',
+		defaultMessage: 'Exams',
+		description: 'A row of the permission grid.'
+	}),
+	rolesAreaSittings: defineMessage({
+		id: 'administration.roles.grid.sittings',
+		defaultMessage: 'Sittings',
+		description: 'A row of the permission grid.'
+	}),
+	rolesAreaSubmissions: defineMessage({
+		id: 'administration.roles.grid.submissions',
+		defaultMessage: 'Submissions',
+		description: 'A row of the permission grid.'
+	}),
+	rolesAreaRecords: defineMessage({
+		id: 'administration.roles.grid.records',
+		defaultMessage: 'Records',
+		description: 'A row of the permission grid.'
+	}),
+	rolesAreaBrowser: defineMessage({
+		id: 'administration.roles.grid.browser',
+		defaultMessage: 'Browser activity',
+		description: 'A row of the permission grid.'
+	}),
+	rolesAreaClasses: defineMessage({
+		id: 'administration.roles.grid.classes',
+		defaultMessage: 'Classes',
+		description: 'A row of the permission grid.'
+	}),
 	rolesNew: defineMessage({
 		id: 'administration.access.new',
 		defaultMessage: 'New role',

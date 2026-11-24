@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port electron-window-skeleton
+import { LogIpcBridge } from '../../log/electron-main/logIpc.js';
+import type { WindowLogSink } from '../../log/common/logEntry.js';
 import type { WindowAppearanceStore } from '../node/windowAppearanceStore.js';
 import { ExamActivityIpcBridge, type ExamActivityCapability } from '../../examActivity/electron-main/examActivityIpc.js';
 
@@ -76,6 +78,8 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly administration?: AdministrationIpcService;
 	readonly examActivity?: ExamActivityCapability;
 	readonly settings?: UserSettingsSessionService;
+	/** Where window log entries are written; without it a window's entries are refused. */
+	readonly log?: WindowLogSink;
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
 	/** Where the build staged @vnilink/elg; without it, macOS 26 falls back to vibrancy. */
 	readonly liquidGlassDirectory?: string;
@@ -288,7 +292,8 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 				this.#options.examActivity,
 				this.#options.administration,
 				material,
-				this.#options.appearance
+				this.#options.appearance,
+				this.#options.log
 			);
 			void window.loadFile(rendererPath).catch(() => {
 				managed.terminate('loadFailed');
@@ -314,6 +319,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 	#accountBridge: AccountIpcBridge | undefined;
 	#examActivityBridge: ExamActivityIpcBridge | undefined;
 	#administrationBridge: AdministrationIpcBridge | undefined;
+	#logBridge: LogIpcBridge | undefined;
 	#settings: {dispose(): void} | undefined;
 	#settingsNativeBridge: SettingsNativeIpcBridge | undefined;
 	#launchMenu: { dispose(): void } | undefined;
@@ -335,7 +341,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		examActivity?: ExamActivityCapability,
 		administration?: AdministrationIpcService,
 		material?: WindowMaterial,
-		appearance?: WindowAppearanceStore
+		appearance?: WindowAppearanceStore,
+		log?: WindowLogSink
 	) {
 		this.#window = window;
 		this.descriptor = descriptor;
@@ -397,6 +404,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#accountBridge = new AccountIpcBridge(ipc, descriptor, account, authorize);
 			if (descriptor.kind === 'authenticated' && administration)
 				this.#administrationBridge = new AdministrationIpcBridge(ipc, descriptor, administration, authorize);
+			if (descriptor.kind === 'authenticated' && log)
+				this.#logBridge = new LogIpcBridge(ipc, descriptor.kind, log, authorize);
 			if (descriptor.kind === 'authenticated' && account?.setApiFocused) {
 				const focused = (value: boolean) => {
 					try { account.setApiFocused!(descriptor, value); }
@@ -446,6 +455,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#accountBridge,
 				this.#examActivityBridge,
 				this.#administrationBridge,
+				this.#logBridge,
 				this.#settings,
 				this.#settingsNativeBridge,
 				this.#windowChromeBridge,
@@ -521,6 +531,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#accountBridge,
 				this.#examActivityBridge,
 				this.#administrationBridge,
+				this.#logBridge,
 				this.#settings,
 				this.#settingsNativeBridge,
 			this.#windowChromeBridge,

@@ -12,7 +12,7 @@ export const authenticatedLayoutCategory: PresentationCategory = Object.freeze({
 	cleanupOwner: 'prctr.authenticated.navigation'
 });
 
-export const SIDEBAR_DEFAULT_WIDTH = 232;
+export const SIDEBAR_DEFAULT_WIDTH = 236;
 export const SIDEBAR_MIN_WIDTH = 200;
 export const SIDEBAR_MAX_WIDTH = 320;
 

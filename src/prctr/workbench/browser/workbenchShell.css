@@ -163,8 +163,12 @@
 			[data-window-material='vibrancy'],
 			[data-window-material='mica']
 		)
-		.prctr-workbench[data-window-kind='authenticated'] {
-		/* The material shows through a tint of the frame color, as drawn. */
+		.prctr-workbench[data-window-kind='authenticated']:not(.vs-dark, .hc-black) {
+		/*
+		 * In light themes the material shows through a tint of the frame colour, as drawn. Dark
+		 * frames stay opaque: the dark material turns grey with the wallpaper behind it, and the
+		 * frame would no longer be the plum the boards draw.
+		 */
 		background: color-mix(in srgb, var(--prctr-color-frame-background) 80%, transparent);
 	}
 	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__titlebar {

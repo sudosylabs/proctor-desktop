@@ -174,6 +174,44 @@ void test('contributions keep to their feature folder and import no other contri
 	);
 });
 
+void test('Proctor stylesheets take colours from tokens; listed ones must still need the exception', async () => {
+	const path = 'src/prctr/workbench/browser/owner.css';
+	const files = (css: string, listed: readonly string[]) =>
+		new VirtualRepository({
+			'build/policies/source-boundaries.json': JSON.stringify({
+				sourceRoot: 'src/prctr',
+				layers: ['base', 'platform', 'editor', 'workbench', 'code'],
+				environments: { common: ['common'], browser: ['common', 'browser'] },
+				testSegments: ['test'],
+				productionDynamicImportAllowlist: [],
+				rawColorStylesheets: listed
+			}),
+			'package.json': '{"dependencies":{}}',
+			'src/prctr/workbench/browser/owner.ts': "import './owner.css';\n",
+			[path]: `@layer workbench { .prctr-owner { ${css} } }`
+		});
+	const run = (repository: VirtualRepository) =>
+		cssCheck.run({ repository, registeredCheckIds: new Set([cssCheck.id]) });
+	assert.deepEqual(await run(files('color: var(--prctr-color-text-default);', [])), []);
+	for (const raw of [
+		'color: #fff;',
+		'box-shadow: 0 1px 2px rgb(0 0 0 / 8%);',
+		'color: hsl(0 0% 0%);'
+	])
+		assert.match(
+			(await run(files(raw, []))).map((value) => value.problem).join('\n'),
+			/raw colour/u,
+			raw
+		);
+	assert.deepEqual(await run(files('color: #fff;', [path])), []);
+	assert.match(
+		(await run(files('color: var(--prctr-color-text-default);', [path])))
+			.map((value) => value.problem)
+			.join('\n'),
+		/holds none/u
+	);
+});
+
 void test('CSS important declarations require one exact override-layer exception', async () => {
 	const path = 'src/prctr/workbench/browser/owner.css';
 	const selector = '.prctr-owner .compatibility';

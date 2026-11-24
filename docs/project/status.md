@@ -45,11 +45,13 @@
   Attempt Configuration.
 - The integrated browser is first-release scope with revision-frozen privileged
   navigation and minimized ordered Browser Activity over the candidate network.
-- Code execution is deferred. The server removed execution hosts and interactive
-  terminals (2026-09-12) because institutions self-host and per-candidate
-  environments are too costly, so Desktop removed its remote terminal. A Run
-  action with an output panel and no interactive terminal is planned before the
-  first release; its backend is undecided. The AI agent is deferred.
+- Code execution belongs to the server: one execution environment per Attempt
+  with Environment Profiles, terminals and port previews, plus the AI assistant at
+  the level the exam allows (Off, Tutor, Reviewer, Pair, Agent), with budgets,
+  candidate approvals and a transcript kept with the Submission. CandidateWindow
+  presents terminals in its panel, previews as content items and the assistant
+  in an auxiliary region. These are designed, not implemented; there is no
+  separate Run action.
 - Native capabilities are being rewritten around one on-demand native agent:
   passive adapters, server-compiled rules evaluated in the agent, Electron main
   containment, a readiness overview before the exam, matches-only application
@@ -185,9 +187,10 @@ Chromium, and enforcement is exercised in real Electron. Server Browser Policy,
 activity upload/acknowledgement, and production protected-spool adapters remain
 required.
 
-The remote terminal and Execution Environment projection were removed to match
-the server. The Candidate panel part remains in the workbench kernel without a
-contribution. The AI agent remains deferred.
+The earlier remote terminal and Execution Environment projection were removed
+while the server had no execution. The Candidate panel part remains in the
+workbench kernel without a contribution until the server-backed terminals,
+previews and assistant are built.
 
 Exam security now includes effective-policy and native-selection validation,
 reconciliation, minimized evidence, authoritative projection derivation, action
@@ -316,12 +319,11 @@ packaged evidence, architecture, skills, and project status agree.
 - Any future audio, camera-frame, screenshot/video, keystroke, packet/DNS, or
   general system-browser-history collection beyond the accepted mechanical
   native facts.
-- AI agent provider/model/prompt/tool/network/privacy/evidence contract.
+- The Desktop transport for terminals, port previews and assistant events: how
+  Electron main relays them, reconnection, and how budgets and approvals reach the
+  renderer. A boundary grill under `.scratch/` comes before code.
 - Workspace batch, historical/range-backed reads, server revert/conflict
   resolution, journal mutation keys, and per-entry capability snapshots.
-- The Run capability: backend (local sandbox, opt-in server runner, or both),
-  whether Run output is exam evidence, and any server API. Draft reasoning is in
-  ignored `.scratch/run-capability/`; it must be settled before the first release.
 - Institution choices for independent protected-record and Browser Activity retention
   periods; their fields, access boundaries and retirement semantics are agreed.
 - Signing providers, artifact publication details, and support-artifact

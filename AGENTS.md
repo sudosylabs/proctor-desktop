@@ -11,9 +11,10 @@ Next.js, JSX, and equivalent application frameworks are outside the accepted
 architecture.
 
 Most durable data is remote. An Attempt Workspace is not a local folder. Code
-execution is absent for now because the server no longer provides execution
-hosts or terminals; a Run capability is planned before the first release, and
-no local shell or process is ever exposed to a renderer. Native
+runs only in the server's per-Attempt execution environment: CandidateWindow
+presents its terminals and port previews, and no local shell or process is ever
+exposed to a renderer. The AI assistant runs on the server at the level the
+exam allows. Native
 capabilities report bounded mechanical facts inside one native agent that
 evaluates server-compiled rules; Electron main applies containment and the
 server decides flags and consequences.
@@ -68,6 +69,11 @@ The accepted UI uses one Proctor-owned design system across every composition.
 Read [`docs/architecture/design-system.md`](docs/architecture/design-system.md)
 before changing a user-facing surface, token, theme, icon, reusable control,
 DOM, CSS, layout, overlay, or visual verification.
+
+Proctor code logs through `ILogService`, reports unexpected errors through
+`onUnexpectedError`, and declares every telemetry event with a classified field
+list. Read [`docs/architecture/observability.md`](docs/architecture/observability.md)
+before adding logging, error reporting, or telemetry.
 
 The accepted repository controls map every architecture invariant to active or
 objectively deferred evidence. Read

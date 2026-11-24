@@ -2,7 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
@@ -40,17 +41,8 @@ import {
 
 type Photo = Extract<AccountResponse, { kind: 'photo' }>;
 
-interface DetailRow {
-	readonly value: HTMLElement;
-	readonly note: HTMLElement;
-	readonly row: HTMLElement;
-}
-
 const CHANGE_PHOTO_ICON = proctorIconFactory('action.changePhoto');
 const SEND_EMAIL_ICON = proctorIconFactory('action.sendEmail', 14);
-
-type DetailKey =
-	'firstName' | 'lastName' | 'email' | 'language' | 'timeZone' | 'memberSince' | 'lastSignIn';
 
 /**
  * Profile: the photo and name, the read-only account details the institution
@@ -62,15 +54,11 @@ export class ProfilePage extends Disposable implements PageView {
 	private readonly sessions: AccountRead<'sessions'>;
 	private readonly notices: AccountRead<'notices'>;
 
-	private readonly avatar: HTMLElement;
-	private readonly name: HTMLElement;
-	private readonly username: HTMLElement;
 	private readonly changePhoto: ButtonControl;
 	private readonly removePhoto: ButtonControl;
 	private readonly fileInput: HTMLInputElement;
 	private readonly photoFeedback: PageFeedback;
 	private readonly details: PageSection;
-	private readonly detailRows: Readonly<Record<DetailKey, DetailRow>>;
 	private readonly unverified: HTMLElement;
 	private readonly sendVerification: ButtonControl;
 	private readonly verificationFeedback: PageFeedback;
@@ -86,13 +74,14 @@ export class ProfilePage extends Disposable implements PageView {
 
 	constructor(
 		body: HTMLElement,
-		_headerActions: HTMLElement,
+		headerActions: HTMLElement,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
 		@IWorkbenchWindowService windowService: IWorkbenchWindowService,
 		@IAuthenticatedNavigationService
 		private readonly navigation: IAuthenticatedNavigationService,
-		@IInstantiationService private readonly instantiationService: IInstantiationService
+		@IInstantiationService private readonly instantiationService: IInstantiationService,
+		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
 		const binding = windowService.binding;
@@ -109,24 +98,8 @@ export class ProfilePage extends Disposable implements PageView {
 			this.instantiationService.createInstance(AccountRead<'notices'>, 'notices')
 		);
 
-		this.avatar = $('span.prctr-account-profile__avatar', { attrs: { 'aria-hidden': 'true' } });
-		this.name = $('p.prctr-account-profile__name');
-		this.username = $('p.prctr-account-profile__username');
-		const names = $('div.prctr-account-profile__names', {}, this.name, this.username);
-		if (this.format.institution !== undefined)
-			names.append(
-				$(
-					'p.prctr-account-profile__institution',
-					{},
-					this._register(
-						createProctorIcon(document, { id: 'object.institution', size: 14 })
-					).element,
-					this.format.institution
-				)
-			);
-		const identity = $('div.prctr-account-profile__identity', {}, this.avatar, names);
-		const photoActions = $('div.prctr-account-profile__photo-actions');
-		identity.append(photoActions);
+		// The person is the page's heading, as the board draws it; the photo buttons sit beside it.
+		const photoActions = headerActions;
 		this.removePhoto = this._register(
 			new ButtonControl(photoActions, {
 				variant: 'ghost',
@@ -148,7 +121,7 @@ export class ProfilePage extends Disposable implements PageView {
 			accept: '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp',
 			hidden: true
 		});
-		const identityBlock = $('div.prctr-account-profile', {}, identity, this.fileInput);
+		const identityBlock = $('div.prctr-account-profile', {}, this.fileInput);
 		body.append(identityBlock);
 		this.photoFeedback = this._register(new PageFeedback(identityBlock));
 
@@ -185,17 +158,6 @@ export class ProfilePage extends Disposable implements PageView {
 				)
 			);
 		}
-		const list = $('dl.prctr-account-details');
-		this.detailRows = {
-			firstName: this.detailRow($, list, 'firstName'),
-			lastName: this.detailRow($, list, 'lastName'),
-			email: this.detailRow($, list, 'email'),
-			language: this.detailRow($, list, 'language'),
-			timeZone: this.detailRow($, list, 'timeZone'),
-			memberSince: this.detailRow($, list, 'memberSince'),
-			lastSignIn: this.detailRow($, list, 'lastSignIn')
-		};
-		this.details.content.append(list);
 
 		const noticeIcon = this._register(
 			createProctorIcon(document, { id: 'action.sendEmail', size: 18 })
@@ -268,24 +230,6 @@ export class ProfilePage extends Disposable implements PageView {
 		this._register(this.sendVerification.onDidRequest(() => void this.requestVerification()));
 	}
 
-	private detailRow(
-		$: ReturnType<typeof createElementFactory>,
-		list: HTMLElement,
-		label: DetailKey
-	): DetailRow {
-		const value = $('dd.prctr-account-details__value');
-		const note = $('dd.prctr-account-details__note', { hidden: true });
-		const row = $(
-			'div.prctr-account-details__row',
-			{},
-			$('dt.prctr-account-details__label', { textContent: this.format.text(label) }),
-			value,
-			note
-		);
-		list.append(row);
-		return { value, note, row };
-	}
-
 	private plainNotice($: ReturnType<typeof createElementFactory>, text: string): HTMLElement {
 		return $('p.prctr-account-notice.prctr-account-notice--plain', { textContent: text });
 	}
@@ -294,16 +238,20 @@ export class ProfilePage extends Disposable implements PageView {
 		const data = this.profile.data?.profile;
 		this.renderRemovePhoto();
 		this.details.setState(this.profile.state, false, () => void this.profile.refresh());
-		const list = this.details.content;
-		list.hidden = data === undefined;
 		const displayName =
 			data === undefined
 				? (this.identity?.displayName ?? '')
 				: data.displayName || data.username;
-		this.name.textContent = displayName;
-		this.username.textContent = data?.username ?? '';
-		this.username.hidden = data === undefined;
-		if (this.photo === undefined) this.avatar.textContent = initialsOf(displayName);
+		this.pane.setHeading({
+			title: displayName,
+			description: '',
+			initials: initialsOf(displayName),
+			...(this.photo === undefined ? {} : { photo: this.photo.dataUrl }),
+			record: [
+				...(data === undefined ? [] : [{ text: data.username, mono: true as const }]),
+				...(this.format.institution === undefined ? [] : [this.format.institution])
+			]
+		});
 		if (data === undefined) {
 			this.unverified.hidden = true;
 			return;
@@ -312,41 +260,53 @@ export class ProfilePage extends Disposable implements PageView {
 	}
 
 	private renderDetails(profile: AccountProfile): void {
-		const text = (key: DetailKey, value: string | undefined): void => {
-			const row = this.detailRows[key];
-			row.value.textContent = value || this.format.text('notProvided');
-			row.value.dataset.empty = String(!value);
-		};
-		text('firstName', profile.firstName);
-		text('lastName', profile.lastName);
-		text('email', profile.email);
-		text(
-			'language',
-			profile.locale === undefined ? undefined : this.format.languageName(profile.locale)
-		);
-		text('timeZone', profile.timezone);
-		text('memberSince', this.format.date(profile.createdAt));
-		const emailNote = this.detailRows.email.note;
+		const value = (text: string | undefined) =>
+			text === undefined || text === ''
+				? { value: this.format.text('notProvided'), empty: true }
+				: { value: text };
 		const verified = profile.emailVerified;
-		emailNote.hidden = profile.email === undefined || verified === undefined;
-		emailNote.replaceChildren(
-			createStatusBadge(emailNote.ownerDocument, {
-				text: this.format.text(verified ? 'emailVerified' : 'emailUnverified'),
-				tone: verified ? 'safeguard' : 'attention'
-			})
-		);
-		this.unverified.hidden = profile.email === undefined || verified !== false;
 		const current = groupSessions(this.sessions.data?.sessions ?? []).current;
-		const lastSignIn = this.detailRows.lastSignIn;
-		lastSignIn.row.hidden = current === undefined;
-		if (current !== undefined)
-			text(
-				'lastSignIn',
-				this.format.text('lastSignInValue', {
-					when: this.format.relativeStandalone(current.createdAt),
-					client: this.format.text(clientKind(current.client))
-				})
-			);
+		renderDetails(this.details.content, [
+			{ label: this.format.text('firstName'), ...value(profile.firstName) },
+			{ label: this.format.text('lastName'), ...value(profile.lastName) },
+			{ label: this.format.text('username'), value: profile.username },
+			{
+				label: this.format.text('email'),
+				...value(profile.email),
+				...(profile.email === undefined || verified === undefined
+					? {}
+					: {
+							note: {
+								text: this.format.text(
+									verified ? 'emailVerified' : 'emailUnverified'
+								),
+								tone: verified ? ('safeguard' as const) : ('attention' as const)
+							}
+						})
+			},
+			{
+				label: this.format.text('language'),
+				...value(
+					profile.locale === undefined
+						? undefined
+						: this.format.languageName(profile.locale)
+				)
+			},
+			{ label: this.format.text('timeZone'), ...value(profile.timezone) },
+			{ label: this.format.text('memberSince'), value: this.format.date(profile.createdAt) },
+			...(current === undefined
+				? []
+				: [
+						{
+							label: this.format.text('lastSignIn'),
+							value: this.format.text('lastSignInValue', {
+								when: this.format.relativeStandalone(current.createdAt),
+								client: this.format.text(clientKind(current.client))
+							})
+						}
+					])
+		]);
+		this.unverified.hidden = profile.email === undefined || verified !== false;
 	}
 
 	private renderNotices(): void {
@@ -415,11 +375,7 @@ export class ProfilePage extends Disposable implements PageView {
 
 	private applyPhoto(photo: Photo): void {
 		this.photo = photo;
-		const image = createElementFactory(this.avatar.ownerDocument)('img', {
-			alt: '',
-			src: photo.dataUrl
-		});
-		this.avatar.replaceChildren(image);
+		this.renderProfile();
 		this.account.setPhoto(photo.dataUrl);
 		this.renderRemovePhoto();
 	}

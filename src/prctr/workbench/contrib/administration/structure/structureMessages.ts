@@ -96,6 +96,21 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'No levels yet',
 		description: 'A programme with no levels.'
 	}),
+	structureProgrammeColumn: defineMessage({
+		id: 'administration.structure.column.programme',
+		defaultMessage: 'Programme',
+		description: 'Column of a unit’s programmes.'
+	}),
+	structureYearsColumn: defineMessage({
+		id: 'administration.structure.column.years',
+		defaultMessage: 'Years',
+		description: 'Column of how many years (levels) a programme has.'
+	}),
+	structureProgrammeActions: defineMessage({
+		id: 'administration.structure.programme.actions',
+		defaultMessage: 'Actions for {name}',
+		description: 'Accessible name of a programme’s ⋯ menu.'
+	}),
 	structureLevels: defineMessage({
 		id: 'administration.structure.levels',
 		defaultMessage: 'Levels',
@@ -508,9 +523,19 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'Current',
 		description: 'A period running now.'
 	}),
+	periodsNext: defineMessage({
+		id: 'administration.structure.periods.next',
+		defaultMessage: 'Next',
+		description: 'Status of the soonest academic period still to start.'
+	}),
+	periodsOwnedNote: defineMessage({
+		id: 'administration.structure.periods.owned.note',
+		defaultMessage: 'A period owned by a unit is only offered to that unit’s classes.',
+		description: 'Explains academic periods above their table.'
+	}),
 	periodsUpcoming: defineMessage({
 		id: 'administration.structure.periods.upcoming',
-		defaultMessage: 'Upcoming',
+		defaultMessage: 'Planned',
 		description: 'A period starting later.'
 	}),
 	periodsPast: defineMessage({

@@ -128,6 +128,15 @@
           }
         }
       }
+    },
+    "rawColorStylesheets": {
+      "description": "Ratchet: Proctor stylesheets that still hold raw colours; each leaves the list once it uses tokens.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^src/prctr/.+\\.css$"
+      }
     }
   },
   "$defs": {

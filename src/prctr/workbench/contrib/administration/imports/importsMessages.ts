@@ -91,132 +91,6 @@ export const importsMessages = Object.freeze({
 		defaultMessage: 'Imports',
 		description: 'The trail step back to Imports.'
 	}),
-	importDescription: defineMessage({
-		id: 'administration.imports.description',
-		defaultMessage: '{rows} rows · Uploaded {when}',
-		description: 'Description of one import.'
-	}),
-	importChecking: defineMessage({
-		id: 'administration.imports.checking',
-		defaultMessage: 'Checking the rows… This page updates on its own.',
-		description: 'Shown while the server reads the file.'
-	}),
-	importImporting: defineMessage({
-		id: 'administration.imports.importing',
-		defaultMessage: 'Importing… This page updates on its own.',
-		description: 'Shown while the server imports the rows.'
-	}),
-	importSummary: defineMessage({
-		id: 'administration.imports.summary',
-		defaultMessage: 'Summary',
-		description: 'Section with the counts of an import.'
-	}),
-	importReady: defineMessage({
-		id: 'administration.imports.ready',
-		defaultMessage: 'Ready',
-		description: 'Count of rows that will import.'
-	}),
-	importErrors: defineMessage({
-		id: 'administration.imports.errors',
-		defaultMessage: 'Errors',
-		description: 'Count of rows that will be left out.'
-	}),
-	importTotal: defineMessage({
-		id: 'administration.imports.total',
-		defaultMessage: 'Rows',
-		description: 'Count of all rows in the file.'
-	}),
-	importSucceeded: defineMessage({
-		id: 'administration.imports.succeeded',
-		defaultMessage: 'Imported',
-		description: 'Count of rows imported.'
-	}),
-	importFailed: defineMessage({
-		id: 'administration.imports.failed',
-		defaultMessage: 'Failed',
-		description: 'Count of rows that failed to import.'
-	}),
-	importSkipped: defineMessage({
-		id: 'administration.imports.skipped',
-		defaultMessage: 'Skipped',
-		description: 'Count of rows left out or already done.'
-	}),
-	importLeftOut: defineMessage({
-		id: 'administration.imports.left.out',
-		defaultMessage:
-			'{count} rows can’t be imported and will be left out. Fix them in the file and upload it again, or import the rest now.',
-		description: 'Notice when some rows have errors.'
-	}),
-	importRows: defineMessage({
-		id: 'administration.imports.rows',
-		defaultMessage: 'Rows that need a look',
-		description: 'Section with the rows that have a problem.'
-	}),
-	importRowsDescription: defineMessage({
-		id: 'administration.imports.rows.description',
-		defaultMessage: 'Errors first. Everything else imports as written.',
-		description: 'Description of the rows section.'
-	}),
-	importRowsNone: defineMessage({
-		id: 'administration.imports.rows.none',
-		defaultMessage: 'Every row is ready to import.',
-		description: 'Shown when no row has a problem.'
-	}),
-	importRowsMore: defineMessage({
-		id: 'administration.imports.rows.more',
-		defaultMessage: 'Only the first 100 rows are shown.',
-		description: 'Shown when the preview has more rows.'
-	}),
-	importRow: defineMessage({
-		id: 'administration.imports.row',
-		defaultMessage: 'Row {row} · {reference}',
-		description: 'Title of one row of an import.'
-	}),
-	importRowCode: defineMessage({
-		id: 'administration.imports.row.code',
-		defaultMessage: '{code}',
-		description: 'The server’s code for a row’s problem.'
-	}),
-	importRowValid: defineMessage({
-		id: 'administration.imports.row.valid',
-		defaultMessage: 'Ready',
-		description: 'Row status.'
-	}),
-	importRowInvalid: defineMessage({
-		id: 'administration.imports.row.invalid',
-		defaultMessage: 'Left out',
-		description: 'Row status: it has an error.'
-	}),
-	importRowDuplicate: defineMessage({
-		id: 'administration.imports.row.duplicate',
-		defaultMessage: 'Duplicate',
-		description: 'Row status: repeats an earlier row.'
-	}),
-	importRowDone: defineMessage({
-		id: 'administration.imports.row.done',
-		defaultMessage: 'Imported',
-		description: 'Row status after import.'
-	}),
-	importRowFailed: defineMessage({
-		id: 'administration.imports.row.failed',
-		defaultMessage: 'Failed',
-		description: 'Row status after a failed import.'
-	}),
-	importRowSkipped: defineMessage({
-		id: 'administration.imports.row.skipped',
-		defaultMessage: 'Skipped',
-		description: 'Row status: left out.'
-	}),
-	importCommitAll: defineMessage({
-		id: 'administration.imports.commit.all',
-		defaultMessage: 'Import {count} rows',
-		description: 'Imports every row; count is how many.'
-	}),
-	importCommitValid: defineMessage({
-		id: 'administration.imports.commit.valid',
-		defaultMessage: 'Import the {count} ready rows',
-		description: 'Imports only the rows without errors.'
-	}),
 	importCommitTitle: defineMessage({
 		id: 'administration.imports.commit.title',
 		defaultMessage: 'Import these rows?',
@@ -303,10 +177,312 @@ export const importsMessages = Object.freeze({
 		defaultMessage: 'Failed',
 		description: 'Import state.'
 	}),
-	importsRecent: defineMessage({
-		id: 'administration.imports.recent',
-		defaultMessage: 'Recent imports',
-		description: 'Section of files uploaded before.'
+	importCommitPeople: defineMessage({
+		id: 'administration.import.commit.people',
+		defaultMessage: 'Import {count} people',
+		description: 'Imports the ready rows of an import.'
+	}),
+	importCommitPeopleOne: defineMessage({
+		id: 'administration.import.commit.people.one',
+		defaultMessage: 'Import {count} person',
+		description: 'Imports the one ready row of an import.'
+	}),
+	importRecordRows: defineMessage({
+		id: 'administration.import.record.rows',
+		defaultMessage: '{count} rows',
+		description: 'How many rows an import file has.'
+	}),
+	importRecordRowsOne: defineMessage({
+		id: 'administration.import.record.rows.one',
+		defaultMessage: '{count} row',
+		description: 'An import file with one row.'
+	}),
+	importRecordPeople: defineMessage({
+		id: 'administration.import.record.people',
+		defaultMessage: '{count} people',
+		description: 'How many people an import is adding.'
+	}),
+	importRecordPeopleOne: defineMessage({
+		id: 'administration.import.record.people.one',
+		defaultMessage: '{count} person',
+		description: 'An import adding one person.'
+	}),
+	importRecordUploaded: defineMessage({
+		id: 'administration.import.record.uploaded',
+		defaultMessage: 'Uploaded {when}',
+		description: 'When an import file was uploaded: “Uploaded 20 minutes ago”.'
+	}),
+	importRecordStarted: defineMessage({
+		id: 'administration.import.record.started',
+		defaultMessage: 'Started {when}',
+		description: 'When an import started: “Started 1 minute ago”.'
+	}),
+	importRecordFinished: defineMessage({
+		id: 'administration.import.record.finished',
+		defaultMessage: 'Finished {when}',
+		description: 'When an import finished: “Finished today at 09:31”.'
+	}),
+	importSteps: defineMessage({
+		id: 'administration.import.steps',
+		defaultMessage: 'Steps',
+		description: 'Accessible name of an import’s steps.'
+	}),
+	importStepUpload: defineMessage({
+		id: 'administration.import.step.upload',
+		defaultMessage: 'Upload',
+		description: 'The first step of an import.'
+	}),
+	importStepReview: defineMessage({
+		id: 'administration.import.step.review',
+		defaultMessage: 'Review',
+		description: 'The second step of an import.'
+	}),
+	importStepImport: defineMessage({
+		id: 'administration.import.step.import',
+		defaultMessage: 'Import',
+		description: 'The last step of an import.'
+	}),
+	importCheckingBanner: defineMessage({
+		id: 'administration.import.banner.checking',
+		defaultMessage:
+			'Checking every row against the people and classes already here. Nothing changes yet, and you can leave this page: the import waits for you under Imports.',
+		description: 'Shown while the server checks an import file.'
+	}),
+	importImportingBanner: defineMessage({
+		id: 'administration.import.banner.importing',
+		defaultMessage:
+			'Imported {done} of {total} people. Each one is added as soon as they’re ready; you can leave this page.',
+		description: 'Shown while an import runs.'
+	}),
+	importLeftOutBanner: defineMessage({
+		id: 'administration.import.banner.left.out',
+		defaultMessage:
+			'{count} rows can’t be imported and will be left out. Fix them in the file and upload it again, or import the rest now.',
+		description: 'Shown on an import ready to review with rows that will be left out.'
+	}),
+	importLeftOutBannerOne: defineMessage({
+		id: 'administration.import.banner.left.out.one',
+		defaultMessage:
+			'{count} row can’t be imported and will be left out. Fix it in the file and upload it again, or import the rest now.',
+		description: 'Shown on an import ready to review with one row that will be left out.'
+	}),
+	importDoneBanner: defineMessage({
+		id: 'administration.import.banner.done',
+		defaultMessage:
+			'{imported} people were imported. {missed} rows didn’t import: {left} left out at review and {failed} that failed while importing. The report lists every one.',
+		description: 'Shown on a finished import where some rows did not import.'
+	}),
+	importUnreadableBanner: defineMessage({
+		id: 'administration.import.banner.unreadable',
+		defaultMessage:
+			'This file couldn’t be read as CSV, so nothing was imported. Save it from your spreadsheet as “CSV UTF-8” and upload it again.',
+		description: 'Shown on an import whose file could not be read.'
+	}),
+	importFailedBanner: defineMessage({
+		id: 'administration.import.banner.failed',
+		defaultMessage:
+			'This import stopped before it finished. Upload the file again to try once more.',
+		description: 'Shown on an import that failed for another reason.'
+	}),
+	importStatChecked: defineMessage({
+		id: 'administration.import.stat.checked',
+		defaultMessage: 'Checked',
+		description: 'Rows checked so far.'
+	}),
+	importStatOf: defineMessage({
+		id: 'administration.import.stat.of',
+		defaultMessage: 'Of {total} rows',
+		description: 'Note under the rows checked so far.'
+	}),
+	importStatReadySoFar: defineMessage({
+		id: 'administration.import.stat.ready.so.far',
+		defaultMessage: 'Ready so far',
+		description: 'Rows ready while checking continues.'
+	}),
+	importStatNew: defineMessage({
+		id: 'administration.import.stat.new',
+		defaultMessage: 'New accounts and enrolments',
+		description: 'Note under rows that add people.'
+	}),
+	importStatNeedLook: defineMessage({
+		id: 'administration.import.stat.need.look',
+		defaultMessage: 'Need a look',
+		description: 'Rows with a problem found so far.'
+	}),
+	importStatSoFar: defineMessage({
+		id: 'administration.import.stat.so.far',
+		defaultMessage: 'So far',
+		description: 'Note under a figure still growing.'
+	}),
+	importStatReady: defineMessage({
+		id: 'administration.import.stat.ready',
+		defaultMessage: 'Ready',
+		description: 'Rows that will import.'
+	}),
+	importStatAsWritten: defineMessage({
+		id: 'administration.import.stat.as.written',
+		defaultMessage: 'Imported as written',
+		description: 'Note under the ready rows.'
+	}),
+	importStatSkipped: defineMessage({
+		id: 'administration.import.stat.skipped',
+		defaultMessage: 'Skipped',
+		description: 'Rows with nothing to change.'
+	}),
+	importStatAlready: defineMessage({
+		id: 'administration.import.stat.already',
+		defaultMessage: 'Already there',
+		description: 'Note under skipped rows.'
+	}),
+	importStatLeftOut: defineMessage({
+		id: 'administration.import.stat.left.out',
+		defaultMessage: 'Left out',
+		description: 'Rows that can’t be imported.'
+	}),
+	importStatFixUpload: defineMessage({
+		id: 'administration.import.stat.fix.upload',
+		defaultMessage: 'Fix and upload again',
+		description: 'Note under rows left out.'
+	}),
+	importStatImported: defineMessage({
+		id: 'administration.import.stat.imported',
+		defaultMessage: 'Imported',
+		description: 'Rows imported.'
+	}),
+	importStatWaiting: defineMessage({
+		id: 'administration.import.stat.waiting',
+		defaultMessage: 'Waiting',
+		description: 'Rows not yet imported.'
+	}),
+	importStatInOrder: defineMessage({
+		id: 'administration.import.stat.in.order',
+		defaultMessage: 'In order',
+		description: 'Note under waiting rows.'
+	}),
+	importStatDidnt: defineMessage({
+		id: 'administration.import.stat.didnt',
+		defaultMessage: 'Didn’t import',
+		description: 'Rows that failed while importing.'
+	}),
+	importStatYet: defineMessage({
+		id: 'administration.import.stat.yet',
+		defaultMessage: 'Yet',
+		description: 'Note under rows that failed so far.'
+	}),
+	importStatLeftOutReview: defineMessage({
+		id: 'administration.import.stat.left.out.review',
+		defaultMessage: 'Left out at review',
+		description: 'Rows left out before importing.'
+	}),
+	importStatInReport: defineMessage({
+		id: 'administration.import.stat.in.report',
+		defaultMessage: 'In the report',
+		description: 'Note under rows left out at review.'
+	}),
+	importStatFailedImporting: defineMessage({
+		id: 'administration.import.stat.failed.importing',
+		defaultMessage: 'Failed while importing',
+		description: 'Rows that failed while importing.'
+	}),
+	importStatListedBelow: defineMessage({
+		id: 'administration.import.stat.listed.below',
+		defaultMessage: 'Listed below',
+		description: 'Note under rows that failed while importing.'
+	}),
+	importLookTitle: defineMessage({
+		id: 'administration.import.look.title',
+		defaultMessage: 'Rows that need a look',
+		description: 'Heading of an import’s rows that won’t import as written.'
+	}),
+	importLookDescription: defineMessage({
+		id: 'administration.import.look.description',
+		defaultMessage: 'Left out first, then skipped. Everything else imports as written.',
+		description: 'Explains the rows that need a look.'
+	}),
+	importFailedTitle: defineMessage({
+		id: 'administration.import.failed.title',
+		defaultMessage: 'Rows that failed while importing',
+		description: 'Heading of an import’s rows that failed.'
+	}),
+	importColumnRow: defineMessage({
+		id: 'administration.import.column.row',
+		defaultMessage: 'Row',
+		description: 'Column of the row number in the file.'
+	}),
+	importColumnPerson: defineMessage({
+		id: 'administration.import.column.person',
+		defaultMessage: 'Person',
+		description: 'Column of who a row is about.'
+	}),
+	importColumnFound: defineMessage({
+		id: 'administration.import.column.found',
+		defaultMessage: 'What Proctor found',
+		description: 'Column of what is wrong with a row.'
+	}),
+	importColumnOutcome: defineMessage({
+		id: 'administration.import.column.outcome',
+		defaultMessage: 'Outcome',
+		description: 'Column of what happens to a row.'
+	}),
+	importColumnWhy: defineMessage({
+		id: 'administration.import.column.why',
+		defaultMessage: 'Why',
+		description: 'Column of why a row failed.'
+	}),
+	importOutcomeLeftOut: defineMessage({
+		id: 'administration.import.outcome.left.out',
+		defaultMessage: 'Left out',
+		description: 'A row that won’t be imported.'
+	}),
+	importOutcomeSkipped: defineMessage({
+		id: 'administration.import.outcome.skipped',
+		defaultMessage: 'Skipped',
+		description: 'A row with nothing to change.'
+	}),
+	importFoundAlready: defineMessage({
+		id: 'administration.import.found.already',
+		defaultMessage: 'Already in place, so nothing changes',
+		description: 'A row that needs no change.'
+	}),
+	importFoundUnknown: defineMessage({
+		id: 'administration.import.found.unknown',
+		defaultMessage: 'This row can’t be imported',
+		description: 'A row with an unknown problem.'
+	}),
+	importExpectsTitle: defineMessage({
+		id: 'administration.import.expects.title',
+		defaultMessage: 'What Proctor expects',
+		description: 'Heading of how an import file should look.'
+	}),
+	importExpectsFormat: defineMessage({
+		id: 'administration.import.expects.format',
+		defaultMessage: 'Format',
+		description: 'The file format an import needs.'
+	}),
+	importExpectsFormatValue: defineMessage({
+		id: 'administration.import.expects.format.value',
+		defaultMessage: 'CSV, saved as “CSV UTF-8”',
+		description: 'The file format an import needs.'
+	}),
+	importExpectsFirstRow: defineMessage({
+		id: 'administration.import.expects.first.row',
+		defaultMessage: 'First row',
+		description: 'What the first row of an import file holds.'
+	}),
+	importExpectsFirstRowValue: defineMessage({
+		id: 'administration.import.expects.first.row.value',
+		defaultMessage: 'Column names: email, first name, last name',
+		description: 'What the first row of an import file holds.'
+	}),
+	importExpectsEachRow: defineMessage({
+		id: 'administration.import.expects.each.row',
+		defaultMessage: 'Each row after',
+		description: 'What every later row of an import file holds.'
+	}),
+	importExpectsEachRowValue: defineMessage({
+		id: 'administration.import.expects.each.row.value',
+		defaultMessage: 'One person',
+		description: 'What every later row of an import file holds.'
 	}),
 	importsRecentTable: defineMessage({
 		id: 'administration.imports.recent.table',
@@ -332,6 +508,41 @@ export const importsMessages = Object.freeze({
 		id: 'administration.imports.column.status',
 		defaultMessage: 'Status',
 		description: 'Column of where an import stands.'
+	}),
+	importsStatus: defineMessage({
+		id: 'administration.imports.filter.status',
+		defaultMessage: 'Status',
+		description: 'Label of the Imports status filter.'
+	}),
+	importsAny: defineMessage({
+		id: 'administration.imports.filter.any',
+		defaultMessage: 'Any',
+		description: 'The Imports status filter set to every status.'
+	}),
+	importsKept: defineMessage({
+		id: 'administration.imports.kept',
+		defaultMessage: 'Kept for 30 days. Open one to see its rows or download its report.',
+		description: 'Explains the Imports list above its table.'
+	}),
+	importsReview: defineMessage({
+		id: 'administration.imports.review',
+		defaultMessage: 'Review',
+		description: 'Opens an import that is ready to review.'
+	}),
+	importsImportedMissed: defineMessage({
+		id: 'administration.imports.imported.missed',
+		defaultMessage: 'Imported, {count} didn’t',
+		description: 'Status of an import where some rows were not imported: “Imported, 2 didn’t”.'
+	}),
+	importsUnreadable: defineMessage({
+		id: 'administration.imports.unreadable',
+		defaultMessage: 'Couldn’t read',
+		description: 'Status of an import whose file could not be read as CSV.'
+	}),
+	importsNoMatch: defineMessage({
+		id: 'administration.imports.no.match',
+		defaultMessage: 'No imports with this status',
+		description: 'The Imports list when the status filter matches nothing.'
 	}),
 	importsRecentEmpty: defineMessage({
 		id: 'administration.imports.recent.empty',

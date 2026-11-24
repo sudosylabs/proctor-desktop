@@ -59,6 +59,16 @@ export const pageMessages = Object.freeze({
 		defaultMessage: 'Another change is being applied. Try again when it finishes.',
 		description: 'Account changes run one at a time.'
 	}),
+	fieldRequired: defineMessage({
+		id: 'page.field.required',
+		defaultMessage: 'This is required.',
+		description: 'Shown under a required form field left empty.'
+	}),
+	fieldRefused: defineMessage({
+		id: 'page.field.refused',
+		defaultMessage: 'The server didn’t accept this. Check it and try again.',
+		description: 'Shown under a form field the server refused.'
+	}),
 	cancel: defineMessage({
 		id: 'page.action.cancel',
 		defaultMessage: 'Cancel',
@@ -172,7 +182,7 @@ export const pageMessages = Object.freeze({
 	}),
 	moreChips: defineMessage({
 		id: 'page.row.chips.more',
-		defaultMessage: '{count} more',
+		defaultMessage: 'and {count} more',
 		description: 'Opens the labels not shown in the row, such as "7 more".'
 	}),
 	confirmItsYouTitle: defineMessage({

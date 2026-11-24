@@ -15,20 +15,19 @@ import {
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
+import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import type { PageRowAction } from '../../../browser/authenticated/pages/pageSection.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
-import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import {
 	AdminList,
 	type AdminListItem,
 	type AdminCell,
 	type AdminListQuery
 } from '../widgets/adminList.js';
-import { readOnce } from '../widgets/adminReads.js';
 import { InviteDialog } from './inviteDialog.js';
 
 type Invitation = AdminListItem<'invitations'>;
@@ -59,7 +58,8 @@ export class InvitationsPage extends Disposable implements PageView {
 	private readonly changes: AdminChanges;
 	private query: AdminListQuery<'invitations'> = { state: 'pending' };
 	/** Who sent each invitation, read once per inviter. */
-	private readonly names = new Map<string, string>();
+	/** Who is signed in, so their own invitations read "You". */
+	private readonly principalId: string | undefined;
 
 	constructor(
 		body: HTMLElement,
@@ -68,9 +68,11 @@ export class InvitationsPage extends Disposable implements PageView {
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
 		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService,
 		@IPagePaneContext private readonly pane: IPagePaneContext,
-		@IAdministrationService private readonly administration: IAdministrationService
+		@IWorkbenchWindowService windowService: IWorkbenchWindowService
 	) {
 		super();
+		const binding = windowService.binding;
+		this.principalId = binding.kind === 'authenticated' ? binding.principalId : undefined;
 		this.changes = this._register(instantiationService.createInstance(AdminChanges));
 		const importButton = this._register(
 			new ButtonControl(headerActions, {
@@ -94,7 +96,7 @@ export class InvitationsPage extends Disposable implements PageView {
 		};
 		this._register(invite.onDidRequest(openInvite));
 
-		const filters = this._register(new AdminFilters(body));
+		const filters = this._register(new PageFilters(body));
 		filters.addSearch(format.text('invitationsFind'), (text) =>
 			this.setQuery({ email: text !== undefined && EMAIL.test(text) ? text : undefined })
 		);
@@ -137,57 +139,60 @@ export class InvitationsPage extends Disposable implements PageView {
 					columns: [
 						{
 							label: format.text('invitationsColumnInvitee'),
-							width: '34%',
 							min: 220,
 							cell: (invitation) => ({
 								kind: 'text',
 								primary: invitation.email,
-								secondary:
-									invitation.delivery?.failureCode === undefined
-										? ''
-										: format.code('problem', invitation.delivery.failureCode),
-								...(invitation.delivery?.failureCode === undefined
-									? {}
-									: { secondaryTone: 'fail' as const }),
 								strong: true
 							})
 						},
 						{
 							label: format.text('invitationsColumnKind'),
-							width: '24%',
+							width: '230px',
+							// The role invited to, or what a student or teacher invitation grants, then where.
 							cell: (invitation) => ({
 								kind: 'text',
-								primary: format.text(PURPOSE_TEXT[invitation.purpose])
+								primary:
+									invitation.roleName ??
+									format.text(PURPOSE_TEXT[invitation.purpose]),
+								secondary: invitation.scopeName ?? ''
 							})
 						},
 						{
 							label: format.text('invitationsColumnBy'),
-							width: '18%',
+							width: '140px',
 							priority: 3,
 							foldLabel: true,
-							cell: (invitation) => ({
-								kind: 'text',
-								primary:
-									this.names.get(invitation.inviterId) ??
-									format.text('inviteLoading'),
-								quiet: true
-							})
+							cell: (invitation) => {
+								const you = invitation.inviterId === this.principalId;
+								return {
+									kind: 'text',
+									primary: you
+										? format.text('invitationsByYou')
+										: (invitation.inviterName ??
+											format.text('invitationsByFormer')),
+									quiet: you
+								};
+							}
 						},
 						{
 							label: format.text('invitationsColumnExpires'),
-							width: '120px',
+							width: '110px',
 							align: 'end',
 							priority: 2,
 							// A pending invitation that lapses within a week says so in amber.
 							cell: (invitation) => {
 								const left = Math.ceil((invitation.expiresAt - format.now()) / DAY);
+								const bounced = invitation.delivery?.state === 'failed';
 								const soon =
-									invitation.state === 'pending' && left > 0 && left <= 7;
+									invitation.state === 'pending' &&
+									!bounced &&
+									left > 0 &&
+									left <= 7;
 								return {
 									kind: 'text',
-									primary: format.date(invitation.expiresAt),
+									primary: format.shortDate(invitation.expiresAt),
 									mono: true,
-									quiet: true,
 									...(soon
 										? {
 												secondary:
@@ -242,30 +247,8 @@ export class InvitationsPage extends Disposable implements PageView {
 			this.list.onDidLoad((invitations) => {
 				// An empty list offers Invite itself, so the heading doesn't repeat it.
 				invite.element.hidden = invitations.length === 0;
-				void this.loadNames(invitations);
 			})
 		);
-	}
-
-	private async loadNames(invitations: readonly Invitation[]): Promise<void> {
-		const missing = [...new Set(invitations.map((invitation) => invitation.inviterId))].filter(
-			(id) => !this.names.has(id)
-		);
-		if (missing.length === 0) return;
-		const users = await Promise.all(
-			missing.map((id) => readOnce(this.administration, { kind: 'user', id }))
-		);
-		if (this._store.isDisposed) return;
-		missing.forEach((id, index) => {
-			const user = users[index]!;
-			this.names.set(
-				id,
-				user.kind === 'data'
-					? user.value.displayName
-					: this.format.text('classUnknownPerson')
-			);
-		});
-		this.list.redraw();
 	}
 
 	private status(invitation: Invitation): AdminCell {

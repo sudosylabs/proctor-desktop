@@ -1,0 +1,130 @@
+/* A table of rows a record page already holds, drawn like the server-paged lists: no card,
+ * hairlines between rows, quiet column labels, the table reaching 12 pixels past its column so
+ * cell text lines up with the page heading. */
+@layer contributions {
+	.prctr-page-table .prctr-page-table__frame {
+		margin-inline: -12px;
+		overflow-x: auto;
+	}
+	.prctr-page-table .prctr-page-table__table {
+		border-collapse: separate;
+		border-spacing: 0;
+		font-size: var(--prctr-typography-body-size);
+		inline-size: 100%;
+		line-height: var(--prctr-typography-body-lineHeight);
+		table-layout: fixed;
+	}
+	.prctr-page-table th {
+		block-size: 40px;
+		box-shadow: inset 0 -1px 0 var(--prctr-color-border-default);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-small-size);
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: var(--prctr-typography-label-small-lineHeight);
+		padding: 0 8px;
+		text-align: start;
+		vertical-align: middle;
+		white-space: nowrap;
+	}
+	.prctr-page-table td {
+		block-size: 40px;
+		box-shadow: inset 0 -1px 0 var(--prctr-color-border-default);
+		box-sizing: border-box;
+		padding: 4px 8px;
+		vertical-align: middle;
+	}
+	.prctr-page-table tbody[data-lines='2'] td {
+		block-size: 48px;
+	}
+	.prctr-page-table th:first-child,
+	.prctr-page-table td:first-child {
+		padding-inline-start: 12px;
+	}
+	.prctr-page-table th:last-child,
+	.prctr-page-table td:last-child {
+		padding-inline-end: 12px;
+	}
+	.prctr-page-table th[data-align='end'],
+	.prctr-page-table td[data-align='end'] {
+		text-align: end;
+	}
+	.prctr-page-table col[data-kind='more'] {
+		width: 44px;
+	}
+	.prctr-page-table td[data-kind='more'] {
+		padding-inline: 0 12px;
+		text-align: end;
+	}
+	.prctr-page-table .prctr-page-table__text {
+		display: flex;
+		flex-direction: column;
+		min-inline-size: 0;
+	}
+	.prctr-page-table td[data-align='end'] .prctr-page-table__text {
+		align-items: flex-end;
+	}
+	.prctr-page-table .prctr-page-table__primary,
+	.prctr-page-table .prctr-page-table__secondary {
+		max-inline-size: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.prctr-page-table .prctr-page-table__text[data-wrap='true'] .prctr-page-table__primary {
+		text-wrap: pretty;
+		white-space: normal;
+	}
+	.prctr-page-table .prctr-page-table__primary {
+		color: var(--prctr-color-text-primary);
+	}
+	.prctr-page-table .prctr-page-table__text[data-strong='true'] .prctr-page-table__primary {
+		font-weight: var(--prctr-typography-weight-medium);
+	}
+	.prctr-page-table .prctr-page-table__text[data-mono='true'] .prctr-page-table__primary {
+		font-variant-numeric: tabular-nums;
+	}
+	.prctr-page-table .prctr-page-table__text[data-quiet='true'] .prctr-page-table__primary,
+	.prctr-page-table .prctr-page-table__secondary {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-page-table .prctr-page-table__secondary {
+		font-size: var(--prctr-typography-label-small-size);
+		line-height: 18px;
+	}
+	.prctr-page-table .prctr-page-table__word {
+		color: var(--prctr-color-text-secondary);
+		font-size: 13px;
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: 18px;
+		white-space: nowrap;
+	}
+	.prctr-page-table .prctr-page-table__word[data-tone='attention'] {
+		color: var(--prctr-color-status-attention);
+	}
+	.prctr-page-table .prctr-page-table__word[data-tone='failure'] {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-page-table .prctr-page-table__word[data-tone='progress'] {
+		color: var(--prctr-color-text-link);
+	}
+	.prctr-page-table .prctr-page-table__word[data-tone='safeguard'] {
+		color: var(--prctr-color-status-safeguard);
+	}
+	.prctr-page-table .prctr-page-table__foot {
+		align-items: center;
+		color: var(--prctr-color-text-secondary);
+		display: flex;
+		font-size: 13px;
+		gap: 12px;
+		justify-content: space-between;
+		min-block-size: 48px;
+	}
+	.prctr-page-table .prctr-page-table__foot[hidden] {
+		display: none;
+	}
+	.prctr-page-table .prctr-page-table__steps {
+		display: flex;
+		gap: 4px;
+	}
+}
