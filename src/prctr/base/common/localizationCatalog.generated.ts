@@ -1943,6 +1943,8 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "page.detail.separator": "{first} · {second}",
     "page.dialog.close": "Close",
     "page.dismiss": "Dismiss",
+    "page.field.refused": "The server didn’t accept this. Check it and try again.",
+    "page.field.required": "This is required.",
     "page.pager.compact": "Page {page} of {count}",
     "page.pager.compact.open": "Page {page}",
     "page.pager.name": "{list} pages",

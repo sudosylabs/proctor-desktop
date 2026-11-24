@@ -12245,6 +12245,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
+    "page.field.refused": {
+      "message": "The server didn’t accept this. Check it and try again.",
+      "description": "Shown under a form field the server refused.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.field.required": {
+      "message": "This is required.",
+      "description": "Shown under a required form field left empty.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
     "page.pager.compact": {
       "message": "Page {page} of {count}",
       "description": "The pager's narrow form, as in \"Page 12 of 25\".",

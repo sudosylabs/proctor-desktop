@@ -19,7 +19,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { AdminChanges } from '../widgets/adminChanges.js';
-import { adminField } from '../widgets/adminForm.js';
+import { pageField } from '../../../browser/authenticated/pages/pageForm.js';
 import { readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 
 const NONE = '';
@@ -66,18 +66,18 @@ export class NewProgressionDialog extends Disposable {
 			})
 		);
 		const body = this.dialog.body;
-		this.unit = this.select(adminField(body, format.text('newUnit')), format.text('newUnit'));
+		this.unit = this.select(pageField(body, format.text('newUnit')), format.text('newUnit'));
 		this._register(this.unit.onDidChange((unit) => void this.loadClasses(unit)));
-		this.from = this.select(adminField(body, format.text('newFrom')), format.text('newFrom'));
-		const toField = adminField(body, format.text('newTo'), format.text('newToHint'));
+		this.from = this.select(pageField(body, format.text('newFrom')), format.text('newFrom'));
+		const toField = pageField(body, format.text('newTo'), format.text('newToHint'));
 		this.to = this.select(toField, format.text('newTo'));
 		toField.element.append(toField.hint);
 		this.toHint = toField.hint;
 		this._register(this.from.onDidChange(() => this.update()));
 		this._register(this.to.onDidChange(() => this.update()));
-		const whenField = adminField(body, format.text('newWhen'), format.text('newWhenHint'));
+		const whenField = pageField(body, format.text('newWhen'), format.text('newWhenHint'));
 		const $ = createElementFactory(body.ownerDocument);
-		this.when = $('input.prctr-admin-form__date', {
+		this.when = $('input.prctr-page-form__date', {
 			id: whenField.id,
 			type: 'date',
 			attrs: { 'aria-describedby': whenField.hint.id }
@@ -107,7 +107,7 @@ export class NewProgressionDialog extends Disposable {
 		void this.loadUnits();
 	}
 
-	private select(field: ReturnType<typeof adminField>, label: string): SelectControl<string> {
+	private select(field: ReturnType<typeof pageField>, label: string): SelectControl<string> {
 		return this._register(
 			new SelectControl<string>(field.element, {
 				label,

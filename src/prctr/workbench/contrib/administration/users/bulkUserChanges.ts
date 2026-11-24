@@ -36,7 +36,7 @@ import {
 	type AdminChangeResult
 } from '../widgets/adminChanges.js';
 import { PageChips } from '../../../browser/authenticated/pages/pageChips.js';
-import { adminField } from '../widgets/adminForm.js';
+import { pageField } from '../../../browser/authenticated/pages/pageForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 import { FilterPreviewDialog } from './filterPreviewDialog.js';
 import './media/bulkUserChanges.css';
@@ -404,7 +404,7 @@ class BulkPlaceDialog extends Disposable {
 			})
 		);
 		const body = this.dialog.body;
-		const peopleField = adminField(body, format.text('bulkPeople'));
+		const peopleField = pageField(body, format.text('bulkPeople'));
 		this.people = this._register(
 			new PageChips(peopleField.element, {
 				label: format.text('bulkPeople'),
@@ -422,9 +422,9 @@ class BulkPlaceDialog extends Disposable {
 			})
 		);
 		const unitLabelText = format.text(enrol ? 'bulkUnit' : 'bulkWhere');
-		this.unit = this.select(adminField(body, unitLabelText), unitLabelText);
+		this.unit = this.select(pageField(body, unitLabelText), unitLabelText);
 		const targetLabel = format.text(enrol ? 'bulkClass' : 'bulkRole');
-		this.target = this.select(adminField(body, targetLabel), targetLabel);
+		this.target = this.select(pageField(body, targetLabel), targetLabel);
 		if (enrol) this._register(this.unit.onDidChange((unit) => void this.loadClasses(unit)));
 		else this._register(this.unit.onDidChange(() => this.update()));
 		this._register(this.target.onDidChange(() => this.update()));
@@ -468,7 +468,7 @@ class BulkPlaceDialog extends Disposable {
 		return this.format.counted(key, count);
 	}
 
-	private select(field: ReturnType<typeof adminField>, label: string): SelectControl<string> {
+	private select(field: ReturnType<typeof pageField>, label: string): SelectControl<string> {
 		return this._register(
 			new SelectControl<string>(field.element, {
 				label,
