@@ -11,7 +11,9 @@ import { BoardAdministration, BOARD_NOW } from './boardData.ts';
 const [place = 'administration/users', theme = 'light'] = (
 	new URLSearchParams(location.search).get('shot') ?? ''
 ).split(',');
-const [area = 'administration', page = 'users'] = place.split('/');
+const [area = 'administration', target = 'users'] = place.split('/');
+// "imports>registry-staff.csv" opens the row with that text from the Imports list.
+const [page = 'users', row] = target.split('>');
 
 // The boards are drawn at one moment, so every date and relative time matches them.
 const realNow = Date.now;
@@ -148,5 +150,9 @@ byText('button, a', AREA_LABELS[area] ?? area)?.click();
 await settle(300);
 byText('button, a, [role="treeitem"]', PAGE_LABELS[page] ?? page)?.click();
 await settle(1200);
+if (row !== undefined) {
+	byText('button, a, [role="link"], [tabindex]', row)?.click();
+	await settle(1200);
+}
 (document.activeElement as HTMLElement | null)?.blur();
 document.documentElement.dataset.previewReady = 'true';

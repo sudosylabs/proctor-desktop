@@ -4,10 +4,12 @@
 		background: var(--prctr-color-background-raised);
 		border-radius: 8px;
 		color: var(--prctr-color-text-primary);
+		box-sizing: border-box;
 		display: flex;
-		font: 13px/19px var(--prctr-typography-font-application);
-		gap: 10px;
-		padding: 8px 8px 8px 12px;
+		font: 13.5px/20px var(--prctr-typography-font-application);
+		gap: 12px;
+		min-block-size: 48px;
+		padding: 7px 8px 7px 14px;
 	}
 
 	.prctr-banner[hidden] {

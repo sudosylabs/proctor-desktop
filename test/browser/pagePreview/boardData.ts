@@ -379,6 +379,60 @@ export class BoardAdministration implements AdministrationClient {
 					)
 				});
 			}
+			case 'onboardingImport': {
+				const index = IMPORTS.findIndex((_, i) => boardId(400 + i) === intent.id);
+				const entry = IMPORTS[index];
+				if (entry === undefined) return { kind: 'error', reason: 'notFound' };
+				const summary = onboardingImport(entry, index);
+				const ready = summary.state === 'preview_ready';
+				return data('onboardingImport', {
+					...summary,
+					...(ready
+						? {
+								validRows: 405,
+								invalidRows: 6,
+								skippedRows: 1,
+								previewDigest: 'a'.repeat(64)
+							}
+						: {}),
+					rows: ready
+						? [
+								[
+									18,
+									'j.okoro@northbridge.example',
+									'invalid',
+									'invitation.conflict'
+								],
+								[47, 'b.harris@northbridge', 'invalid', 'invitation.invalid'],
+								[
+									63,
+									'l.fischer@northbridge.example',
+									'invalid',
+									'resource.not_found'
+								],
+								[102, 'o.saleh@northbridge.example', 'no_op', undefined]
+							].map(([row, reference, status, code]) => ({
+								row,
+								reference,
+								operation: 'create',
+								status,
+								...(code === undefined ? {} : { code })
+							}))
+						: summary.failedRows > 0
+							? [
+									[211, 'o.hughes@northbridge.example'],
+									[388, 'n.petrova@northbridge.example']
+								].map(([row, reference]) => ({
+									row,
+									reference,
+									operation: 'create',
+									status: 'failed',
+									code: 'invitation.class_period_conflict'
+								}))
+							: [],
+					moreRows: false
+				});
+			}
 			case 'audits':
 				return data('audits', {
 					items: [

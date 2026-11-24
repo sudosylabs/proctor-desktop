@@ -4782,6 +4782,398 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.import.banner.checking": {
+      "message": "Checking every row against the people and classes already here. Nothing changes yet, and you can leave this page: the import waits for you under Imports.",
+      "description": "Shown while the server checks an import file.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.done": {
+      "message": "{imported} people were imported. {missed} rows didn’t import: {left} left out at review and {failed} that failed while importing. The report lists every one.",
+      "description": "Shown on a finished import where some rows did not import.",
+      "placeholders": [
+        "imported",
+        "missed",
+        "left",
+        "failed"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.failed": {
+      "message": "This import stopped before it finished. Upload the file again to try once more.",
+      "description": "Shown on an import that failed for another reason.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.importing": {
+      "message": "Imported {done} of {total} people. Each one is added as soon as they’re ready; you can leave this page.",
+      "description": "Shown while an import runs.",
+      "placeholders": [
+        "done",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.left.out": {
+      "message": "{count} rows can’t be imported and will be left out. Fix them in the file and upload it again, or import the rest now.",
+      "description": "Shown on an import ready to review with rows that will be left out.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.left.out.one": {
+      "message": "{count} row can’t be imported and will be left out. Fix it in the file and upload it again, or import the rest now.",
+      "description": "Shown on an import ready to review with one row that will be left out.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.banner.unreadable": {
+      "message": "This file couldn’t be read as CSV, so nothing was imported. Save it from your spreadsheet as “CSV UTF-8” and upload it again.",
+      "description": "Shown on an import whose file could not be read.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.found": {
+      "message": "What Proctor found",
+      "description": "Column of what is wrong with a row.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.outcome": {
+      "message": "Outcome",
+      "description": "Column of what happens to a row.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.person": {
+      "message": "Person",
+      "description": "Column of who a row is about.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.row": {
+      "message": "Row",
+      "description": "Column of the row number in the file.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.column.why": {
+      "message": "Why",
+      "description": "Column of why a row failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.commit.people": {
+      "message": "Import {count} people",
+      "description": "Imports the ready rows of an import.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.commit.people.one": {
+      "message": "Import {count} person",
+      "description": "Imports the one ready row of an import.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.each.row": {
+      "message": "Each row after",
+      "description": "What every later row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.each.row.value": {
+      "message": "One person",
+      "description": "What every later row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.first.row": {
+      "message": "First row",
+      "description": "What the first row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.first.row.value": {
+      "message": "Column names: email, first name, last name",
+      "description": "What the first row of an import file holds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.format": {
+      "message": "Format",
+      "description": "The file format an import needs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.format.value": {
+      "message": "CSV, saved as “CSV UTF-8”",
+      "description": "The file format an import needs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.expects.title": {
+      "message": "What Proctor expects",
+      "description": "Heading of how an import file should look.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.failed.title": {
+      "message": "Rows that failed while importing",
+      "description": "Heading of an import’s rows that failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.found.already": {
+      "message": "Already in place, so nothing changes",
+      "description": "A row that needs no change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.found.unknown": {
+      "message": "This row can’t be imported",
+      "description": "A row with an unknown problem.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.look.description": {
+      "message": "Left out first, then skipped. Everything else imports as written.",
+      "description": "Explains the rows that need a look.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.look.title": {
+      "message": "Rows that need a look",
+      "description": "Heading of an import’s rows that won’t import as written.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.outcome.left.out": {
+      "message": "Left out",
+      "description": "A row that won’t be imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.outcome.skipped": {
+      "message": "Skipped",
+      "description": "A row with nothing to change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.finished": {
+      "message": "Finished {when}",
+      "description": "When an import finished: “Finished today at 09:31”.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.people": {
+      "message": "{count} people",
+      "description": "How many people an import is adding.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.people.one": {
+      "message": "{count} person",
+      "description": "An import adding one person.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.rows": {
+      "message": "{count} rows",
+      "description": "How many rows an import file has.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.rows.one": {
+      "message": "{count} row",
+      "description": "An import file with one row.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.started": {
+      "message": "Started {when}",
+      "description": "When an import started: “Started 1 minute ago”.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.record.uploaded": {
+      "message": "Uploaded {when}",
+      "description": "When an import file was uploaded: “Uploaded 20 minutes ago”.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.already": {
+      "message": "Already there",
+      "description": "Note under skipped rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.as.written": {
+      "message": "Imported as written",
+      "description": "Note under the ready rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.checked": {
+      "message": "Checked",
+      "description": "Rows checked so far.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.didnt": {
+      "message": "Didn’t import",
+      "description": "Rows that failed while importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.failed.importing": {
+      "message": "Failed while importing",
+      "description": "Rows that failed while importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.fix.upload": {
+      "message": "Fix and upload again",
+      "description": "Note under rows left out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.imported": {
+      "message": "Imported",
+      "description": "Rows imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.in.order": {
+      "message": "In order",
+      "description": "Note under waiting rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.in.report": {
+      "message": "In the report",
+      "description": "Note under rows left out at review.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.left.out": {
+      "message": "Left out",
+      "description": "Rows that can’t be imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.left.out.review": {
+      "message": "Left out at review",
+      "description": "Rows left out before importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.listed.below": {
+      "message": "Listed below",
+      "description": "Note under rows that failed while importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.need.look": {
+      "message": "Need a look",
+      "description": "Rows with a problem found so far.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.new": {
+      "message": "New accounts and enrolments",
+      "description": "Note under rows that add people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.of": {
+      "message": "Of {total} rows",
+      "description": "Note under the rows checked so far.",
+      "placeholders": [
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.ready": {
+      "message": "Ready",
+      "description": "Rows that will import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.ready.so.far": {
+      "message": "Ready so far",
+      "description": "Rows ready while checking continues.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.skipped": {
+      "message": "Skipped",
+      "description": "Rows with nothing to change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.so.far": {
+      "message": "So far",
+      "description": "Note under a figure still growing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.waiting": {
+      "message": "Waiting",
+      "description": "Rows not yet imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.stat.yet": {
+      "message": "Yet",
+      "description": "Note under rows that failed so far.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.step.import": {
+      "message": "Import",
+      "description": "The last step of an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.step.review": {
+      "message": "Review",
+      "description": "The second step of an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.step.upload": {
+      "message": "Upload",
+      "description": "The first step of an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.import.steps": {
+      "message": "Steps",
+      "description": "Accessible name of an import’s steps.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
     "administration.imports.cancel": {
       "message": "Cancel import",
       "description": "Cancels an import after confirming.",
@@ -4809,12 +5201,6 @@
     "administration.imports.cancelled": {
       "message": "The import is cancelled",
       "description": "Toast after an import is cancelled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.checking": {
-      "message": "Checking the rows… This page updates on its own.",
-      "description": "Shown while the server reads the file.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -4848,14 +5234,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.commit.all": {
-      "message": "Import {count} rows",
-      "description": "Imports every row; count is how many.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
     "administration.imports.commit.body": {
       "message": "Accounts, enrolments and invitations are created as the rows say. Rows with errors are left out.",
       "description": "Confirmation body before importing.",
@@ -4865,35 +5243,6 @@
     "administration.imports.commit.title": {
       "message": "Import these rows?",
       "description": "Confirmation title before importing.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.commit.valid": {
-      "message": "Import the {count} ready rows",
-      "description": "Imports only the rows without errors.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.description": {
-      "message": "{rows} rows · Uploaded {when}",
-      "description": "Description of one import.",
-      "placeholders": [
-        "rows",
-        "when"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.errors": {
-      "message": "Errors",
-      "description": "Count of rows that will be left out.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.failed": {
-      "message": "Failed",
-      "description": "Count of rows that failed to import.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -4941,24 +5290,10 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.importing": {
-      "message": "Importing… This page updates on its own.",
-      "description": "Shown while the server imports the rows.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
     "administration.imports.kept": {
       "message": "Kept for 30 days. Open one to see its rows or download its report.",
       "description": "Explains the Imports list above its table.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.left.out": {
-      "message": "{count} rows can’t be imported and will be left out. Fix them in the file and upload it again, or import the rest now.",
-      "description": "Notice when some rows have errors.",
-      "placeholders": [
-        "count"
-      ],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
     "administration.imports.mode": {
@@ -5015,12 +5350,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
-    "administration.imports.ready": {
-      "message": "Ready",
-      "description": "Count of rows that will import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
     "administration.imports.recent.empty": {
       "message": "No imports yet",
       "description": "Title of the empty Imports list.",
@@ -5042,89 +5371,6 @@
     "administration.imports.review": {
       "message": "Review",
       "description": "Opens an import that is ready to review.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row": {
-      "message": "Row {row} · {reference}",
-      "description": "Title of one row of an import.",
-      "placeholders": [
-        "row",
-        "reference"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.code": {
-      "message": "{code}",
-      "description": "The server’s code for a row’s problem.",
-      "placeholders": [
-        "code"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.done": {
-      "message": "Imported",
-      "description": "Row status after import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.duplicate": {
-      "message": "Duplicate",
-      "description": "Row status: repeats an earlier row.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.failed": {
-      "message": "Failed",
-      "description": "Row status after a failed import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.invalid": {
-      "message": "Left out",
-      "description": "Row status: it has an error.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.skipped": {
-      "message": "Skipped",
-      "description": "Row status: left out.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.row.valid": {
-      "message": "Ready",
-      "description": "Row status.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows": {
-      "message": "Rows that need a look",
-      "description": "Section with the rows that have a problem.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows.description": {
-      "message": "Errors first. Everything else imports as written.",
-      "description": "Description of the rows section.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows.more": {
-      "message": "Only the first 100 rows are shown.",
-      "description": "Shown when the preview has more rows.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.rows.none": {
-      "message": "Every row is ready to import.",
-      "description": "Shown when no row has a problem.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.skipped": {
-      "message": "Skipped",
-      "description": "Count of rows left out or already done.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -5179,24 +5425,6 @@
     "administration.imports.state.uploading": {
       "message": "Uploading",
       "description": "Import state.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.succeeded": {
-      "message": "Imported",
-      "description": "Count of rows imported.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.summary": {
-      "message": "Summary",
-      "description": "Section with the counts of an import.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
-    },
-    "administration.imports.total": {
-      "message": "Rows",
-      "description": "Count of all rows in the file.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },

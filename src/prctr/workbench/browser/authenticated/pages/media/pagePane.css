@@ -103,7 +103,7 @@
 		gap: 24px;
 	}
 	.prctr-page-pane .prctr-page-pane__title-row {
-		align-items: center;
+		align-items: baseline;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 4px 12px;
@@ -128,8 +128,52 @@
 		inline-size: 100%;
 		object-fit: cover;
 	}
-	.prctr-page-pane .prctr-page-pane__status {
-		display: inline-flex;
+	/* The status word beside a record's title, in its tone. */
+	.prctr-page-pane .prctr-page-pane__status,
+	.prctr-page-pane .prctr-page-pane__record-word {
+		color: var(--prctr-color-text-secondary);
+		font-size: 14px;
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: 18px;
+		white-space: nowrap;
+	}
+	.prctr-page-pane .prctr-page-pane__record-word {
+		font-size: 13px;
+	}
+	.prctr-page-pane .prctr-page-pane__status[data-tone='attention'],
+	.prctr-page-pane .prctr-page-pane__record-word[data-tone='attention'] {
+		color: var(--prctr-color-status-attention);
+	}
+	.prctr-page-pane .prctr-page-pane__status[data-tone='failure'],
+	.prctr-page-pane .prctr-page-pane__record-word[data-tone='failure'] {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-page-pane .prctr-page-pane__status[data-tone='progress'],
+	.prctr-page-pane .prctr-page-pane__record-word[data-tone='progress'] {
+		color: var(--prctr-color-text-link);
+	}
+	.prctr-page-pane .prctr-page-pane__status[data-tone='safeguard'],
+	.prctr-page-pane .prctr-page-pane__record-word[data-tone='safeguard'] {
+		color: var(--prctr-color-status-safeguard);
+	}
+	/* The record line: short facts joined by "·", wrapping as a whole. */
+	.prctr-page-pane .prctr-page-pane__record {
+		align-items: baseline;
+		color: var(--prctr-color-text-secondary);
+		column-gap: 6px;
+		display: flex;
+		flex-wrap: wrap;
+		font-size: 13px;
+		line-height: 18px;
+		margin: 0;
+	}
+	.prctr-page-pane .prctr-page-pane__record-separator {
+		color: var(--prctr-color-text-tertiary);
+	}
+	.prctr-page-pane .prctr-page-pane__record-mono {
+		color: var(--prctr-color-text-primary);
+		font-family: var(--prctr-typography-font-monospace);
+		font-size: 12.5px;
 	}
 
 	.prctr-page-pane .prctr-page-pane__trail {
@@ -161,7 +205,7 @@
 		outline: 2px solid var(--prctr-color-border-focus);
 	}
 	.prctr-page-pane .prctr-page-pane__trail-current {
-		color: var(--prctr-color-text-primary);
+		color: var(--prctr-color-text-secondary);
 	}
 	/* #endregion */
 
