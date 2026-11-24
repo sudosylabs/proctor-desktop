@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 export type DesignTokenKind =
-	'color' | 'dimension' | 'duration' | 'font-family' | 'font-weight' | 'shadow';
+	'color' | 'dimension' | 'duration' | 'easing' | 'font-family' | 'font-weight' | 'shadow';
 
 export interface DesignTokenDefinition<Id extends string = string> {
 	readonly id: Id;
@@ -281,6 +281,11 @@ const tokenDefinitions = [
 		description: 'Page title line height.'
 	},
 	{
+		id: 'typography.title.page.letterSpacing',
+		kind: 'dimension',
+		description: 'Page title tracking, tightened.'
+	},
+	{
 		id: 'typography.title.dialog.size',
 		kind: 'dimension',
 		description: 'Dialog title font size.'
@@ -289,6 +294,11 @@ const tokenDefinitions = [
 		id: 'typography.title.dialog.lineHeight',
 		kind: 'dimension',
 		description: 'Dialog title line height.'
+	},
+	{
+		id: 'typography.title.dialog.letterSpacing',
+		kind: 'dimension',
+		description: 'Dialog title tracking, tightened.'
 	},
 	{
 		id: 'typography.title.section.size',
@@ -354,7 +364,14 @@ const tokenDefinitions = [
 	{ id: 'motion.duration.instant', kind: 'duration', description: 'No transition.' },
 	{ id: 'motion.duration.fast', kind: 'duration', description: 'Fast acknowledgement.' },
 	{ id: 'motion.duration.normal', kind: 'duration', description: 'Normal transition.' },
-	{ id: 'motion.duration.slow', kind: 'duration', description: 'Slow orientation transition.' }
+	{ id: 'motion.duration.slow', kind: 'duration', description: 'Slow orientation transition.' },
+	{
+		id: 'motion.easing.standard',
+		kind: 'easing',
+		description: 'Movement within the view, such as a menu opening.'
+	},
+	{ id: 'motion.easing.entrance', kind: 'easing', description: 'Something entering the view.' },
+	{ id: 'motion.easing.exit', kind: 'easing', description: 'Something leaving the view.' }
 ] as const satisfies readonly DesignTokenDefinition[];
 
 export type DesignTokenId = (typeof tokenDefinitions)[number]['id'];

@@ -189,9 +189,9 @@
 	}
 	/* #endregion */
 
-	/* #region Loading: grey rows shaped like the content, shown only after 300 ms */
+	/* #region Loading: grey rows shaped like the content, shown only after 1 s */
 	.prctr-page-section .prctr-page-section__skeleton {
-		animation: prctr-page-skeleton-appear 0s linear 300ms forwards;
+		animation: prctr-page-skeleton-appear 0s linear 1s forwards;
 		opacity: 0;
 	}
 	.prctr-page-section .prctr-page-section__skeleton-row {
