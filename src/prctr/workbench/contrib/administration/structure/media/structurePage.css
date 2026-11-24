@@ -1,33 +1,34 @@
 /* The Structure page: the unit tree beside the chosen unit's programmes and classes. */
 @layer contributions {
+	/* The units beside the chosen unit, divided by a hairline, as the board draws them. */
 	.prctr-admin-structure {
-		align-items: flex-start;
+		align-items: stretch;
 		display: flex;
-		gap: 24px;
+		gap: 28px;
 	}
 	.prctr-admin-structure .prctr-admin-structure__aside {
-		background: var(--prctr-color-background-card);
-		border-radius: 10px;
-		box-shadow: inset 0 0 0 1px var(--prctr-color-border-default);
+		box-shadow: inset -1px 0 0 var(--prctr-color-border-default);
 		box-sizing: border-box;
 		display: flex;
 		flex: none;
 		flex-direction: column;
-		gap: 4px;
-		inline-size: 260px;
-		padding: 8px;
+		gap: 1px;
+		inline-size: 232px;
+		padding-inline-end: 16px;
 	}
 	.prctr-admin-structure .prctr-admin-structure__aside-header {
 		align-items: center;
+		block-size: 28px;
 		display: flex;
 		gap: 8px;
-		padding: 4px 4px 8px 8px;
+		margin-block-end: 6px;
+		padding-inline-start: 8px;
 	}
 	.prctr-admin-structure .prctr-admin-structure__aside-title {
-		color: var(--prctr-color-text-tertiary);
+		color: var(--prctr-color-text-primary);
 		flex: 1;
-		font-size: 12px;
-		font-weight: var(--prctr-typography-weight-medium);
+		font-size: 13px;
+		font-weight: var(--prctr-typography-weight-semibold);
 	}
 	.prctr-admin-structure .prctr-admin-structure__aside-note {
 		color: var(--prctr-color-text-tertiary);
@@ -47,7 +48,9 @@
 			flex-direction: column;
 		}
 		.prctr-admin-structure .prctr-admin-structure__aside {
+			box-shadow: inset 0 -1px 0 var(--prctr-color-border-default);
 			inline-size: 100%;
+			padding: 0 0 12px;
 		}
 	}
 }

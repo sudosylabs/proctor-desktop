@@ -6,7 +6,10 @@ import type { StatusBadgeTone } from '../../../../base/browser/ui/badge/statusBa
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
+import type { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
+import type { PageRowAction } from './pageSection.js';
+import { createRowMenuButton } from './rowMenuButton.js';
 import './media/pageTable.css';
 
 /** What one cell shows, in the forms the boards draw. */
@@ -38,6 +41,12 @@ export interface PageTableOptions<T> {
 	readonly label: string;
 	readonly columns: readonly PageTableColumn<T>[];
 	readonly rowId: (item: T) => string;
+	/** A row's ⋯ menu: its accessible name and actions, the destructive ones last. */
+	readonly actions?: {
+		readonly menu: MenuControl;
+		label(item: T): string;
+		actions(item: T): readonly PageRowAction[];
+	};
 	/** Rows per page; the pager steps through the items the page already has. */
 	readonly pageSize: number;
 	readonly labels: {
@@ -94,7 +103,8 @@ export class PageTable<T> extends Disposable {
 							attrs: { scope: 'col' },
 							data: { align: column.align ?? 'start' }
 						})
-					)
+					),
+					...(options.actions === undefined ? [] : [$('th', { data: { kind: 'more' } })])
 				)
 			),
 			this.body
@@ -165,7 +175,8 @@ export class PageTable<T> extends Disposable {
 							{ data: { align: column.align ?? 'start' } },
 							this.cell(column.cell(item))
 						)
-					)
+					),
+					...this.menuCell(item)
 				)
 			)
 		);
@@ -174,7 +185,8 @@ export class PageTable<T> extends Disposable {
 			first + shown.length,
 			this.items.length
 		);
-		this.foot.hidden = this.items.length === 0;
+		// Rows that fit on one page need no pager.
+		this.foot.hidden = this.pages() === 1;
 		this.previous.setState({
 			label: this.options.labels.previous,
 			icon: proctorIconFactory('action.back', 14),
@@ -185,6 +197,23 @@ export class PageTable<T> extends Disposable {
 			trailingIcon: proctorIconFactory('action.forward', 14),
 			disabled: this.page === this.pages()
 		});
+	}
+
+	private menuCell(item: T): HTMLElement[] {
+		const menu = this.options.actions;
+		if (menu === undefined) return [];
+		const $ = createElementFactory(this.element.ownerDocument);
+		const td = $('td', { data: { kind: 'more' } });
+		const actions = menu.actions(item);
+		if (actions.length > 0)
+			td.append(
+				createRowMenuButton(this.rowStore, menu.menu, this.element.ownerDocument, {
+					label: menu.label(item),
+					actions,
+					className: 'prctr-page-table__more'
+				})
+			);
+		return [td];
 	}
 
 	private cell(cell: PageTableCell): HTMLElement {

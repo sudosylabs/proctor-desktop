@@ -96,6 +96,21 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'No levels yet',
 		description: 'A programme with no levels.'
 	}),
+	structureProgrammeColumn: defineMessage({
+		id: 'administration.structure.column.programme',
+		defaultMessage: 'Programme',
+		description: 'Column of a unit’s programmes.'
+	}),
+	structureYearsColumn: defineMessage({
+		id: 'administration.structure.column.years',
+		defaultMessage: 'Years',
+		description: 'Column of how many years (levels) a programme has.'
+	}),
+	structureProgrammeActions: defineMessage({
+		id: 'administration.structure.programme.actions',
+		defaultMessage: 'Actions for {name}',
+		description: 'Accessible name of a programme’s ⋯ menu.'
+	}),
 	structureLevels: defineMessage({
 		id: 'administration.structure.levels',
 		defaultMessage: 'Levels',

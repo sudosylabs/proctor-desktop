@@ -280,6 +280,49 @@ function onboardingImport(
 	};
 }
 
+/** The Structure board's units: name, parent (by index), and Computer Science's contents. */
+const UNITS: readonly (readonly [string, number | undefined])[] = [
+	['Northbridge University', undefined],
+	['Faculty of Arts', 0],
+	['Faculty of Science', 0],
+	['Computer Science', 2],
+	['Software Engineering', 3],
+	['Mathematics', 2],
+	['Physics', 2],
+	['Registry', 0]
+];
+const unitId = (index: number): string => boardId(1000 + index);
+const PERIOD = boardId(1100);
+const PROGRAMMES = [
+	['BSc Computing', 'Undergraduate · Years 1 to 3'],
+	['MSc Data Science', 'Postgraduate · Year 1']
+] as const;
+const LEVELS = [
+	['Year 1', 0],
+	['Year 2', 0],
+	['Year 3', 0],
+	['Year 1', 1]
+] as const;
+const CLASSES = [
+	['Algorithms (CS201)', 1, 71],
+	['Data Mining (DS501)', 3, 28],
+	['Databases (CS204)', 1, 64]
+] as const;
+const MEMBERS = [
+	['Priya Raman', 'p.raman', ['Exam manager'], Date.UTC(2019, 8, 1)],
+	['Ahmed Farouk', 'a.farouk', ['Teacher', 'Exam manager'], Date.UTC(2021, 8, 1)],
+	['Wei Zhang', 'w.zhang', ['Teacher'], Date.UTC(2023, 0, 1)],
+	['Samuel Osei', 's.osei', ['Teaching assistant'], Date.UTC(2025, 8, 15)],
+	['Laura Kim', 'l.kim', [], Date.UTC(2026, 10, 3)]
+] as const;
+const structured = (id: string, displayName: string, description = '') => ({
+	id,
+	name: displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+	displayName,
+	description,
+	revision: 1
+});
+
 function job(index: number, type: string, at: number) {
 	return {
 		id: boardId(200 + index),
@@ -469,8 +512,95 @@ export class BoardAdministration implements AdministrationClient {
 					displayName: 'Northbridge University',
 					description: ''
 				});
-			case 'roles':
 			case 'academicUnits':
+			case 'unitChildren': {
+				const parentIndex =
+					intent.kind === 'unitChildren'
+						? UNITS.findIndex((_, index) => unitId(index) === intent.unitId)
+						: undefined;
+				return data(intent.kind, {
+					items: UNITS.flatMap(([name, parent], index) =>
+						parent === parentIndex
+							? [
+									{
+										...structured(unitId(index), name),
+										...(parent === undefined
+											? {}
+											: { parentId: unitId(parent) })
+									}
+								]
+							: []
+					)
+				});
+			}
+			case 'unitProgrammes':
+				return data('unitProgrammes', {
+					items:
+						intent.unitId === unitId(3)
+							? PROGRAMMES.map(([name, description], index) => ({
+									...structured(boardId(1200 + index), name, description),
+									unitId: unitId(3)
+								}))
+							: []
+				});
+			case 'programmeLevels':
+				return data('programmeLevels', {
+					items: LEVELS.flatMap(([name, programme], index) =>
+						boardId(1200 + programme) === intent.programmeId
+							? [
+									{
+										...structured(boardId(1300 + index), name),
+										programmeId: intent.programmeId
+									}
+								]
+							: []
+					)
+				});
+			case 'unitClasses':
+				return data('unitClasses', {
+					items:
+						intent.unitId === unitId(3)
+							? CLASSES.map(([name, level, students], index) => ({
+									...structured(boardId(1400 + index), name),
+									levelId: boardId(1300 + level),
+									academicPeriodId: PERIOD,
+									studentCount: students
+								}))
+							: [],
+					...(intent.unitId === unitId(3)
+						? { cursor: 'page-2', total: 14, totalAtLeast: false }
+						: {})
+				});
+			case 'unitMembers':
+				return data('unitMembers', {
+					items: MEMBERS.map(([name, email, roles, since], index) => ({
+						id: boardId(1500 + index),
+						userId: boardId(1600 + index),
+						unitId: intent.unitId,
+						startAt: since,
+						user: { displayName: name, email: `${email}@northbridge.example` },
+						rolesHere: roles.map((role, roleIndex) => ({
+							roleId: boardId(700 + roleIndex),
+							displayName: role
+						}))
+					})),
+					cursor: 'page-2',
+					total: 36,
+					totalAtLeast: false
+				});
+			case 'academicPeriods':
+				return data('academicPeriods', {
+					items: [
+						{
+							...structured(PERIOD, 'Autumn 2026'),
+							ownerType: 'institution',
+							ownerId: boardId(900),
+							startAt: Date.UTC(2026, 8, 15),
+							endAt: Date.UTC(2026, 11, 12)
+						}
+					]
+				});
+			case 'roles':
 				return data(intent.kind, { items: [] });
 			default:
 				return { kind: 'error', reason: 'unavailable' };

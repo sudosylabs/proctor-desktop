@@ -19,6 +19,7 @@ import { IInstantiationService } from '../../../../platform/instantiation/common
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
+import { PageTable } from '../../../browser/authenticated/pages/pageTable.js';
 import {
 	PageSection,
 	type PageRowAction,
@@ -68,6 +69,7 @@ export class StructurePage extends Disposable implements PageView {
 	private readonly treeNote: HTMLElement;
 	private readonly details: PageSection;
 	private readonly programmes: PageSection;
+	private readonly programmeTable: PageTable<Programme>;
 	private readonly levels: PageSection;
 	private readonly classes = this._register(new MutableDisposable<AdminList<'unitClasses'>>());
 	private readonly members = this._register(new MutableDisposable<AdminList<'unitMembers'>>());
@@ -135,8 +137,9 @@ export class StructurePage extends Disposable implements PageView {
 			new ButtonControl(asideHeader, {
 				variant: 'ghost',
 				size: 'small',
-				label: format.text('structureNewUnit'),
-				icon: proctorIconFactory('action.add', 14)
+				label: '',
+				accessibleLabel: format.text('structureNewUnit'),
+				icon: proctorIconFactory('action.add', 16)
 			})
 		);
 		this._register(newUnit.onDidRequest(() => this.createUnit(undefined)));
@@ -163,7 +166,52 @@ export class StructurePage extends Disposable implements PageView {
 		this.programmes = this._register(
 			instantiationService.createInstance(PageSection, main, {
 				title: format.text('structureProgrammes'),
-				action: { label: format.text('structureNewProgramme'), icon: 'action.add' }
+				action: { label: format.text('structureNewProgramme'), icon: 'action.add' },
+				plain: true
+			})
+		);
+		this.programmeTable = this._register(
+			new PageTable<Programme>(this.programmes.content, {
+				label: format.text('structureProgrammes'),
+				rowId: (programme) => programme.id,
+				pageSize: 50,
+				labels: {
+					previous: format.text('pagerPrevious'),
+					next: format.text('pagerNext'),
+					showing: (first, last, total) =>
+						format.text('listShowing', {
+							range: format.pagerLabels('').range(first, last, total, false)
+						})
+				},
+				columns: [
+					{
+						label: format.text('structureProgrammeColumn'),
+						cell: (programme) => ({
+							kind: 'text',
+							primary: programme.displayName,
+							secondary: programme.description,
+							strong: true
+						})
+					},
+					{
+						label: format.text('structureYearsColumn'),
+						width: '64px',
+						align: 'end',
+						cell: (programme) => ({
+							kind: 'text',
+							primary: format.count(
+								this.levelsByProgramme.get(programme.id)?.length ?? 0
+							),
+							mono: true
+						})
+					}
+				],
+				actions: {
+					menu: pane.menu,
+					label: (programme) =>
+						format.text('structureProgrammeActions', { name: programme.displayName }),
+					actions: (programme) => this.programmeActions(programme)
+				}
 			})
 		);
 		this.views = this._register(
@@ -319,6 +367,7 @@ export class StructurePage extends Disposable implements PageView {
 			{ unitId: unit.id },
 			{
 				title: this.format.text('structureClasses'),
+				fixedPageSize: true,
 				label: this.format.text('structureClasses'),
 				action: { label: this.format.text('structureNewClass'), icon: 'action.add' },
 				columns: [
@@ -656,51 +705,40 @@ export class StructurePage extends Disposable implements PageView {
 			{ kind: 'ready' },
 			this.programmeList.length === 0 ? this.format.text('structureProgrammesEmpty') : false
 		);
-		this.programmes.setRows(
-			this.programmeList.map((programme): PageRowModel => {
-				const levels = this.levelsByProgramme.get(programme.id) ?? [];
-				return {
-					id: programme.id,
-					glyph: 'object.class',
-					title: programme.displayName,
-					detail:
-						levels.length === 0
-							? this.format.text('structureNoLevels')
-							: this.format.text('structureLevelsOf', {
-									levels: levels.map((level) => level.displayName).join(', ')
-								}),
-					button: {
-						label: this.format.text('structureLevels'),
-						icon: 'action.forward',
-						run: () => this.showLevels(programme)
-					},
-					actions: [
-						{
-							label: this.format.text('structureRename'),
-							icon: 'action.edit',
-							run: () => this.rename(programme, 'updateProgramme')
-						},
-						{
-							label: this.format.text('structureArchive'),
-							icon: 'action.delete',
-							destructive: true,
-							run: () =>
-								this.archive(
-									programme.displayName,
-									{
-										kind: 'archiveProgramme',
-										id: programme.id,
-										expectedRevision: programme.revision
-									},
-									() => void this.loadProgrammes()
-								)
-						}
-					]
-				};
-			})
-		);
+		this.programmeTable.setItems(this.programmeList);
+		this.programmeTable.element.hidden = this.programmeList.length === 0;
 		if (this.programme !== undefined)
 			this.showLevels(this.programmeList.find((p) => p.id === this.programme!.id));
+	}
+
+	private programmeActions(programme: Programme): PageRowAction[] {
+		return [
+			{
+				label: this.format.text('structureLevels'),
+				icon: 'action.forward',
+				run: () => this.showLevels(programme)
+			},
+			{
+				label: this.format.text('structureRename'),
+				icon: 'action.edit',
+				run: () => this.rename(programme, 'updateProgramme')
+			},
+			{
+				label: this.format.text('structureArchive'),
+				icon: 'action.delete',
+				destructive: true,
+				run: () =>
+					this.archive(
+						programme.displayName,
+						{
+							kind: 'archiveProgramme',
+							id: programme.id,
+							expectedRevision: programme.revision
+						},
+						() => void this.loadProgrammes()
+					)
+			}
+		];
 	}
 
 	private showLevels(programme: Programme | undefined): void {

@@ -49,6 +49,13 @@
 	.prctr-page-table td[data-align='end'] {
 		text-align: end;
 	}
+	.prctr-page-table col[data-kind='more'] {
+		width: 44px;
+	}
+	.prctr-page-table td[data-kind='more'] {
+		padding-inline: 0 12px;
+		text-align: end;
+	}
 	.prctr-page-table .prctr-page-table__text {
 		display: flex;
 		flex-direction: column;

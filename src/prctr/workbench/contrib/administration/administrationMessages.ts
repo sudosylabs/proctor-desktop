@@ -130,7 +130,8 @@ const sharedMessages = Object.freeze({
 	}),
 	structureDescription: defineMessage({
 		id: 'administration.page.structure.description',
-		defaultMessage: 'Academic units, their programmes and levels, and the classes in them.',
+		defaultMessage:
+			'Faculties, departments, programmes and classes, as your institution is organised.',
 		description: 'One-line description under the Structure heading.'
 	}),
 	classTitle: defineMessage({

@@ -7268,7 +7268,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.structure.description": {
-      "message": "Academic units, their programmes and levels, and the classes in them.",
+      "message": "Faculties, departments, programmes and classes, as your institution is organised.",
       "description": "One-line description under the Structure heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -8688,9 +8688,21 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
+    "administration.structure.column.programme": {
+      "message": "Programme",
+      "description": "Column of a unit’s programmes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
     "administration.structure.column.students": {
       "message": "Students",
       "description": "Column of a unit's classes: how many students each has.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.column.years": {
+      "message": "Years",
+      "description": "Column of how many years (levels) a programme has.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
@@ -8927,6 +8939,14 @@
       "message": "Upcoming",
       "description": "A period starting later.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.programme.actions": {
+      "message": "Actions for {name}",
+      "description": "Accessible name of a programme’s ⋯ menu.",
+      "placeholders": [
+        "name"
+      ],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.programme.new": {
