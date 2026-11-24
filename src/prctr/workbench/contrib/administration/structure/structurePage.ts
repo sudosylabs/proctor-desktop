@@ -431,7 +431,7 @@ export class StructurePage extends Disposable implements PageView {
 						sort: { key: 'name', first: 'asc' },
 						cell: (member) => ({
 							kind: 'person',
-							name: member.user.displayName,
+							name: this.unitMemberName(member),
 							detail: member.user.email ?? member.user.username
 						})
 					},
@@ -470,7 +470,7 @@ export class StructurePage extends Disposable implements PageView {
 					}
 				],
 				rowId: (member) => member.id,
-				rowName: (member) => member.user.displayName,
+				rowName: (member) => this.unitMemberName(member),
 				sorting: {
 					initial: { key: 'since', dir: 'asc' },
 					params: (sort) => ({ sort: sort.key as 'since' | 'name', dir: sort.dir })
@@ -542,8 +542,13 @@ export class StructurePage extends Disposable implements PageView {
 		});
 	}
 
+	/** A removed account keeps its row but has no name. */
+	private unitMemberName(member: AdminListItem<'unitMembers'>): string {
+		return member.user.displayName ?? this.format.text('unitMemberFormer');
+	}
+
 	private endMember(member: AdminListItem<'unitMembers'>): void {
-		const name = member.user.displayName;
+		const name = this.unitMemberName(member);
 		this.dialog.value = this.instantiationService.createInstance(
 			AdminConfirmation,
 			{

@@ -28,6 +28,9 @@ import {
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
+import { strongSignInStep } from '../../../../platform/identity/common/signInStanding.js';
+import { IAccountService } from '../../../services/account/common/account.js';
+import type { SignInRequirement } from '../../../browser/authenticated/pages/signInCheck.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { AdminFilters } from '../widgets/adminFilters.js';
 import { DeliveryDialog } from './deliveryDialog.js';
@@ -78,6 +81,7 @@ export class MailPage extends Disposable implements PageView {
 		@IInstantiationService private readonly instantiationService: IInstantiationService,
 		@IAdministrationService private readonly administration: IAdministrationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
+		@IAccountService private readonly account: IAccountService,
 		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
@@ -366,18 +370,15 @@ export class MailPage extends Disposable implements PageView {
 		]);
 		if (this._store.isDisposed) return;
 		if (mail.kind === 'failure' && mfa.kind === 'failure') {
-			const strong =
-				mail.reason === 'strongRequired' || mail.reason === 'reauthenticationRequired';
+			if (mail.reason === 'strongRequired' || mail.reason === 'reauthenticationRequired') {
+				await this.showKeysLocked(mail.reason === 'strongRequired' ? 'twoStep' : 'recent');
+				return;
+			}
 			this.keys.setState(
 				{ kind: 'failed', reason: mail.reason },
 				false,
-				strong || mail.reason === 'noAccess' ? undefined : () => void this.loadKeys()
+				mail.reason === 'noAccess' ? undefined : () => void this.loadKeys()
 			);
-			if (strong)
-				this.keys.setHeading(
-					this.format.text('mailKeys'),
-					this.format.text('mailKeysStrong')
-				);
 			return;
 		}
 		const rows: PageRowModel[] = [];
@@ -405,6 +406,43 @@ export class MailPage extends Disposable implements PageView {
 				);
 		this.keys.setState({ kind: 'ready' }, false);
 		this.keys.setRows(rows);
+	}
+
+	/**
+	 * Keys this sign-in can't read: a lock, why, and Confirm it's you, which reads them again
+	 * once it's done. A sign-in that can't reach two-step verification learns why instead.
+	 */
+	private async showKeysLocked(requirement: SignInRequirement): Promise<void> {
+		const title = this.format.text('mailKeys');
+		const label = this.format.text('confirmItsYouTitle');
+		const standing = requirement === 'twoStep' ? await this.account.readSignIn() : undefined;
+		if (this._store.isDisposed) return;
+		const step = standing === undefined ? 'confirm' : strongSignInStep(standing);
+		this.keys.setState({ kind: 'ready' }, false);
+		this.keys.setRows([
+			{
+				id: 'keysLocked',
+				glyph: 'status.locked',
+				title: this.format.text('mailKeysLocked'),
+				detail: this.format.text(
+					requirement === 'recent'
+						? 'mailKeysLockedRecent'
+						: step === 'turnOn'
+							? 'mailKeysLockedTurnOn'
+							: step === 'unavailable'
+								? 'mailKeysLockedUnavailable'
+								: 'mailKeysLockedCode'
+				),
+				button: {
+					label,
+					icon: 'action.openExternal',
+					run: () =>
+						void this.changes.checkSignIn(requirement, [title]).then((confirmed) => {
+							if (confirmed && !this._store.isDisposed) void this.loadKeys();
+						})
+				}
+			}
+		]);
 	}
 
 	private keyRow(

@@ -580,7 +580,9 @@ void test('a security update between renewals applies the server result', async 
 void test('a changed readiness digest at Start refreshes readiness and stops', async () => {
 	const { server, agent, service } = setup();
 	await service.openReadiness(SITTING);
+	// The policy changed on the server, so both the preflight and a fresh overview carry it.
 	server.prepareDigest = DIGEST('7');
+	server.overviewDigest = DIGEST('7');
 	await assert.rejects(
 		service.start(SITTING),
 		(error: unknown) =>

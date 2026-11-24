@@ -7,6 +7,12 @@ import { ServerApiError } from '../../serverApi/common/serverApi.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import type { SessionApi } from '../../serverApi/node/sessionApi.js';
 import {
+	changeTags,
+	type ServerChangeTags,
+	type ServerDataTag
+} from '../../serverApi/common/serverDataTags.js';
+import { TagChangeQueue } from '../../serverApi/common/tagChangeQueue.js';
+import {
 	validateAccountIntent,
 	validateAccountResponse,
 	type AccountFailure,
@@ -21,6 +27,7 @@ import {
 	readAccountNotices,
 	readAccountProfile,
 	readAccountSecurity,
+	readAccountSignIn,
 	readAccountSessions,
 	readAccountToken,
 	readAccountTokenCreation,
@@ -29,6 +36,53 @@ import {
 } from './accountWire.js';
 
 type AccountRead = Extract<AccountIntent, { kind: 'read' | 'readPhoto' | 'readHistory' }>;
+type AccountChange = Exclude<AccountIntent, AccountRead>;
+
+/** What each Account read holds, as server data tags under the signed-in person's `account`. */
+function accountReadTags(intent: AccountRead): readonly ServerDataTag[] {
+	switch (intent.kind) {
+		case 'read':
+			return [`account/${intent.section}`];
+		case 'readPhoto':
+			return ['account/profile'];
+		case 'readHistory':
+			return ['account/history'];
+	}
+}
+
+/** What each Account change writes. Sessions and desktops share one list, so both re-read. */
+const accountChanges: {
+	readonly [K in AccountChange['kind']]: readonly ServerDataTag[];
+} = {
+	openSecurity: [],
+	uploadPhoto: ['account/profile'],
+	removePhoto: ['account/profile'],
+	revokeSession: ['account/sessions', 'account/desktops'],
+	revokeOtherSessions: ['account/sessions', 'account/desktops'],
+	revokeDesktop: ['account/sessions', 'account/desktops'],
+	renameSession: ['account/sessions', 'account/desktops'],
+	renameDesktop: ['account/sessions', 'account/desktops'],
+	createToken: ['account/tokens'],
+	disableToken: ['account/tokens'],
+	enableToken: ['account/tokens'],
+	revokeToken: ['account/tokens'],
+	requestEmailVerification: ['account/profile'],
+	reauthenticate: [],
+	cancelReauthentication: []
+};
+
+/**
+ * The tags an Account change writes and locks. A change that writes anything is recorded in the
+ * person's history and may show on their own User in Administration, so it writes both.
+ */
+export function accountChangeTags(intent: AccountChange, principalId: string): ServerChangeTags {
+	const tags = accountChanges[intent.kind];
+	if (!tags.length) return changeTags();
+	return {
+		writes: [...tags, 'account/history', `user/${principalId}`, 'audit'],
+		locks: tags
+	};
+}
 export type AccountApi = Pick<SessionApi, 'origin' | 'request' | 'reads' | 'events' | 'setFocused'>;
 
 /** What the Session owner lends Account. Credentials and refresh never leave it. */
@@ -66,7 +120,8 @@ const SAFETY_POLL_MS = 300_000;
  * runs at a time. Credentials, URLs and arbitrary requests never cross IPC.
  */
 export class AccountService {
-	#changing = false;
+	/** One queue per Session, so a change never waits on another Session's. */
+	readonly #queues = new WeakMap<AccountApi, TagChangeQueue>();
 	constructor(private readonly session: AccountSessionPort) {}
 
 	async account(binding: SessionBinding, raw: AccountIntent): Promise<AccountResponse> {
@@ -75,7 +130,9 @@ export class AccountService {
 		try {
 			return await this.session
 				.apiForSession(binding)
-				.reads.read(['account', intent], (signal) => this.#read(binding, intent, signal));
+				.reads.read(['account', intent], (signal) => this.#read(binding, intent, signal), {
+					tags: accountReadTags(intent)
+				});
 		} catch (error) {
 			return failure(error, false);
 		}
@@ -108,10 +165,16 @@ export class AccountService {
 				if (state.error) listener(failure(state.error, false));
 				else if (state.value) listener(state.value);
 			},
-			{ pollIntervalMs: event ? SAFETY_POLL_MS : POLL_MS }
+			{ pollIntervalMs: event ? SAFETY_POLL_MS : POLL_MS, tags: accountReadTags(intent) }
 		);
 		if (!event) return observation;
-		const changes = api.events.on(event, undefined, () => api.reads.refresh(key));
+		const changes = api.events.on(event, undefined, () =>
+			api.reads.refreshTags(
+				event === 'user_profile_picture_changed'
+					? ['account/profile']
+					: ['account/sessions', 'account/desktops']
+			)
+		);
 		return combinedDisposable(observation, changes);
 	}
 
@@ -143,6 +206,10 @@ export class AccountService {
 			return { kind: 'data', data: readAccountHistory(result.value) };
 		}
 		const section = intent.section;
+		if (section === 'signIn') {
+			const mfa = await api.request('getMFAStatus', {}, { signal });
+			return { kind: 'data', data: readAccountSignIn(mfa.value) };
+		}
 		if (section === 'security') {
 			const [methods, mfa] = await Promise.all([
 				api.request('listAuthenticationMethods', {}, { signal }),
@@ -194,22 +261,40 @@ export class AccountService {
 				return failure(error, true);
 			}
 		}
-		if (this.#changing) return { kind: 'error', reason: 'unavailable' };
-		this.#changing = true;
+		let session: AccountApi;
 		try {
-			return await this.#apply(binding, intent);
+			session = this.session.apiForSession(binding);
 		} catch (error) {
 			return failure(error, true);
-		} finally {
-			this.#changing = false;
 		}
+		let queue = this.#queues.get(session);
+		if (!queue) this.#queues.set(session, (queue = new TagChangeQueue()));
+		const tags = accountChangeTags(intent, binding.principalId);
+		const result = await queue.run(tags.locks, async () => {
+			try {
+				return await this.#apply(binding, intent, tags.writes);
+			} catch (error) {
+				return failure(error, true);
+			}
+		});
+		return result === 'busy' ? { kind: 'error', reason: 'busy' } : result;
 	}
 
 	async #apply(
 		binding: SessionBinding,
-		intent: Exclude<AccountIntent, AccountRead | { kind: 'cancelReauthentication' }>
+		intent: Exclude<AccountIntent, AccountRead | { kind: 'cancelReauthentication' }>,
+		writes: readonly ServerDataTag[]
 	): Promise<AccountResponse> {
-		const api = this.session.apiForSession(binding);
+		const session = this.session.apiForSession(binding);
+		// Every request of the change fences only what it writes.
+		const api: AccountApi = {
+			origin: session.origin,
+			reads: session.reads,
+			events: session.events,
+			setFocused: (focused) => session.setFocused(focused),
+			request: (operation, input, options) =>
+				session.request(operation, input, { ...options, fence: writes })
+		};
 		switch (intent.kind) {
 			case 'openSecurity':
 				await this.session.openBrowser(new URL('/account/security', api.origin).href);

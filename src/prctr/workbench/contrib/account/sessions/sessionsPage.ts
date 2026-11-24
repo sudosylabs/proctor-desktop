@@ -2,6 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { SignInCheck } from '../../../browser/authenticated/pages/signInCheck.js';
+import { accountSignInCheck } from '../widgets/accountReauthentication.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
@@ -55,6 +57,8 @@ export class SessionsPage extends Disposable implements PageView {
 	/** Items whose last change has an unknown outcome; they wait for a fresh read. */
 	private readonly unconfirmed = new Set<string>();
 
+	private readonly signIn: SignInCheck;
+
 	constructor(
 		body: HTMLElement,
 		_headerActions: HTMLElement,
@@ -66,6 +70,12 @@ export class SessionsPage extends Disposable implements PageView {
 		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
+		this.signIn = this._register(
+			this.instantiationService.createInstance(
+				SignInCheck,
+				accountSignInCheck(this.account, this.format)
+			)
+		);
 		this.sessions = this._register(
 			this.instantiationService.createInstance(AccountRead<'sessions'>, 'sessions')
 		);
@@ -466,11 +476,33 @@ export class SessionsPage extends Disposable implements PageView {
 				message: options.message,
 				confirmLabel: options.confirmLabel,
 				...(options.confirmIcon === undefined ? {} : { confirmIcon: options.confirmIcon }),
-				run: () => this.account.change(options.intent),
+				run: () => this.send(options.intent, [options.title]),
 				onDidComplete: (result) => this.onChangeComplete(result, options)
 			},
 			() => undefined
 		);
+	}
+
+	/**
+	 * Sends a change; one the institution guards goes through Confirm it's you (asking for the
+	 * code when it needs two-step verification) and is sent again, or ends as cancelled.
+	 */
+	private async send(
+		intent: AccountIntent,
+		summary: readonly string[]
+	): Promise<AccountResponse | 'busy'> {
+		const result = await this.account.change(intent);
+		if (result === 'busy' || result.kind !== 'error') return result;
+		const requirement =
+			result.reason === 'reauthenticationRequired'
+				? 'recent'
+				: result.reason === 'strongAuthenticationRequired'
+					? 'twoStep'
+					: undefined;
+		if (requirement === undefined) return result;
+		const confirmed = await this.signIn.resolve(requirement, summary);
+		if (this._store.isDisposed || !confirmed) return { kind: 'error', reason: 'cancelled' };
+		return this.account.change(intent);
 	}
 
 	private onChangeComplete(

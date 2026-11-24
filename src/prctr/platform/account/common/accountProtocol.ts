@@ -1,3 +1,7 @@
+import {
+	validateSignInStanding,
+	type SignInStanding
+} from '../../identity/common/signInStanding.js';
 import type { ObservableCapability } from '../../capabilityObservation/common/capabilityObservation.js';
 import {
 	projectionFlag,
@@ -16,7 +20,8 @@ export const accountReadSections = [
 	...accountSections,
 	'tokens',
 	'grantableScopes',
-	'notices'
+	'notices',
+	'signIn'
 ] as const;
 export type AccountReadSection = (typeof accountReadSections)[number];
 export const accountNoticeCategories = [
@@ -271,6 +276,8 @@ export type AccountData =
 	| { readonly section: 'desktops'; readonly desktops: readonly AccountDesktop[] }
 	| { readonly section: 'tokens'; readonly tokens: readonly AccountToken[] }
 	| { readonly section: 'grantableScopes'; readonly grantable: AccountGrantableScopes }
+	/** How this Session stands for changes the institution guards. */
+	| { readonly section: 'signIn'; readonly signIn: SignInStanding }
 	| {
 			readonly section: 'history';
 			readonly entries: readonly AccountHistoryEntry[];
@@ -310,7 +317,9 @@ export type AccountFailure =
 	/** The person stopped a step in the browser, or it was cancelled here. */
 	| 'cancelled'
 	/** The browser step was not finished in time. */
-	| 'expired';
+	| 'expired'
+	/** Too many changes to the same data are already waiting; nothing was sent. */
+	| 'busy';
 export type AccountResponse =
 	| { readonly kind: 'photo'; readonly dataUrl: string; readonly etag: string }
 	| { readonly kind: 'data'; readonly data: AccountData }
@@ -585,6 +594,8 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 				photoKind: projectionMember(p.photoKind, ['custom', 'default'])
 			})
 		};
+	} else if (data.section === 'signIn') {
+		result = { section: 'signIn', signIn: validateSignInStanding(data.signIn) };
 	} else if (data.section === 'security') {
 		const s = projectionRecord(data.security);
 		const m = s.mfa === undefined ? undefined : projectionRecord(s.mfa);

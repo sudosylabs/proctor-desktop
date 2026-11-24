@@ -38,6 +38,10 @@ import {
 	IAdministrationService
 } from '../../workbench/services/administration/common/administration.js';
 import {
+	IServerDataService,
+	ServerDataService
+} from '../../workbench/services/serverData/common/serverData.js';
+import {
 	AuthenticatedHostService,
 	IAuthenticatedHostService
 } from '../../workbench/services/authenticatedHost/common/authenticatedHost.js';
@@ -79,6 +83,12 @@ export function authenticatedWindowServices(
 		services.set(
 			IAdministrationService,
 			new SyncDescriptor(AdministrationService, [preload.administration])
+		);
+		services.set(
+			IServerDataService,
+			new SyncDescriptor(ServerDataService, [
+				{ administration: preload.administration, account: preload.account }
+			])
 		);
 		services.set(IPageFormatService, new SyncDescriptor(PageFormatService, [Date.now]));
 		services.set(IAccountFormatService, new SyncDescriptor(AccountFormatService));

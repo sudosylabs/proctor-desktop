@@ -42,6 +42,11 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+	.prctr-menu .prctr-menu__trailing {
+		color: var(--prctr-color-text-tertiary);
+		display: flex;
+		flex: none;
+	}
 	.prctr-menu button:not([aria-disabled='true']):hover,
 	.prctr-menu button:focus {
 		background: var(--prctr-color-interaction-hover);

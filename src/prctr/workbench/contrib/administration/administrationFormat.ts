@@ -67,7 +67,8 @@ const failureMessages: Readonly<Record<string, AdministrationText>> = Object.fre
 	conflict: 'failureConflict',
 	invalid: 'failureInvalid',
 	cancelled: 'failureCancelled',
-	expired: 'failureExpired'
+	expired: 'failureExpired',
+	busy: 'busy'
 });
 
 export class AdministrationFormatService implements IAdministrationFormatService {

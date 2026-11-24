@@ -33,6 +33,8 @@ import { renderDetails } from '../widgets/adminDetails.js';
 import { AdminFormDialog, type AdminFormOptions } from '../widgets/adminFormDialog.js';
 import { initialsOf } from '../widgets/adminList.js';
 import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { strongSignInStep } from '../../../../platform/identity/common/signInStanding.js';
+import { IAccountService } from '../../../services/account/common/account.js';
 import { adminRead, readPages, readUnitTree } from '../widgets/adminReads.js';
 
 type Read<K extends 'user' | 'userPhoto' | 'affiliations' | 'roleBindings' | 'userSessions'> =
@@ -71,6 +73,8 @@ export class UserPage extends Disposable implements PageView {
 	private roleChoices: readonly { readonly value: string; readonly label: string }[] = [];
 	private unitNames = new Map<string, string>();
 	private institutionId: string | undefined;
+	/** This sign-in can't make a change that needs two-step verification without help first. */
+	private twoStepLocked = false;
 
 	constructor(
 		body: HTMLElement,
@@ -79,6 +83,7 @@ export class UserPage extends Disposable implements PageView {
 		@IInstantiationService private readonly instantiationService: IInstantiationService,
 		@IAdministrationService private readonly administration: IAdministrationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
+		@IAccountService private readonly account: IAccountService,
 		@IAuthenticatedNavigationService
 		private readonly navigation: IAuthenticatedNavigationService,
 		@IPagePaneContext private readonly pane: IPagePaneContext
@@ -124,6 +129,7 @@ export class UserPage extends Disposable implements PageView {
 			)
 		);
 
+		void this.readSignIn();
 		this.user = this._register(adminRead(administration, { kind: 'user', id: userId }));
 		this.photo = this._register(adminRead(administration, { kind: 'userPhoto', userId }));
 		this.affiliations = this._register(
@@ -230,16 +236,40 @@ export class UserPage extends Disposable implements PageView {
 
 	// #region Rendering
 
+	/** Locks mark the changes that need two-step verification this sign-in can't reach. */
+	private async readSignIn(): Promise<void> {
+		const standing = await this.account.readSignIn();
+		if (this._store.isDisposed || standing === undefined) return;
+		const step = strongSignInStep(standing);
+		this.twoStepLocked = step === 'turnOn' || step === 'unavailable';
+		this.renderResetButton(this.user.data !== undefined);
+	}
+
+	private renderResetButton(ready: boolean): void {
+		const label = this.format.text('userResetTwoStep');
+		this.resetButton.setState({
+			label,
+			icon: proctorIconFactory('account.security'),
+			disabled: !ready,
+			...(this.twoStepLocked
+				? {
+						trailingIcon: proctorIconFactory('status.locked', 14),
+						accessibleLabel: this.lockedLabel(label)
+					}
+				: {})
+		});
+	}
+
+	private lockedLabel(label: string): string | undefined {
+		return this.twoStepLocked ? this.format.text('twoStepLockLabel', { label }) : undefined;
+	}
+
 	private renderUser(): void {
 		const user = this.user.data;
 		const state = this.user.state;
 		this.profileSection.setState(state, false, () => void this.user.refresh());
 		const ready = user !== undefined;
-		this.resetButton.setState({
-			label: this.format.text('userResetTwoStep'),
-			icon: proctorIconFactory('account.security'),
-			disabled: !ready
-		});
+		this.renderResetButton(ready);
 		for (const section of [this.profileSection, this.affiliationSection, this.roleSection])
 			section.setAction(ready);
 		this.sessionSection.setAction(ready && user.disabledAt === undefined);
@@ -527,6 +557,7 @@ export class UserPage extends Disposable implements PageView {
 			{
 				label: this.format.text('userChangeEmail'),
 				icon: 'action.sendEmail',
+				locked: this.lockedLabel(this.format.text('userChangeEmail')),
 				run: () => this.changeEmail(user)
 			}
 		];
@@ -534,6 +565,7 @@ export class UserPage extends Disposable implements PageView {
 			actions.push({
 				label: this.format.text('userMarkVerified'),
 				icon: 'status.verified',
+				locked: this.lockedLabel(this.format.text('userMarkVerified')),
 				run: () => void this.markVerified(user)
 			});
 		actions.push({
@@ -551,12 +583,16 @@ export class UserPage extends Disposable implements PageView {
 		return actions;
 	}
 
-	private openForm(
+	private async openForm(
 		options: Omit<AdminFormOptions, 'onDidComplete'> & {
 			readonly toast: string;
 			readonly after: () => void;
+			/** The change needs a two-step sign-in: explain first when this one can't reach it. */
+			readonly twoStep?: boolean;
 		}
-	): void {
+	): Promise<void> {
+		if (options.twoStep === true && !(await this.changes.beforeTwoStep())) return;
+		if (this._store.isDisposed) return;
 		this.dialog.value = this.instantiationService.createInstance(AdminFormDialog, {
 			...options,
 			onDidComplete: (result) => {
@@ -571,7 +607,7 @@ export class UserPage extends Disposable implements PageView {
 		const user = this.user.data;
 		if (user === undefined) return;
 		const name = user.displayName;
-		this.openForm({
+		void this.openForm({
 			title: this.format.text('userEditTitle', { name }),
 			confirmLabel: this.format.text('userEditSave'),
 			confirmIcon: 'action.confirm',
@@ -639,7 +675,7 @@ export class UserPage extends Disposable implements PageView {
 	private addAffiliation(): void {
 		const user = this.user.data;
 		if (user === undefined) return;
-		this.openForm({
+		void this.openForm({
 			title: this.format.text('userAddAffiliation'),
 			confirmLabel: this.format.text('userAddAffiliationSave'),
 			confirmIcon: 'action.add',
@@ -701,7 +737,7 @@ export class UserPage extends Disposable implements PageView {
 				label: name
 			}))
 		];
-		this.openForm({
+		void this.openForm({
 			title: this.format.text('userGrantRole'),
 			confirmLabel: this.format.text('userGrantRoleSave'),
 			confirmIcon: 'action.add',
@@ -754,6 +790,7 @@ export class UserPage extends Disposable implements PageView {
 				user.displayName,
 				this.roleNames.get(String(values.roleId)) ?? ''
 			],
+			twoStep: true,
 			toast: this.format.text('userRoleGranted'),
 			after: () => void this.bindings.refresh()
 		});
@@ -763,7 +800,7 @@ export class UserPage extends Disposable implements PageView {
 		const user = this.user.data;
 		if (user === undefined) return;
 		const name = user.displayName;
-		this.openForm({
+		void this.openForm({
 			title: this.format.text('userResetTwoStepTitle', { name }),
 			description: this.format.text('userResetTwoStepBody'),
 			confirmLabel: this.format.text('userResetConfirm'),
@@ -799,6 +836,7 @@ export class UserPage extends Disposable implements PageView {
 							verificationReference: values.verificationReference as string
 						},
 			summary: () => [name, this.format.text('userResetConfirm')],
+			twoStep: true,
 			toast: this.format.text('userTwoStepReset', { name }),
 			after: () => void this.user.refresh()
 		});
@@ -806,7 +844,7 @@ export class UserPage extends Disposable implements PageView {
 
 	private changeEmail(user: AdminUser): void {
 		const name = user.displayName;
-		this.openForm({
+		void this.openForm({
 			title: this.format.text('userChangeEmailTitle', { name }),
 			description: this.format.text('userChangeEmailBody'),
 			confirmLabel: this.format.text('userChangeEmailConfirm'),
@@ -826,12 +864,15 @@ export class UserPage extends Disposable implements PageView {
 					? { kind: 'changeUserEmail', userId: user.id, email: values.email as string }
 					: { field: 'email', error: this.format.text('userEmailInvalid') },
 			summary: (values) => [name, String(values.email ?? '')],
+			twoStep: true,
 			toast: this.format.text('userEmailChanged'),
 			after: () => void this.user.refresh()
 		});
 	}
 
 	private async markVerified(user: AdminUser): Promise<void> {
+		if (!(await this.changes.beforeTwoStep())) return;
+		if (this._store.isDisposed) return;
 		const result = await this.changes.send({ kind: 'verifyUserEmail', userId: user.id }, [
 			user.displayName
 		]);

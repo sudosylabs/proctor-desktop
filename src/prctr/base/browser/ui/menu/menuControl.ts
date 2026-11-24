@@ -19,6 +19,13 @@ export interface MenuEntry {
 	readonly destructive?: boolean;
 	/** The entry's icon, created when the menu shows it and disposed with the row. */
 	readonly icon?: (document: Document) => { readonly element: HTMLElement; dispose(): void };
+	/** A small decorative mark after the label, such as a lock; `accessibleLabel` says what it means. */
+	readonly trailingIcon?: (document: Document) => {
+		readonly element: HTMLElement;
+		dispose(): void;
+	};
+	/** The entry's accessible name when it says more than the label. */
+	readonly accessibleLabel?: string;
 	readonly children?: readonly MenuEntry[];
 	readonly run?: () => void | Promise<void>;
 }
@@ -78,6 +85,15 @@ export class MenuControl extends Disposable {
 				text.className = 'prctr-menu__label';
 				text.textContent = item.label;
 				button.append(text);
+				if (item.trailingIcon !== undefined) {
+					const trailing = item.trailingIcon(root.ownerDocument);
+					rowStore.add(trailing);
+					trailing.element.classList.add('prctr-menu__trailing');
+					trailing.element.setAttribute('aria-hidden', 'true');
+					button.append(trailing.element);
+				}
+				if (item.accessibleLabel !== undefined)
+					button.setAttribute('aria-label', item.accessibleLabel);
 				button.tabIndex = -1;
 				button.setAttribute('aria-disabled', String(item.enabled === false));
 				if (item.destructive) button.dataset.destructive = 'true';

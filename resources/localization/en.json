@@ -34,6 +34,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
+    "account.failure.busy": {
+      "message": "Other changes to this are still being saved. Try again in a moment.",
+      "description": "Too many changes to the same account data are already waiting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
     "account.failure.cancelled": {
       "message": "Stopped before it finished. Nothing changed.",
       "description": "The person cancelled a browser step, or it was cancelled in Proctor.",
@@ -3160,6 +3166,24 @@
     "administration.access.revoked.hint": {
       "message": "Build identifiers, one per line.",
       "description": "Hint under the blocked builds field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoked.reason": {
+      "message": "Reason for newly blocked builds",
+      "description": "Label of the field giving why builds added to the blocked list are refused.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoked.reason.hint": {
+      "message": "Builds already blocked keep their reason.",
+      "description": "Hint under the reason for newly blocked builds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoked.reason.required": {
+      "message": "Say why these builds are blocked.",
+      "description": "Error when builds were added to the blocked list without a reason.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
@@ -6430,9 +6454,33 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
-    "administration.operations.mail.keys.strong": {
-      "message": "Keys are shown to a sign-in with two-step verification only.",
-      "description": "Shown when keys need a stronger sign-in.",
+    "administration.operations.mail.keys.locked": {
+      "message": "Shown only to a sign-in with two-step verification",
+      "description": "Title of the row that stands in for the keys when this sign-in can’t read them.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.keys.locked.code": {
+      "message": "Your current sign-in didn’t use it. Confirm it’s you with your authenticator code to see and rotate the mail and two-step keys.",
+      "description": "Why the keys are hidden and the way on, when this sign-in hasn’t used two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.keys.locked.recent": {
+      "message": "Confirm it’s you to see and rotate the mail and two-step keys.",
+      "description": "Why the keys are hidden and the way on, when the sign-in isn’t recent enough.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.keys.locked.turnon": {
+      "message": "Your account doesn’t have two-step verification yet. Turn it on, then confirm it’s you with the new code to see and rotate the mail and two-step keys.",
+      "description": "Why the keys are hidden and the way on, when the account has no two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.keys.locked.unavailable": {
+      "message": "This Proctor doesn’t offer two-step verification, so nobody can see or rotate these keys until it’s turned on.",
+      "description": "Why the keys are hidden, when the installation has two-step verification turned off.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -8751,6 +8799,12 @@
       "placeholders": [
         "name"
       ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.member.former": {
+      "message": "A former user",
+      "description": "Name shown for a unit member whose account was removed.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.unit.members": {
@@ -12085,22 +12139,70 @@
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
     "page.confirm.body": {
-      "message": "{institution} asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
-      "description": "Why the person must sign in again; {institution} is the institution’s name.",
+      "message": "{institution} asks you to sign in again before this change.",
+      "description": "First sentence of Confirm it’s you; {institution} is the institution’s name.",
       "placeholders": [
         "institution"
       ],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
     "page.confirm.body.generic": {
-      "message": "Your institution asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
-      "description": "Why the person must sign in again, when the institution’s name is unknown.",
+      "message": "Your institution asks you to sign in again before this change.",
+      "description": "First sentence of Confirm it’s you when the institution’s name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
     "page.confirm.continue": {
       "message": "Continue in browser",
       "description": "Opens the institution’s sign-in page in the system browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.done": {
+      "message": "The change is made as soon as you’re back.",
+      "description": "Last sentence of Confirm it’s you.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.footnote": {
+      "message": "The page in your browser stays open for 5 minutes.",
+      "description": "Note under Confirm it’s you, before the browser step starts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.step": {
+      "message": "It opens in your browser.",
+      "description": "Second sentence of Confirm it’s you when the sign-in method is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.step.password": {
+      "message": "It opens in your browser: sign in with your password.",
+      "description": "Second sentence of Confirm it’s you for a password sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.step.password.code": {
+      "message": "It opens in your browser: sign in with your password, then enter the code from your authenticator app.",
+      "description": "Second sentence of Confirm it’s you for a password sign-in that hasn’t used two-step verification yet.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.step.provider": {
+      "message": "It opens in your browser: sign in with single sign-on.",
+      "description": "Second sentence of Confirm it’s you for a single sign-on (CAS or OpenID Connect).",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.step.provider.code": {
+      "message": "It opens in your browser: sign in with single sign-on, then enter the code from your authenticator app.",
+      "description": "Second sentence of Confirm it’s you for a single sign-on that hasn’t used two-step verification yet.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.stop": {
+      "message": "Cancel stops the browser step. Nothing has changed yet.",
+      "description": "Note under Confirm it’s you while the browser step is open.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
@@ -12360,6 +12462,104 @@
     "page.trail": {
       "message": "Breadcrumb",
       "description": "Accessible name of the trail of pages above a record’s page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.lock": {
+      "message": "{label}, needs two-step verification on your account",
+      "description": "Accessible name of an action marked with a lock; {label} is the action’s own label.",
+      "placeholders": [
+        "label"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.lock.title": {
+      "message": "Needs two-step verification on your account",
+      "description": "Tooltip of the lock after an action’s label.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.body": {
+      "message": "This change needs your own sign-in to use two-step verification, and your account doesn’t have two-step verification yet.",
+      "description": "Why the change can’t be made yet.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.first": {
+      "message": "Turn it on, on {institution}’s security page in your browser.",
+      "description": "The first step; {institution} is the institution’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.first.generic": {
+      "message": "Turn it on, on your institution’s security page in your browser.",
+      "description": "The first step, when the institution’s name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.first.label": {
+      "message": "First",
+      "description": "Label of the first of two steps.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.open": {
+      "message": "Open security page",
+      "description": "Opens the institution’s security page in the system browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.then": {
+      "message": "Come back here and confirm it’s you with the new code. The change opens then.",
+      "description": "The second step.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.then.label": {
+      "message": "Then",
+      "description": "Label of the second of two steps.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.needed.title": {
+      "message": "Turn on two-step verification first",
+      "description": "Title of the dialog shown when a change needs a two-step sign-in and the account has no two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.unavailable.body": {
+      "message": "This change needs a sign-in that used two-step verification, and {institution}’s Proctor doesn’t offer it.",
+      "description": "Why the change can’t be made; {institution} is the institution’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.unavailable.body.generic": {
+      "message": "This change needs a sign-in that used two-step verification, and your institution’s Proctor doesn’t offer it.",
+      "description": "Why the change can’t be made, when the institution’s name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.unavailable.note": {
+      "message": "The people who run Proctor for {institution} can turn two-step verification on. Until then, nobody can make this change.",
+      "description": "Who can fix it; {institution} is the institution’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.unavailable.note.generic": {
+      "message": "The people who run Proctor for your institution can turn two-step verification on. Until then, nobody can make this change.",
+      "description": "Who can fix it, when the institution’s name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.twostep.unavailable.title": {
+      "message": "This change isn’t available here",
+      "description": "Title of the dialog shown when a change needs two-step verification and the installation doesn’t offer it.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },

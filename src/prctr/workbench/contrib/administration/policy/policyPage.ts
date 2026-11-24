@@ -669,10 +669,10 @@ export class PolicyPage extends Disposable implements PageView {
 			{
 				label: this.format.text('policyRevoked'),
 				value:
-					desktop.revokedBuildIds.length === 0
+					desktop.revokedBuilds.length === 0
 						? none
-						: desktop.revokedBuildIds.join(', '),
-				empty: desktop.revokedBuildIds.length === 0
+						: desktop.revokedBuilds.map((build) => build.buildId).join(', '),
+				empty: desktop.revokedBuilds.length === 0
 			},
 			{
 				label: this.format.text('policyMessage'),
@@ -717,20 +717,46 @@ export class PolicyPage extends Disposable implements PageView {
 					kind: 'longText',
 					id: 'revoked',
 					label: this.format.text('policyRevoked'),
-					value: desktop.revokedBuildIds.join('\n'),
+					value: desktop.revokedBuilds.map((build) => build.buildId).join('\n'),
 					hint: this.format.text('policyRevokedHint')
+				},
+				{
+					kind: 'text',
+					id: 'revokedReason',
+					label: this.format.text('policyRevokedReason'),
+					hint: this.format.text('policyRevokedReasonHint')
 				}
 			],
-			submit: (values) => ({
-				kind: 'replaceDesktopCompatibility',
-				expectedRevision: desktop.revision,
-				availability: values.availability === 'maintenance' ? 'maintenance' : 'ready',
-				minimumRelease: values.minimumRelease as string,
-				message: (values.message as string | undefined) ?? '',
-				revokedBuildIds: String(values.revoked ?? '')
-					.split(/\s+/u)
-					.filter((build) => build !== '')
-			}),
+			submit: (values) => {
+				// A build already blocked keeps its reason; the reason field covers new ones.
+				const kept = new Map(
+					desktop.revokedBuilds.map((build) => [build.buildId, build.reason])
+				);
+				const reason = values.revokedReason as string | undefined;
+				const ids = [
+					...new Set(
+						String(values.revoked ?? '')
+							.split(/\s+/u)
+							.filter((build) => build !== '')
+					)
+				];
+				if (reason === undefined && ids.some((id) => !kept.has(id)))
+					return {
+						field: 'revokedReason',
+						error: this.format.text('policyRevokedReasonRequired')
+					};
+				return {
+					kind: 'replaceDesktopCompatibility',
+					expectedRevision: desktop.revision,
+					availability: values.availability === 'maintenance' ? 'maintenance' : 'ready',
+					minimumRelease: values.minimumRelease as string,
+					message: (values.message as string | undefined) ?? '',
+					revokedBuilds: ids.map((buildId) => ({
+						buildId,
+						reason: kept.get(buildId) ?? reason ?? ''
+					}))
+				};
+			},
 			summary: () => [this.format.text('policyDesktopEditTitle')],
 			onDidComplete: (result) => {
 				this.pane.toast(

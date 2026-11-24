@@ -2,9 +2,16 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { QueryClient, QueryObserver, hashKey, type QueryKey } from '@tanstack/query-core';
+import {
+	QueryClient,
+	QueryObserver,
+	hashKey,
+	type Query,
+	type QueryFilters
+} from '@tanstack/query-core';
 import { Disposable, toDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import { ServerApiError } from '../common/serverApi.js';
+import { anyTagCovered, type ServerDataTag } from '../common/serverDataTags.js';
 
 /** A capability-owned cache key. Its first element names the capability that owns the read. */
 export type ReadKey = readonly [capability: string, ...rest: readonly unknown[]];
@@ -15,6 +22,10 @@ export interface ReadPolicy {
 	readonly gcTime?: number;
 	/** Re-reads while observed, online and focused; at least one second. */
 	readonly pollIntervalMs?: number;
+	/** What the read holds, known before it answers; a change writing one fences it. */
+	readonly tags?: readonly ServerDataTag[];
+	/** What else an answer holds, such as one tag per listed row. */
+	readonly valueTags?: (value: unknown) => readonly ServerDataTag[];
 }
 export interface ReadState<T> {
 	readonly value: T | undefined;
@@ -32,6 +43,8 @@ export interface ReadObservation extends IDisposable {
 export type ReadLoader<T> = (signal: AbortSignal) => Promise<T>;
 
 const transientStatuses = new Set([429, 502, 503, 504]);
+/** A server event hints one tag at most this often; later hints in the window join one pass. */
+export const TAG_HINT_INTERVAL_MS = 2000;
 const MAX_TIMER_MS = 2147483647;
 
 /**
@@ -59,7 +72,11 @@ export class SessionReads extends Disposable {
 		}
 	});
 	private readonly observations = new Set<ReadObservation>();
-	private readonly refreshes = new Map<string, QueryKey | undefined>();
+	private readonly refreshes = new Map<string, QueryFilters>();
+	/** The tags of each cached read, by query hash: its policy's, then its last answer's. */
+	private readonly tags = new Map<string, ReadonlySet<ServerDataTag>>();
+	private readonly hinted = new Map<ServerDataTag, number>();
+	private readonly hintTimers = new Map<ServerDataTag, ReturnType<typeof setTimeout>>();
 	private refreshing = false;
 	private focused = true;
 	private online = true;
@@ -71,13 +88,23 @@ export class SessionReads extends Disposable {
 			toDisposable(() => {
 				this.ended = true;
 				this.refreshes.clear();
+				for (const timer of this.hintTimers.values()) clearTimeout(timer);
+				this.hintTimers.clear();
 				for (const observation of [...this.observations]) observation.dispose();
 				// A cancelled fetch can finish its Query Core finally block after clear(); keep that
 				// detached query from scheduling a fresh garbage-collection timer.
 				for (const query of this.queries.getQueryCache().getAll())
 					query.setOptions({ ...query.options, gcTime: Infinity });
 				this.queries.clear();
+				this.tags.clear();
 			})
+		);
+		this._register(
+			toDisposable(
+				this.queries.getQueryCache().subscribe((event) => {
+					if (event.type === 'removed') this.tags.delete(event.query.queryHash);
+				})
+			)
 		);
 	}
 
@@ -85,7 +112,7 @@ export class SessionReads extends Disposable {
 		this.assertCurrent();
 		return this.queries.fetchQuery({
 			queryKey: key,
-			queryFn: ({ signal }) => load(signal),
+			queryFn: this.tagged(key, load, policy),
 			...freshness(policy)
 		});
 	}
@@ -105,7 +132,7 @@ export class SessionReads extends Disposable {
 			throw new ServerApiError('invalidRequest');
 		const observer = new QueryObserver<T, Error>(this.queries, {
 			queryKey: key,
-			queryFn: ({ signal }) => load(signal),
+			queryFn: this.tagged(key, load, policy),
 			...freshness(policy)
 		});
 		let active = true;
@@ -164,8 +191,68 @@ export class SessionReads extends Disposable {
 	 * publish data from before the change, then re-reads the observed ones.
 	 */
 	async invalidate(prefix?: ReadKey): Promise<void> {
+		await this.fence(prefix ? { queryKey: prefix } : {});
+	}
+
+	/**
+	 * The fence after a change that names what it wrote: only reads holding a written tag, or
+	 * one below it, are cancelled and re-read.
+	 */
+	async invalidateTags(written: readonly ServerDataTag[]): Promise<void> {
+		if (written.length) await this.fence({ predicate: this.covered(written) });
+	}
+
+	/**
+	 * A server event's hint that data under `tags` changed. Each tag refreshes at most once per
+	 * {@link TAG_HINT_INTERVAL_MS}; a hint inside the window waits for its end and joins one pass.
+	 */
+	refreshTags(tags: readonly ServerDataTag[]): void {
 		if (this.ended) return;
-		const filter = prefix ? { queryKey: prefix } : {};
+		for (const tag of tags) {
+			if (this.hintTimers.has(tag)) continue;
+			const wait = (this.hinted.get(tag) ?? -Infinity) + TAG_HINT_INTERVAL_MS - Date.now();
+			if (wait <= 0) {
+				this.hint(tag);
+				continue;
+			}
+			const timer = setTimeout(() => {
+				this.hintTimers.delete(tag);
+				this.hint(tag);
+			}, wait);
+			timer.unref?.();
+			this.hintTimers.set(tag, timer);
+		}
+	}
+
+	private hint(tag: ServerDataTag): void {
+		if (this.ended) return;
+		this.hinted.set(tag, Date.now());
+		this.enqueue(`tag:${tag}`, { predicate: this.covered([tag]) });
+	}
+
+	private covered(written: readonly ServerDataTag[]): (query: Query) => boolean {
+		return (query) => anyTagCovered(written, this.tags.get(query.queryHash) ?? []);
+	}
+
+	/** Remembers a read's tags, then those of each answer, so a change can find it. */
+	private tagged<T>(
+		key: ReadKey,
+		load: ReadLoader<T>,
+		policy: ReadPolicy
+	): (context: { signal: AbortSignal }) => Promise<T> {
+		const hash = hashKey(key);
+		const fixed = policy.tags ?? [];
+		if (fixed.length && !this.tags.has(hash)) this.tags.set(hash, new Set(fixed));
+		return async ({ signal }) => {
+			const value = await load(signal);
+			if (!this.ended)
+				this.tags.set(hash, new Set([...fixed, ...(policy.valueTags?.(value) ?? [])]));
+			return value;
+		};
+	}
+
+	private async fence(filter: QueryFilters): Promise<void> {
+		if (this.ended) return;
 		// Cancel first: Query Core otherwise reuses a pending initial fetch even with cancelRefetch.
 		await this.queries.cancelQueries(filter);
 		if (this.ended) return;
@@ -180,7 +267,11 @@ export class SessionReads extends Disposable {
 	refresh(prefix?: ReadKey): void {
 		if (this.ended) return;
 		if (!prefix) this.refreshes.clear();
-		if (!this.refreshes.has('*')) this.refreshes.set(prefix ? hashKey(prefix) : '*', prefix);
+		this.enqueue(prefix ? hashKey(prefix) : '*', prefix ? { queryKey: prefix } : {});
+	}
+
+	private enqueue(id: string, filter: QueryFilters): void {
+		if (!this.refreshes.has('*')) this.refreshes.set(id, filter);
 		if (this.refreshing) return;
 		this.refreshing = true;
 		void this.drainRefreshes()
@@ -203,9 +294,7 @@ export class SessionReads extends Disposable {
 
 	private async drainRefreshes(): Promise<void> {
 		while (!this.ended && this.refreshes.size) {
-			const filters = [...this.refreshes.values()].map((queryKey) =>
-				queryKey ? { queryKey } : {}
-			);
+			const filters = [...this.refreshes.values()];
 			this.refreshes.clear();
 			const pending = new Set(
 				filters.flatMap((filter) =>

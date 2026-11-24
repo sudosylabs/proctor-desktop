@@ -808,7 +808,7 @@ export const administrationChanges = {
 		minimumRelease: 'release',
 		message: 'description',
 		retryAt: { optional: 'instant' },
-		revokedBuildIds: { list: 'buildId', max: 256 }
+		revokedBuilds: { list: { shape: { buildId: 'buildId', reason: 'reason' } }, max: 256 }
 	},
 	// Retention
 	replaceRetentionPolicy: {
@@ -1090,7 +1090,12 @@ const unitMemberShape = {
 	startAt: 'instant',
 	endAt: { optional: 'instant' },
 	user: {
-		shape: { displayName: 'text', username: 'text', email: { optional: 'text' } }
+		/** The name is left out for a removed account; the username when it isn't visible. */
+		shape: {
+			displayName: { optional: 'text' },
+			username: { optional: 'text' },
+			email: { optional: 'text' }
+		}
 	},
 	/** Left out when the person can't see role grants in the unit. */
 	rolesHere: {
@@ -1371,7 +1376,7 @@ export const administrationResources = {
 		minimumRelease: 'text',
 		message: 'text',
 		retryAt: { optional: 'instant' },
-		revokedBuildIds: { list: 'text', max: 256 },
+		revokedBuilds: { list: { shape: { buildId: 'text', reason: 'text' } }, max: 256 },
 		updatedAt: 'instant'
 	},
 	audits: pageOf(auditShape),
@@ -1524,7 +1529,9 @@ export const administrationFailures = [
 	/** The preview is past its commit deadline; a new preview is needed. */
 	'expired',
 	/** The person can no longer see what the preview's filter selects, so it can't be used. */
-	'accessChanged'
+	'accessChanged',
+	/** Too many changes to the same data are already waiting; nothing was sent. */
+	'busy'
 ] as const;
 export type AdministrationFailure = (typeof administrationFailures)[number];
 

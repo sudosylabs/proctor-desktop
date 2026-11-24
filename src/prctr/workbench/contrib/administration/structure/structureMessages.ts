@@ -599,6 +599,11 @@ export const structureMessages = Object.freeze({
 			'Staff who belong to this unit. Belonging grants nothing on its own; roles do.',
 		description: 'Explains unit membership.'
 	}),
+	unitMemberFormer: defineMessage({
+		id: 'administration.unit.member.former',
+		defaultMessage: 'A former user',
+		description: 'Name shown for a unit member whose account was removed.'
+	}),
 	unitMemberColumn: defineMessage({
 		id: 'administration.unit.member.column',
 		defaultMessage: 'Member',

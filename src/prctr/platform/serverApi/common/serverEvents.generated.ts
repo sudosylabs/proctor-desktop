@@ -4,11 +4,53 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * Academic Period changed
+         * @description Names the Academic Period to refetch and, for a period an Academic Unit owns, that unit.
+         */
+        readonly academic_period_changed: {
+            readonly academic_period_id: components["schemas"]["id"];
+            readonly academic_unit_id?: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+        };
+        /**
+         * Academic Unit changed
+         * @description Names the Academic Unit and, unless it is a root unit, its parent.
+         */
+        readonly academic_unit_changed: {
+            readonly academic_unit_id: components["schemas"]["id"];
+            readonly parent_academic_unit_id?: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+        };
+        /**
          * Access Policy changed
          * @description The Access Policy revision after a committed change. No policy fields are included.
          */
         readonly access_policy_changed: {
             readonly revision: number;
+        };
+        /**
+         * Attempt evidence changed
+         * @description Names an Attempt that gained integrity Flags, evidence or native conditions, and the time the change is current as of. No evidence is included.
+         */
+        readonly attempt_evidence_changed: {
+            readonly as_of: components["schemas"]["instant"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+        };
+        /**
+         * Class changed
+         * @description Names the Class to refetch and the Academic Unit that owns it through its Programme.
+         */
+        readonly class_changed: {
+            readonly academic_unit_id: components["schemas"]["id"];
+            readonly class_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
         };
         /**
          * Collection invalidation
@@ -98,6 +140,7 @@ export interface components {
         readonly exam_attempt_access_changed: {
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly reason_code?: "secure_connectivity_lost" | "focus_policy_review_required" | "native_policy_review_required" | "manager_suspended";
@@ -111,6 +154,7 @@ export interface components {
         readonly exam_attempt_assistant_approval_requested: {
             readonly call_id: components["schemas"]["id"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly expires_at: components["schemas"]["instant"];
             readonly summary: string;
@@ -127,6 +171,7 @@ export interface components {
             /** Format: date-time */
             readonly ended_at: string;
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly outcome: "exited" | "stopped" | "timed_out" | "sealed" | "ended";
@@ -138,6 +183,7 @@ export interface components {
          */
         readonly exam_attempt_assistant_session_started: {
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** Format: date-time */
             readonly started_at: string;
@@ -149,6 +195,7 @@ export interface components {
          */
         readonly exam_attempt_assistant_text_delta: {
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly index: number;
             readonly text: string;
@@ -161,6 +208,7 @@ export interface components {
         readonly exam_attempt_assistant_tool_call: {
             readonly call_id: components["schemas"]["id"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly outcome?: string;
             /** @enum {string} */
@@ -175,6 +223,7 @@ export interface components {
         readonly exam_attempt_assistant_turn_ended: {
             readonly ended_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly stop_reason: string;
             readonly turn_id: components["schemas"]["id"];
@@ -193,6 +242,7 @@ export interface components {
         readonly exam_attempt_assistant_turn_started: {
             readonly conversation_id: components["schemas"]["id"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly started_at: components["schemas"]["instant"];
             readonly turn_id: components["schemas"]["id"];
@@ -204,6 +254,7 @@ export interface components {
         readonly exam_attempt_assistant_unavailable: {
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly reason: "rate_limited" | "overloaded" | "invalid" | "context_too_long" | "unavailable";
@@ -261,6 +312,7 @@ export interface components {
             /** @enum {string} */
             readonly close_reason?: "transport_closed" | "interrupted" | "lease_expired" | "policy_suspended" | "kicked" | "submitted" | "manager_ended" | "sitting_closed";
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly state: "open" | "closed";
@@ -308,6 +360,7 @@ export interface components {
         readonly exam_attempt_focus_warning: {
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @constant */
             readonly warning_code: "focus_loss_policy_warning";
@@ -323,6 +376,7 @@ export interface components {
             readonly evidence_available: true;
             readonly evidence_overflow_count: number;
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly integrity_flag_id: components["schemas"]["id"];
             /** @enum {string} */
@@ -339,6 +393,7 @@ export interface components {
             readonly candidate_user_id: components["schemas"]["id"];
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly suspension_id: components["schemas"]["id"];
         };
@@ -373,6 +428,7 @@ export interface components {
         readonly exam_attempt_screen_clips_requested: {
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
         };
         /**
@@ -394,6 +450,7 @@ export interface components {
             readonly assistant_transcript_digest: string;
             readonly candidate_user_id: components["schemas"]["id"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly manifest_digest: components["schemas"]["sha256"];
             /** @enum {string} */
@@ -411,6 +468,7 @@ export interface components {
         readonly exam_attempt_submitted_for_candidate: {
             readonly assistant_transcript_digest: string;
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly manifest_digest: components["schemas"]["sha256"];
             /** @enum {string} */
@@ -431,6 +489,7 @@ export interface components {
             readonly candidate_user_id: components["schemas"]["id"];
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly integrity_flag_id?: components["schemas"]["id"];
             readonly suspension_id: components["schemas"]["id"];
@@ -442,9 +501,29 @@ export interface components {
         readonly exam_attempt_workspace_changed: {
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly first_workspace_cursor: number;
             readonly workspace_cursor: number;
+        };
+        /**
+         * Exam counts changed
+         * @description Names the Exam whose catalogue counts should be refetched. No count, candidate or Submission is named.
+         */
+        readonly exam_counts_changed: {
+            readonly exam_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+        };
+        /**
+         * Exam created
+         * @description Names the new Exam and the Academic Unit that owns it.
+         */
+        readonly exam_created: {
+            readonly academic_unit_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
         };
         /**
          * Exam Draft updated
@@ -474,6 +553,8 @@ export interface components {
             readonly candidate_user_id: components["schemas"]["id"];
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly release_state: "withheld" | "released";
             readonly review_revision: number;
@@ -574,6 +655,8 @@ export interface components {
         readonly exam_student_result_released_for_candidate: {
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
             /** @constant */
             readonly release_state: "released";
             readonly review_revision: number;
@@ -606,12 +689,15 @@ export interface components {
         readonly instant: string;
         /**
          * Invitation changed
-         * @description Names an Invitation the addressed User issued and the state it reached. The accepting User is never included.
+         * @description Names an Invitation visible in the addressed scope, the state it reached and the scope it grants at. The accepting User is never included.
          */
         readonly invitation_changed: {
             readonly invitation_id: components["schemas"]["id"];
             /** @constant */
             readonly schema_version: 1;
+            readonly scope_id: components["schemas"]["id"];
+            /** @enum {string} */
+            readonly scope_type: "institution" | "academic_unit" | "class";
             /** @enum {string} */
             readonly state: "pending" | "accepted" | "revoked" | "expired" | "superseded";
         };
@@ -637,6 +723,15 @@ export interface components {
             readonly current: number;
             readonly stage: string;
             readonly total: number;
+        };
+        /**
+         * Mail delivery changed
+         * @description Names the mail delivery whose state changed. The recipient and the message are never included.
+         */
+        readonly mail_delivery_changed: {
+            readonly mail_delivery_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
         };
         /**
          * Onboarding import changed
@@ -682,6 +777,53 @@ export interface components {
         readonly resource: {
             readonly id: string;
             readonly type: string;
+        };
+        /**
+         * Retention changed
+         * @description Says which retention read to refetch: the policy, a hold (with the hold and its Exam), or an Exam's records due for removal.
+         */
+        readonly retention_changed: {
+            readonly exam_id?: components["schemas"]["id"];
+            /** @enum {string} */
+            readonly kind: "policy" | "hold" | "records";
+            readonly retention_hold_id?: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+        };
+        /**
+         * Role Binding changed
+         * @description Names the Role Binding to refetch, its holder, its Role and the scope it is bound at.
+         */
+        readonly role_binding_changed: {
+            readonly role_binding_id: components["schemas"]["id"];
+            readonly role_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+            readonly scope_id: components["schemas"]["id"];
+            /** @enum {string} */
+            readonly scope_type: "institution" | "academic_unit" | "class";
+            readonly user_id: components["schemas"]["id"];
+        };
+        /**
+         * Role changed
+         * @description Names the Role to refetch.
+         */
+        readonly role_changed: {
+            readonly role_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+        };
+        /**
+         * Screen clip changed
+         * @description Names a screen clip that was requested or changed state. Its reason, range and state stay in the clip list.
+         */
+        readonly screen_clip_changed: {
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+            readonly screen_clip_id: components["schemas"]["id"];
         };
         /**
          * Security control
@@ -737,12 +879,31 @@ export interface components {
             readonly schema_version: 1;
         };
         /**
+         * Sitting submissions changed
+         * @description Names the Exam Sitting whose submission list should be refetched. No Submission, candidate or review is named.
+         */
+        readonly sitting_submissions_changed: {
+            readonly exam_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** @constant */
+            readonly schema_version: 1;
+        };
+        /**
          * Subscription
          * @description An action and the exact resource it is checked against.
          */
         readonly subscription: {
             readonly action: string;
             readonly resource: components["schemas"]["resource"];
+        };
+        /**
+         * User changed
+         * @description Names the User to refetch. What changed is never included.
+         */
+        readonly user_changed: {
+            /** @constant */
+            readonly schema_version: 1;
+            readonly user_id: components["schemas"]["id"];
         };
         /**
          * User profile picture changed
@@ -777,14 +938,20 @@ export const USER_DELIVERY = "@user";
 
 /** Each server event by delivery: a subscription action, or USER_DELIVERY, to its payload schema (null without data). */
 export const serverEventCatalog = {
-	"academic_unit_archived": { "academic_unit.view": null },
-	"academic_unit_created": { "academic_unit.view": null },
-	"academic_unit_updated": { "academic_unit.view": null },
+	"academic_period.changed": { "academic_period.view": "academic_period_changed" },
+	"academic_unit_archived": { "academic_unit.view": "academic_unit_changed" },
+	"academic_unit_created": { "academic_unit.view": "academic_unit_changed" },
+	"academic_unit_updated": { "academic_unit.view": "academic_unit_changed" },
 	"access_policy_changed": { "access_policy.view": "access_policy_changed" },
 	"candidate.exam_activity.changed": { "@user": "collection_invalidation" },
+	"class.changed": { "class.view": "class_changed" },
 	"current_user.context.changed": { "@user": "collection_invalidation" },
 	"current_user.sessions.changed": { "@user": "collection_invalidation" },
+	"desktop_compatibility_policy.changed": { "desktop_compatibility_policy.manage": null },
+	"exam.counts.changed": { "exam.view": "exam_counts_changed" },
 	"exam_archived": { "exam.view": "exam_archived" },
+	"exam_attempt.evidence.changed": { "exam.sitting.manage": "attempt_evidence_changed" },
+	"exam_attempt.screen_clip.changed": { "exam.sitting.manage": "screen_clip_changed" },
 	"exam_attempt_access_reallowed": { "exam.sitting.participate": "exam_attempt_access_changed" },
 	"exam_attempt_access_suspended": { "exam.sitting.participate": "exam_attempt_access_changed" },
 	"exam_attempt_assistant_approval_requested": { "@user": "exam_attempt_assistant_approval_requested" },
@@ -804,7 +971,7 @@ export const serverEventCatalog = {
 	"exam_attempt_submitted": { "exam.sitting.participate": "exam_attempt_submitted_for_candidate", "exam.sitting.view": "exam_attempt_submitted" },
 	"exam_attempt_suspended": { "exam.sitting.view": "exam_attempt_suspended" },
 	"exam_attempt_workspace_changed": { "exam.sitting.participate": "exam_attempt_workspace_changed" },
-	"exam_created": { "exam.view": null },
+	"exam_created": { "exam.view": "exam_created" },
 	"exam_draft_updated": { "exam.view": "exam_draft_updated" },
 	"exam_integrity_discrepancy_recorded": { "submission.view": "exam_integrity_discrepancy_recorded" },
 	"exam_integrity_review_changed": { "submission.view": "exam_integrity_review" },
@@ -812,6 +979,7 @@ export const serverEventCatalog = {
 	"exam_manager_changed": { "exam.view": "exam_manager_changed" },
 	"exam_owner_transferred": { "exam.view": "exam_owner_transferred" },
 	"exam_revision_published": { "exam.view": "exam_revision_published" },
+	"exam_sitting.submissions.changed": { "submission.view": "sitting_submissions_changed" },
 	"exam_sitting_canceled": { "exam.sitting.view": "exam_sitting_changed" },
 	"exam_sitting_content_corrected": { "exam.sitting.participate": "exam_sitting_content_corrected", "exam.sitting.view": "exam_sitting_content_corrected" },
 	"exam_sitting_lifecycle_changed": { "exam.sitting.participate": "exam_sitting_lifecycle_changed", "exam.sitting.view": "exam_sitting_lifecycle_changed" },
@@ -819,25 +987,36 @@ export const serverEventCatalog = {
 	"exam_sitting_scheduled": { "exam.sitting.view": "exam_sitting_changed" },
 	"exam_starter_workspace_changed": { "exam.view": "exam_starter_workspace_changed" },
 	"exam_student_result_released": { "@user": "exam_student_result_released_for_candidate", "submission.view": "exam_integrity_review" },
-	"invitation.changed": { "@user": "invitation_changed" },
+	"invitation.changed": { "invitation.view": "invitation_changed" },
 	"job.changed": { "job.view": "job_changed" },
+	"mail_delivery.changed": { "mail.view": "mail_delivery_changed" },
 	"manager.sitting_board.changed": { "exam.sitting.view": "sitting_board_invalidation" },
 	"onboarding_import.changed": { "@user": "onboarding_import_changed", "onboarding_batch.view": "onboarding_import_changed" },
 	"plugin_settings_changed": { "plugin.manage": "plugin_settings_changed" },
+	"retention.changed": { "retention_policy.view": "retention_changed" },
+	"role.changed": { "role.view": "role_changed" },
+	"role_binding.changed": { "role_binding.view": "role_binding_changed" },
+	"user.changed": { "user.view": "user_changed" },
 	"user_profile_picture_changed": { "@user": "user_profile_picture_changed" },
 	"user_settings_changed": { "@user": "user_settings_changed" },
 } as const;
 
 /** The payload of each server event by delivery, `undefined` for a copy without data. */
 export interface ServerEventVariants {
-	"academic_unit_archived": { "academic_unit.view": undefined };
-	"academic_unit_created": { "academic_unit.view": undefined };
-	"academic_unit_updated": { "academic_unit.view": undefined };
+	"academic_period.changed": { "academic_period.view": components['schemas']["academic_period_changed"] };
+	"academic_unit_archived": { "academic_unit.view": components['schemas']["academic_unit_changed"] };
+	"academic_unit_created": { "academic_unit.view": components['schemas']["academic_unit_changed"] };
+	"academic_unit_updated": { "academic_unit.view": components['schemas']["academic_unit_changed"] };
 	"access_policy_changed": { "access_policy.view": components['schemas']["access_policy_changed"] };
 	"candidate.exam_activity.changed": { "@user": components['schemas']["collection_invalidation"] };
+	"class.changed": { "class.view": components['schemas']["class_changed"] };
 	"current_user.context.changed": { "@user": components['schemas']["collection_invalidation"] };
 	"current_user.sessions.changed": { "@user": components['schemas']["collection_invalidation"] };
+	"desktop_compatibility_policy.changed": { "desktop_compatibility_policy.manage": undefined };
+	"exam.counts.changed": { "exam.view": components['schemas']["exam_counts_changed"] };
 	"exam_archived": { "exam.view": components['schemas']["exam_archived"] };
+	"exam_attempt.evidence.changed": { "exam.sitting.manage": components['schemas']["attempt_evidence_changed"] };
+	"exam_attempt.screen_clip.changed": { "exam.sitting.manage": components['schemas']["screen_clip_changed"] };
 	"exam_attempt_access_reallowed": { "exam.sitting.participate": components['schemas']["exam_attempt_access_changed"] };
 	"exam_attempt_access_suspended": { "exam.sitting.participate": components['schemas']["exam_attempt_access_changed"] };
 	"exam_attempt_assistant_approval_requested": { "@user": components['schemas']["exam_attempt_assistant_approval_requested"] };
@@ -857,7 +1036,7 @@ export interface ServerEventVariants {
 	"exam_attempt_submitted": { "exam.sitting.participate": components['schemas']["exam_attempt_submitted_for_candidate"]; "exam.sitting.view": components['schemas']["exam_attempt_submitted"] };
 	"exam_attempt_suspended": { "exam.sitting.view": components['schemas']["exam_attempt_suspended"] };
 	"exam_attempt_workspace_changed": { "exam.sitting.participate": components['schemas']["exam_attempt_workspace_changed"] };
-	"exam_created": { "exam.view": undefined };
+	"exam_created": { "exam.view": components['schemas']["exam_created"] };
 	"exam_draft_updated": { "exam.view": components['schemas']["exam_draft_updated"] };
 	"exam_integrity_discrepancy_recorded": { "submission.view": components['schemas']["exam_integrity_discrepancy_recorded"] };
 	"exam_integrity_review_changed": { "submission.view": components['schemas']["exam_integrity_review"] };
@@ -865,6 +1044,7 @@ export interface ServerEventVariants {
 	"exam_manager_changed": { "exam.view": components['schemas']["exam_manager_changed"] };
 	"exam_owner_transferred": { "exam.view": components['schemas']["exam_owner_transferred"] };
 	"exam_revision_published": { "exam.view": components['schemas']["exam_revision_published"] };
+	"exam_sitting.submissions.changed": { "submission.view": components['schemas']["sitting_submissions_changed"] };
 	"exam_sitting_canceled": { "exam.sitting.view": components['schemas']["exam_sitting_changed"] };
 	"exam_sitting_content_corrected": { "exam.sitting.participate": components['schemas']["exam_sitting_content_corrected"]; "exam.sitting.view": components['schemas']["exam_sitting_content_corrected"] };
 	"exam_sitting_lifecycle_changed": { "exam.sitting.participate": components['schemas']["exam_sitting_lifecycle_changed"]; "exam.sitting.view": components['schemas']["exam_sitting_lifecycle_changed"] };
@@ -872,11 +1052,16 @@ export interface ServerEventVariants {
 	"exam_sitting_scheduled": { "exam.sitting.view": components['schemas']["exam_sitting_changed"] };
 	"exam_starter_workspace_changed": { "exam.view": components['schemas']["exam_starter_workspace_changed"] };
 	"exam_student_result_released": { "@user": components['schemas']["exam_student_result_released_for_candidate"]; "submission.view": components['schemas']["exam_integrity_review"] };
-	"invitation.changed": { "@user": components['schemas']["invitation_changed"] };
+	"invitation.changed": { "invitation.view": components['schemas']["invitation_changed"] };
 	"job.changed": { "job.view": components['schemas']["job_changed"] };
+	"mail_delivery.changed": { "mail.view": components['schemas']["mail_delivery_changed"] };
 	"manager.sitting_board.changed": { "exam.sitting.view": components['schemas']["sitting_board_invalidation"] };
 	"onboarding_import.changed": { "@user": components['schemas']["onboarding_import_changed"]; "onboarding_batch.view": components['schemas']["onboarding_import_changed"] };
 	"plugin_settings_changed": { "plugin.manage": components['schemas']["plugin_settings_changed"] };
+	"retention.changed": { "retention_policy.view": components['schemas']["retention_changed"] };
+	"role.changed": { "role.view": components['schemas']["role_changed"] };
+	"role_binding.changed": { "role_binding.view": components['schemas']["role_binding_changed"] };
+	"user.changed": { "user.view": components['schemas']["user_changed"] };
 	"user_profile_picture_changed": { "@user": components['schemas']["user_profile_picture_changed"] };
 	"user_settings_changed": { "@user": components['schemas']["user_settings_changed"] };
 }

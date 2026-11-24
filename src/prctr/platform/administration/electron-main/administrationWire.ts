@@ -284,7 +284,7 @@ export function unitMember(m: Schema<'AcademicUnitMemberListItemResponse'>): Ite
 		user: {
 			displayName: m.user.display_name,
 			username: m.user.username,
-			email: m.user.email
+			email: m.email
 		},
 		rolesHere: m.roles_here?.map((role) => ({
 			roleId: role.role_id,
@@ -391,7 +391,10 @@ export function desktopCompatibility(
 		minimumRelease: p.minimum_desktop_release,
 		message: p.administrator_message,
 		retryAt: optionalAt(p.retry_at),
-		revokedBuildIds: p.revoked_desktop_build_ids,
+		revokedBuilds: p.revoked_desktop_builds.map((b) => ({
+			buildId: b.build_id,
+			reason: b.reason
+		})),
 		updatedAt: at(p.updated_at)
 	};
 }

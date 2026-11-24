@@ -748,16 +748,46 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(!dialog() && account.count('revokeSession') === 0, 'Cancel changes nothing');
 		check(document.activeElement === more, 'Cancel returns focus to the row');
 
+		// A change that needs two-step verification the account doesn't have explains the way
+		// on over the confirmation, which stays as it was when that explanation is cancelled.
+		account.reads.set('signIn', () =>
+			data({
+				section: 'signIn',
+				signIn: {
+					method: 'password',
+					multiFactor: false,
+					twoStepOffered: true,
+					twoStepOn: false,
+					canRaise: false
+				}
+			})
+		);
 		account.changes.set('revokeSession', () => failure('strongAuthenticationRequired'));
+		const top = (): HTMLDialogElement | undefined =>
+			[...host.querySelectorAll<HTMLDialogElement>('dialog[open]')].at(-1);
 		menuItem(openMenu('Lab PC 14'), 'End session…').click();
 		await wait(() => dialog() !== null, 'confirmation again');
 		buttonIn(dialog()!, 'End session')!.click();
 		await wait(
-			() => !!dialog()?.textContent?.includes('stronger sign-in'),
-			'known failure in dialog'
+			() => !!top()?.textContent?.includes('Turn on two-step verification first'),
+			'two-step needed explains'
 		);
 		check(account.count('revokeSession') === 1, 'The change ran exactly once');
+		check(!!buttonIn(top()!, 'Open security page'), 'The way on opens the security page');
+		buttonIn(top()!, 'Cancel')!.click();
+		await wait(
+			() =>
+				host.querySelectorAll('dialog[open]').length === 1 &&
+				buttonIn(dialog()!, 'Cancel')?.disabled === false,
+			'back to the confirmation'
+		);
+		check(
+			!dialog()!.querySelector('.prctr-page-feedback')?.textContent,
+			'A stopped check leaves nothing to report'
+		);
 		buttonIn(dialog()!, 'Cancel')!.click();
+		await wait(() => !dialog() && !overlays.visible, 'both dialogs closed');
+		account.reads.delete('signIn');
 
 		account.changes.set('revokeSession', () => failure('unconfirmed'));
 		let resolveSessions: ((value: AccountResponse) => void) | undefined;

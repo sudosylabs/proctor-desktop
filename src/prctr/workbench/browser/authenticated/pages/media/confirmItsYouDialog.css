@@ -20,7 +20,58 @@
 		color: var(--prctr-color-text-secondary);
 	}
 
+	.prctr-page-dialog .prctr-page-confirm-note {
+		color: var(--prctr-color-text-secondary);
+		font-size: 12.5px;
+		line-height: 18px;
+		margin: 0;
+		text-wrap: pretty;
+	}
+
+	.prctr-page-dialog .prctr-page-two-step-steps {
+		column-gap: 16px;
+		display: grid;
+		font-size: 13.5px;
+		grid-template-columns: 132px minmax(0, 1fr);
+		line-height: 20px;
+		margin: 0;
+		row-gap: 12px;
+	}
+
+	.prctr-page-dialog .prctr-page-two-step-steps > dt {
+		color: var(--prctr-color-text-secondary);
+	}
+
+	.prctr-page-dialog .prctr-page-two-step-steps > dd {
+		color: var(--prctr-color-text-primary);
+		margin: 0;
+		min-width: 0;
+		text-wrap: pretty;
+	}
+
+	.prctr-page-dialog .prctr-page-two-step-note {
+		background: var(--prctr-color-background-raised);
+		border-radius: 8px;
+		color: var(--prctr-color-text-primary);
+		display: flex;
+		font-size: 13px;
+		gap: 10px;
+		line-height: 19px;
+		margin: 0;
+		padding: 10px 12px;
+		text-wrap: pretty;
+	}
+
+	.prctr-page-dialog .prctr-page-two-step-note > .prctr-icon {
+		flex: none;
+		padding-top: 2px;
+	}
+
 	@media (forced-colors: active) {
+		.prctr-page-dialog .prctr-page-two-step-note {
+			border: 1px solid CanvasText;
+		}
+
 		.prctr-page-dialog .prctr-page-confirm-summary {
 			border: 1px solid CanvasText;
 		}

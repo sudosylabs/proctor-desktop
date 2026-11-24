@@ -9,6 +9,7 @@ import type {
 	AccountIntent,
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
+import type { SignInStanding } from '../../../../platform/identity/common/signInStanding.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import type { IDisposable } from '../../../../base/common/lifecycle.js';
 
@@ -46,6 +47,8 @@ export interface IAccountService {
 	): IDisposable | undefined;
 	/** The current profile photo as a data URL, when the account has one. */
 	readPhoto(): Promise<string | undefined>;
+	/** How the current sign-in stands for guarded changes; undefined when it can't be read. */
+	readSignIn(): Promise<SignInStanding | undefined>;
 	/** Shows a photo the account now uses, everywhere the window shows it. */
 	setPhoto(dataUrl: string): void;
 }
@@ -71,6 +74,13 @@ export class AccountService extends Disposable implements IAccountService {
 
 	get isChanging(): boolean {
 		return this.changing;
+	}
+
+	async readSignIn(): Promise<SignInStanding | undefined> {
+		const result = await this.request({ kind: 'read', section: 'signIn' });
+		return result.kind === 'data' && result.data.section === 'signIn'
+			? result.data.signIn
+			: undefined;
 	}
 
 	async request(intent: AccountIntent): Promise<AccountResponse> {
