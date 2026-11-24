@@ -3225,6 +3225,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.audits.note": {
+      "message": "Each line is written by Proctor, naming who did what. The line under it is the reason they gave, when there is one.",
+      "description": "Explains the audit list above its table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
     "administration.audits.period": {
       "message": "Period",
       "description": "Filter of how far back the audit log reaches.",
@@ -3264,7 +3270,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.audits.where": {
-      "message": "Where",
+      "message": "From",
       "description": "Column of the app and address an event came from.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -7166,7 +7172,7 @@
       "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
     },
     "administration.page.audits.description": {
-      "message": "Everything that changed at {institution}, who did it and when.",
+      "message": "Everything done at {institution}, by whom and from where.",
       "description": "One-line description under the Audits heading.",
       "placeholders": [
         "institution"
@@ -7174,7 +7180,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.audits.description.generic": {
-      "message": "Everything that changed, who did it and when.",
+      "message": "Everything done, by whom and from where.",
       "description": "Audits description when the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -7941,7 +7947,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.audits.column.event": {
-      "message": "Event",
+      "message": "What happened",
       "description": "Audit column.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"

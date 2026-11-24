@@ -46,7 +46,8 @@ export interface AdminPersonFilterOptions {
  * that names the chosen person, and a dialog to find them by name, email or username.
  */
 export class AdminPersonFilter extends Disposable {
-	private readonly button: ButtonControl;
+	private readonly button: HTMLButtonElement;
+	private readonly value: HTMLElement;
 	private readonly dialog = this._register(new MutableDisposable<PersonPickerDialog>());
 	private chosen: AdminPerson | undefined;
 
@@ -56,32 +57,38 @@ export class AdminPersonFilter extends Disposable {
 		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
-		this.button = this._register(
-			new ButtonControl(host, {
-				variant: 'secondary',
-				label: this.labelText(),
-				icon: proctorIconFactory(options.icon, 16)
-			})
+		// A filter pill like the others in the bar: icon, the filter's name, its value, a caret.
+		const document = host.ownerDocument;
+		const $ = createElementFactory(document);
+		const icon = this._register(proctorIconFactory(options.icon, 16)(document));
+		const caret = this._register(proctorIconFactory('action.expand', 12)(document));
+		this.value = $('span.prctr-admin-person-filter__value');
+		this.button = $(
+			'button.prctr-admin-person-filter',
+			{ type: 'button', data: { part: 'pill' }, attrs: { 'aria-haspopup': 'dialog' } },
+			icon.element,
+			$('span.prctr-admin-person-filter__prefix', { textContent: options.label }),
+			this.value,
+			caret.element
 		);
-		this.button.element.setAttribute('aria-haspopup', 'dialog');
-		this._register(this.button.onDidRequest(() => this.open()));
+		host.append(this.button);
+		this._register(addDisposableListener(this.button, 'click', () => this.open()));
+		this.render();
 	}
 
-	get value(): AdminPerson | undefined {
+	private render(): void {
+		this.value.textContent = this.chosen?.name ?? this.options.anyone;
+		this.button.dataset.set = String(this.chosen !== undefined);
+	}
+
+	get person(): AdminPerson | undefined {
 		return this.chosen;
 	}
 
 	/** Sets the person without reporting it, as a page showing a saved choice does. */
 	setValue(person: AdminPerson | undefined): void {
 		this.chosen = person;
-		this.button.setState({
-			label: this.labelText(),
-			icon: proctorIconFactory(this.options.icon, 16)
-		});
-	}
-
-	private labelText(): string {
-		return `${this.options.label}: ${this.chosen?.name ?? this.options.anyone}`;
+		this.render();
 	}
 
 	private open(): void {

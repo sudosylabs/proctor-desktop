@@ -183,12 +183,12 @@ const sharedMessages = Object.freeze({
 	}),
 	auditsDescription: defineMessage({
 		id: 'administration.page.audits.description',
-		defaultMessage: 'Everything that changed at {institution}, who did it and when.',
+		defaultMessage: 'Everything done at {institution}, by whom and from where.',
 		description: 'One-line description under the Audits heading.'
 	}),
 	auditsDescriptionGeneric: defineMessage({
 		id: 'administration.page.audits.description.generic',
-		defaultMessage: 'Everything that changed, who did it and when.',
+		defaultMessage: 'Everything done, by whom and from where.',
 		description: 'Audits description when the institution name is unknown.'
 	}),
 	retentionTitle: defineMessage({

@@ -5,13 +5,11 @@
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
-import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
 import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
-import { AdminList, type AdminListItem, type AdminListQuery } from '../widgets/adminList.js';
-import { readOnce } from '../widgets/adminReads.js';
+import { AdminList, type AdminListQuery } from '../widgets/adminList.js';
 import { AdminPersonFilter } from '../widgets/adminPersonFilter.js';
 import { auditEventActions, auditEventKinds, type AuditEventKind } from '../common/auditEvents.js';
 import type { AdministrationText } from '../administrationFormat.js';
@@ -25,7 +23,6 @@ const EVENT_TEXT: Readonly<Record<AuditEventKind, AdministrationText>> = {
 	records: 'auditsEventRecords'
 };
 
-type Audit = AdminListItem<'audits'>;
 type Period = 'day' | 'week' | 'month' | 'any';
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -42,7 +39,6 @@ function since(period: Period, now: number): AdminListQuery<'audits'> {
  */
 export class AuditsPage extends Disposable implements PageView {
 	private readonly list: AdminList<'audits'>;
-	private readonly names = new Map<string, string>();
 	private readonly filters: PageFilters;
 	private query: AdminListQuery<'audits'>;
 
@@ -50,7 +46,6 @@ export class AuditsPage extends Disposable implements PageView {
 		body: HTMLElement,
 		_headerActions: HTMLElement,
 		@IInstantiationService instantiationService: IInstantiationService,
-		@IAdministrationService private readonly administration: IAdministrationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
 		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService
 	) {
@@ -155,33 +150,24 @@ export class AuditsPage extends Disposable implements PageView {
 					{
 						label: format.text('auditsEvent'),
 						min: 240,
-						// The server writes each event as a sentence that names its target.
-						cell: (audit) => ({
-							kind: 'text',
-							primary: audit.summary,
-							secondary:
-								audit.reason === undefined
-									? ''
-									: format.text('auditsReason', { reason: audit.reason }),
-							strong: true
-						})
-					},
-					{
-						label: format.text('auditsActor'),
-						width: '20%',
-						foldLabel: true,
-						cell: (audit) => ({
-							kind: 'text',
-							primary:
-								audit.actorId === undefined
-									? format.text('auditsSystem')
-									: (this.names.get(audit.actorId) ??
-										format.text('inviteLoading'))
-						})
+						wrap: true,
+						// The server writes each event as a sentence naming who did what; the line
+						// under it is the reason they gave, red when the attempt failed.
+						cell: (audit) => {
+							const failed =
+								audit.status !== 'success' && audit.status !== 'succeeded';
+							return {
+								kind: 'text',
+								primary: audit.summary,
+								secondary: audit.reason ?? '',
+								strong: true,
+								...(failed ? { secondaryTone: 'fail' as const } : {})
+							};
+						}
 					},
 					{
 						label: format.text('auditsWhere'),
-						width: '22%',
+						width: '160px',
 						priority: 3,
 						cell: (audit) => ({
 							kind: 'text',
@@ -191,34 +177,18 @@ export class AuditsPage extends Disposable implements PageView {
 						})
 					},
 					{
-						label: format.text('auditsOutcome'),
-						width: '120px',
-						priority: 2,
-						cell: (audit) =>
-							audit.status === 'success' || audit.status === 'succeeded'
-								? {
-										kind: 'status',
-										text: format.text('overviewSucceeded'),
-										tone: 'neutral'
-									}
-								: {
-										kind: 'status',
-										text: format.text('overviewRefused'),
-										tone: 'failure'
-									}
-					},
-					{
 						label: format.text('auditsWhen'),
-						width: '140px',
+						width: '120px',
 						align: 'end',
 						sort: { key: 'when', first: 'desc' },
 						cell: (audit) => ({
 							kind: 'text',
-							primary: format.relativeStandalone(audit.createdAt),
+							primary: this.when(audit.createdAt),
 							mono: true
 						})
 					}
 				],
+				description: format.text('auditsNote'),
 				rowId: (audit) => audit.id,
 				rowName: (audit) => audit.summary,
 				sorting: {
@@ -248,7 +218,17 @@ export class AuditsPage extends Disposable implements PageView {
 				}
 			})
 		);
-		this._register(this.list.onDidLoad((audits) => void this.loadNames(audits)));
+	}
+
+	/** "Today, 08:40", "Yesterday, 17:02", or "5 Nov, 10:05" further back. */
+	private when(time: number): string {
+		const standalone = this.format.relativeStandalone(time);
+		return standalone === this.format.shortDate(time) || standalone === this.format.date(time)
+			? this.format.text('overviewDayTime', {
+					date: this.format.shortDate(time),
+					time: this.format.time(time)
+				})
+			: standalone;
 	}
 
 	private client(client: string | undefined): string {
@@ -266,28 +246,5 @@ export class AuditsPage extends Disposable implements PageView {
 
 	setVisible(visible: boolean): void {
 		this.list.setActive(visible);
-	}
-
-	private async loadNames(audits: readonly Audit[]): Promise<void> {
-		const missing = [
-			...new Set(
-				audits.flatMap((audit) => (audit.actorId === undefined ? [] : [audit.actorId]))
-			)
-		].filter((id) => !this.names.has(id));
-		if (missing.length === 0) return;
-		const users = await Promise.all(
-			missing.map((id) => readOnce(this.administration, { kind: 'user', id }))
-		);
-		if (this._store.isDisposed) return;
-		missing.forEach((id, index) => {
-			const user = users[index]!;
-			this.names.set(
-				id,
-				user.kind === 'data'
-					? user.value.displayName
-					: this.format.text('classUnknownPerson')
-			);
-		});
-		this.list.redraw();
 	}
 }

@@ -22,7 +22,6 @@
   "src/prctr/workbench/contrib/administration/policy/policyPage.ts",
   "src/prctr/workbench/contrib/administration/progression/newProgressionDialog.ts",
   "src/prctr/workbench/contrib/administration/progression/progressionReviewPage.ts",
-  "src/prctr/workbench/contrib/administration/records/auditsPage.ts",
   "src/prctr/workbench/contrib/administration/records/retentionPage.ts",
   "src/prctr/workbench/contrib/administration/roles/rolesPage.ts",
   "src/prctr/workbench/contrib/administration/structure/structurePage.ts",

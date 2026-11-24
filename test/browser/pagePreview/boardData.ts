@@ -339,11 +339,20 @@ function job(index: number, type: string, at: number) {
 	};
 }
 
-function audit(index: number, summary: string, at: number, reason?: string) {
+function audit(
+	index: number,
+	summary: string,
+	at: number,
+	reason?: string,
+	client = 'web',
+	failed = false
+) {
 	return {
 		id: boardId(600 + index),
 		action: 'change',
-		status: 'success',
+		status: failed ? 'failure' : 'success',
+		client,
+		ipAddress: `81.2.69.${150 + index}`,
 		summary,
 		createdAt: at,
 		resourceType: 'user',
