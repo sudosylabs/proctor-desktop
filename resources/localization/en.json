@@ -7324,7 +7324,7 @@
       "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
     },
     "administration.page.retention.description": {
-      "message": "How long exam records are kept, and what is deleted when.",
+      "message": "How long Proctor keeps examination records, and when it may delete them.",
       "description": "One-line description under the Data retention heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -8091,7 +8091,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.audit": {
-      "message": "Audit events",
+      "message": "Audits",
       "description": "Retention period.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -8152,6 +8152,14 @@
       "message": "Enter a whole number of days from 0 to 36500.",
       "description": "Error for an invalid number of days.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.days.one": {
+      "message": "{count} day",
+      "description": "One day.",
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.draft.apply": {
@@ -8311,7 +8319,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.grace": {
-      "message": "Grace before deleting",
+      "message": "Grace period",
       "description": "Days records wait after becoming eligible.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -8347,7 +8355,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.notices": {
-      "message": "Tell candidates",
+      "message": "Tell candidates first",
       "description": "Whether candidates are told when their records will be deleted.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -8468,6 +8476,22 @@
       "message": "Work",
       "description": "Category of records.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.years": {
+      "message": "{count} years",
+      "description": "A number of years records are kept.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.years.one": {
+      "message": "{count} year",
+      "description": "One year records are kept.",
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.roles.grid.browser": {

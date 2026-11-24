@@ -427,6 +427,57 @@ export class BoardAdministration implements AdministrationClient {
 						{ state: 'queued', count: 12, outcome: '' }
 					]
 				});
+			case 'retentionPolicy':
+				return data('retentionPolicy', {
+					revision: 4,
+					auditDays: 2557,
+					browserActivityDays: 90,
+					deletionGraceDays: 14,
+					exportDays: 30,
+					integrityDays: 365,
+					securityOperationalDays: 365,
+					submissionDays: 2191,
+					candidateNotices: true,
+					automaticDeletion: false,
+					updatedAt: Date.UTC(2026, 9, 3, 10)
+				});
+			case 'retentionRecords':
+				return data('retentionRecords', {
+					items: [],
+					asOf: BOARD_NOW,
+					policyRevision: 4
+				});
+			case 'accessPolicy':
+				return data('accessPolicy', {
+					revision: 14,
+					localLogin: true,
+					publicRegistration: false,
+					invitationAdmission: true,
+					invitationLocalCredential: true,
+					desktopAuthorization: true,
+					durableMail: true,
+					roleHolderMfaRequired: false,
+					roleHolderMfaEnforced: true,
+					sessionIdleDefault: 720,
+					sessionIdleMaximum: 1440,
+					sessionAbsoluteDefault: 43200,
+					sessionAbsoluteMaximum: 129600,
+					providers: [
+						{ id: 'entra', displayName: 'Northbridge single sign-on', type: 'oidc' }
+					],
+					providerAdmissions: [{ providerId: 'entra', mode: 'linked_only' }],
+					history: [],
+					updatedAt: Date.UTC(2026, 9, 27, 11, 15)
+				});
+			case 'desktopCompatibility':
+				return data('desktopCompatibility', {
+					revision: 3,
+					availability: 'ready',
+					minimumRelease: '1.4.0',
+					message: '',
+					revokedBuilds: [],
+					updatedAt: Date.UTC(2026, 9, 1, 10)
+				});
 			case 'retentionControl':
 				return data('retentionControl', {
 					revision: 3,

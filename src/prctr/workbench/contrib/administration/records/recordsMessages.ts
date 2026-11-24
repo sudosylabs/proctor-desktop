@@ -163,7 +163,7 @@ export const recordsMessages = Object.freeze({
 	}),
 	retentionAudit: defineMessage({
 		id: 'administration.records.retention.audit',
-		defaultMessage: 'Audit events',
+		defaultMessage: 'Audits',
 		description: 'Retention period.'
 	}),
 	retentionExports: defineMessage({
@@ -173,13 +173,28 @@ export const recordsMessages = Object.freeze({
 	}),
 	retentionGrace: defineMessage({
 		id: 'administration.records.retention.grace',
-		defaultMessage: 'Grace before deleting',
+		defaultMessage: 'Grace period',
 		description: 'Days records wait after becoming eligible.'
 	}),
 	retentionNotices: defineMessage({
 		id: 'administration.records.retention.notices',
-		defaultMessage: 'Tell candidates',
+		defaultMessage: 'Tell candidates first',
 		description: 'Whether candidates are told when their records will be deleted.'
+	}),
+	retentionYears: defineMessage({
+		id: 'administration.records.retention.years',
+		defaultMessage: '{count} years',
+		description: 'A number of years records are kept.'
+	}),
+	retentionYearsOne: defineMessage({
+		id: 'administration.records.retention.years.one',
+		defaultMessage: '{count} year',
+		description: 'One year records are kept.'
+	}),
+	retentionDaysOne: defineMessage({
+		id: 'administration.records.retention.days.one',
+		defaultMessage: '{count} day',
+		description: 'One day.'
 	}),
 	retentionDays: defineMessage({
 		id: 'administration.records.retention.days',

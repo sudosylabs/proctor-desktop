@@ -198,7 +198,7 @@ const sharedMessages = Object.freeze({
 	}),
 	retentionDescription: defineMessage({
 		id: 'administration.page.retention.description',
-		defaultMessage: 'How long exam records are kept, and what is deleted when.',
+		defaultMessage: 'How long Proctor keeps examination records, and when it may delete them.',
 		description: 'One-line description under the Data retention heading.'
 	}),
 	jobsTitle: defineMessage({

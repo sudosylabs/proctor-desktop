@@ -464,9 +464,11 @@ export class PolicyPage extends Disposable implements PageView {
 		});
 		this.discard.setState({
 			label: this.format.text('policyDiscard'),
-			icon: proctorIconFactory('action.close'),
 			disabled: !changed || this.working
 		});
+		// As the board draws it: the page's actions appear only while a change is previewed.
+		this.apply.element.hidden = !changed && !this.working;
+		this.discard.element.hidden = !changed && !this.working;
 	}
 
 	private intent(): Omit<AdministrationIntentOf<'replaceAccessPolicy'>, 'kind'> | undefined {
