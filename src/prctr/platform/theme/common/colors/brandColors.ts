@@ -4,7 +4,11 @@
 
 import { Color } from '../../../../base/common/color.js';
 import { localize } from '../../../../base/common/vscodeNls.js';
+import { plumPalette } from '../plumPalette.generated.js';
 import { registerColor } from '../colorUtils.js';
+
+const L = plumPalette.light;
+const D = plumPalette.dark;
 
 /*
  * Proctor's brand colors. They are reserved for the primary action, links,
@@ -15,8 +19,8 @@ import { registerColor } from '../colorUtils.js';
 export const brandAccent = registerColor(
 	'proctor.brandAccent',
 	{
-		light: Color.fromHex('#5C00AA'),
-		dark: Color.fromHex('#7A2FD4'),
+		light: Color.fromHex(L.accent[8]),
+		dark: Color.fromHex(D.accent[8]),
 		hcLight: Color.fromHex('#3F0075'),
 		hcDark: Color.fromHex('#C9A3F5')
 	},
@@ -26,8 +30,8 @@ export const brandAccent = registerColor(
 export const brandAccentHover = registerColor(
 	'proctor.brandAccentHover',
 	{
-		light: Color.fromHex('#4A008A'),
-		dark: Color.fromHex('#8A45E0'),
+		light: Color.fromHex(L.accent[9]),
+		dark: Color.fromHex(D.accent[9]),
 		hcLight: Color.fromHex('#2E0057'),
 		hcDark: Color.fromHex('#DCC2F8')
 	},
@@ -48,8 +52,8 @@ export const brandAccentForeground = registerColor(
 export const brandLink = registerColor(
 	'proctor.brandLink',
 	{
-		light: Color.fromHex('#5C00AA'),
-		dark: Color.fromHex('#C9A3F5'),
+		light: Color.fromHex(L.accent[8]),
+		dark: Color.fromHex(D.accent[10]),
 		hcLight: Color.fromHex('#3F0075'),
 		hcDark: Color.fromHex('#DCC2F8')
 	},
@@ -59,8 +63,8 @@ export const brandLink = registerColor(
 export const brandMark = registerColor(
 	'proctor.brandMark',
 	{
-		light: Color.fromHex('#5C00AA'),
-		dark: Color.fromHex('#B98AF0'),
+		light: Color.fromHex(L.accent[8]),
+		dark: Color.fromHex(D.accent[10]),
 		hcLight: Color.fromHex('#3F0075'),
 		hcDark: Color.fromHex('#DCC2F8')
 	},

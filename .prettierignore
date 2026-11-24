@@ -35,6 +35,8 @@ resources/server-api/asyncapi.json
 /resources/settings/settings.catalog.json
 /resources/settings/settings.rejections.json
 /resources/settings/settings.schema.json
+/resources/themes/proctor/dark.json
+/resources/themes/proctor/light.json
 /src/prctr/base/browser/browser.ts
 /src/prctr/base/browser/canIUse.ts
 /src/prctr/base/browser/contextmenu.ts
@@ -816,6 +818,7 @@ resources/server-api/asyncapi.json
 /src/prctr/platform/theme/common/encodedTokenAttributes.ts
 /src/prctr/platform/theme/common/iconRegistry.ts
 /src/prctr/platform/theme/common/plistParser.ts
+/src/prctr/platform/theme/common/plumPalette.generated.ts
 /src/prctr/platform/theme/common/proctorIconGlyphs.generated.ts
 /src/prctr/platform/theme/common/sizeRegistry.ts
 /src/prctr/platform/theme/common/sizeUtils.ts

@@ -4,7 +4,11 @@
 
 import { Color } from '../../../../base/common/color.js';
 import { localize } from '../../../../base/common/vscodeNls.js';
+import { plumPalette } from '../plumPalette.generated.js';
 import { registerColor } from '../colorUtils.js';
+
+const L = plumPalette.light;
+const D = plumPalette.dark;
 
 /*
  * Proctor roles that VS Code has no color for. The defaults are the Proctor
@@ -15,8 +19,8 @@ import { registerColor } from '../colorUtils.js';
 export const tertiaryForeground = registerColor(
 	'proctor.tertiaryForeground',
 	{
-		light: Color.fromHex('#686C72'),
-		dark: Color.fromHex('#9DA1A7'),
+		light: Color.fromHex(L.neutral[9]),
+		dark: Color.fromHex(D.neutral[9]),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -26,8 +30,8 @@ export const tertiaryForeground = registerColor(
 export const pendingForeground = registerColor(
 	'proctor.pendingForeground',
 	{
-		light: Color.fromHex('#B4B7BB'),
-		dark: Color.fromHex('#62666C'),
+		light: Color.fromHex(L.neutral[7]),
+		dark: Color.fromHex(D.neutral[7]),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -37,8 +41,8 @@ export const pendingForeground = registerColor(
 export const disabledBackground = registerColor(
 	'proctor.disabledBackground',
 	{
-		light: Color.fromHex('#ECECE9'),
-		dark: Color.fromHex('#2A2C30'),
+		light: Color.fromHex(L.neutral[2]),
+		dark: Color.fromHex(D.neutral[3]),
 		hcLight: Color.white,
 		hcDark: Color.black
 	},
@@ -48,8 +52,8 @@ export const disabledBackground = registerColor(
 export const developmentBackground = registerColor(
 	'proctor.developmentBackground',
 	{
-		light: Color.fromHex('#FFF3D1'),
-		dark: Color.fromHex('#3A2E10'),
+		light: Color.fromHex(L.amberSoft),
+		dark: Color.fromHex(D.amberSoft),
 		hcLight: Color.white,
 		hcDark: Color.black
 	},
@@ -70,8 +74,8 @@ export const developmentStripe = registerColor(
 export const developmentForeground = registerColor(
 	'proctor.developmentForeground',
 	{
-		light: Color.fromHex('#5B3B00'),
-		dark: Color.fromHex('#F2D489'),
+		light: Color.fromHex(L.amber),
+		dark: Color.fromHex(D.amber),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -86,8 +90,8 @@ export const developmentForeground = registerColor(
 export const frameBackground = registerColor(
 	'proctor.frameBackground',
 	{
-		light: Color.fromHex('#F4F3F0'),
-		dark: Color.fromHex('#1E1F22'),
+		light: Color.fromHex(L.glass),
+		dark: Color.fromHex(D.glass),
 		hcLight: Color.white,
 		hcDark: Color.black
 	},
@@ -100,8 +104,8 @@ export const frameBackground = registerColor(
 export const frameDivider = registerColor(
 	'proctor.frameDivider',
 	{
-		light: Color.fromHex('#00000012'),
-		dark: Color.fromHex('#FFFFFF14'),
+		light: Color.fromHex(L.glassEdge),
+		dark: Color.fromHex(D.glassEdge),
 		hcLight: Color.fromHex('#0F4A85'),
 		hcDark: Color.fromHex('#6FC3DF')
 	},
@@ -111,8 +115,8 @@ export const frameDivider = registerColor(
 export const navigationSelectedBackground = registerColor(
 	'proctor.navigationSelectedBackground',
 	{
-		light: Color.fromHex('#0000000F'),
-		dark: Color.fromHex('#FFFFFF14'),
+		light: Color.fromHex(L.glassSelected),
+		dark: Color.fromHex(D.glassSelected),
 		hcLight: Color.fromHex('#0F4A851A'),
 		hcDark: Color.fromHex('#6FC3DF33')
 	},
@@ -125,8 +129,8 @@ export const navigationSelectedBackground = registerColor(
 export const navigationSelectedForeground = registerColor(
 	'proctor.navigationSelectedForeground',
 	{
-		light: Color.fromHex('#161616'),
-		dark: Color.fromHex('#EDEDEE'),
+		light: Color.fromHex(L.neutral[11]),
+		dark: Color.fromHex(D.neutral[11]),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -136,8 +140,8 @@ export const navigationSelectedForeground = registerColor(
 export const avatarBackground = registerColor(
 	'proctor.avatarBackground',
 	{
-		light: Color.fromHex('#ECE2F6'),
-		dark: Color.fromHex('#3A2B52'),
+		light: Color.fromHex(L.accent[2]),
+		dark: Color.fromHex(D.accent[3]),
 		hcLight: Color.white,
 		hcDark: Color.black
 	},
@@ -147,8 +151,8 @@ export const avatarBackground = registerColor(
 export const avatarForeground = registerColor(
 	'proctor.avatarForeground',
 	{
-		light: Color.fromHex('#4A1488'),
-		dark: Color.fromHex('#E3D1FA'),
+		light: Color.fromHex(L.accent[11]),
+		dark: Color.fromHex(D.accent[11]),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -158,8 +162,8 @@ export const avatarForeground = registerColor(
 export const cardBackground = registerColor(
 	'proctor.cardBackground',
 	{
-		light: Color.fromHex('#FFFFFF'),
-		dark: Color.fromHex('#222327'),
+		light: Color.fromHex(L.neutral[0]),
+		dark: Color.fromHex(D.neutral[2]),
 		hcLight: Color.white,
 		hcDark: Color.black
 	},
@@ -174,8 +178,8 @@ export const cardBackground = registerColor(
 export const fieldBorder = registerColor(
 	'proctor.fieldBorder',
 	{
-		light: Color.fromHex('#8E9196'),
-		dark: Color.fromHex('#6B6F76'),
+		light: Color.fromHex(L.neutral[8]),
+		dark: Color.fromHex(D.neutral[8]),
 		hcLight: Color.fromHex('#0F4A85'),
 		hcDark: Color.fromHex('#6FC3DF')
 	},
@@ -185,8 +189,8 @@ export const fieldBorder = registerColor(
 export const controlOutline = registerColor(
 	'proctor.controlOutline',
 	{
-		light: Color.fromHex('#7D8086'),
-		dark: Color.fromHex('#767A81'),
+		light: Color.fromHex(L.neutral[5]),
+		dark: Color.fromHex(D.neutral[5]),
 		hcLight: Color.fromHex('#0F4A85'),
 		hcDark: Color.fromHex('#6FC3DF')
 	},
@@ -199,8 +203,8 @@ export const controlOutline = registerColor(
 export const accentLine = registerColor(
 	'proctor.accentLine',
 	{
-		light: Color.fromHex('#5C00AA'),
-		dark: Color.fromHex('#9B5DE5'),
+		light: Color.fromHex(L.accent[8]),
+		dark: Color.fromHex(D.accent[10]),
 		hcLight: Color.fromHex('#0F4A85'),
 		hcDark: Color.fromHex('#6FC3DF')
 	},
@@ -210,8 +214,8 @@ export const accentLine = registerColor(
 export const selectedRowBackground = registerColor(
 	'proctor.selectedRowBackground',
 	{
-		light: Color.fromHex('#F6F0FC'),
-		dark: Color.fromHex('#2A2338'),
+		light: Color.fromHex(L.selectedRow),
+		dark: Color.fromHex(D.selectedRow),
 		hcLight: Color.fromHex('#0F4A851A'),
 		hcDark: Color.fromHex('#6FC3DF33')
 	},
@@ -221,8 +225,8 @@ export const selectedRowBackground = registerColor(
 export const statusSafeguardForeground = registerColor(
 	'proctor.statusSafeguardForeground',
 	{
-		light: Color.fromHex('#17693A'),
-		dark: Color.fromHex('#62C98C'),
+		light: Color.fromHex(L.green),
+		dark: Color.fromHex(D.green),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -235,8 +239,8 @@ export const statusSafeguardForeground = registerColor(
 export const statusAttentionForeground = registerColor(
 	'proctor.statusAttentionForeground',
 	{
-		light: Color.fromHex('#7D4D00'),
-		dark: Color.fromHex('#E8B44E'),
+		light: Color.fromHex(L.amber),
+		dark: Color.fromHex(D.amber),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -249,8 +253,8 @@ export const statusAttentionForeground = registerColor(
 export const frameLabelForeground = registerColor(
 	'proctor.frameLabelForeground',
 	{
-		light: Color.fromHex('#686C72'),
-		dark: Color.fromHex('#C9CCD1'),
+		light: Color.fromHex(L.neutral[9]),
+		dark: Color.fromHex(D.neutral[9]),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
@@ -260,8 +264,8 @@ export const frameLabelForeground = registerColor(
 export const frameItemForeground = registerColor(
 	'proctor.frameItemForeground',
 	{
-		light: Color.fromHex('#55585D'),
-		dark: Color.fromHex('#D0D3D8'),
+		light: Color.fromHex(L.neutral[11]),
+		dark: Color.fromHex(D.neutral[11]),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},
