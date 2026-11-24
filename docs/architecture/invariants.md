@@ -256,3 +256,17 @@ change.
     Institution servers publish compatibility and build-revocation policy only.
 86. `toolchain.attempt-safe-updates` Updates never stage during active/paused participation and never install,
     restart, or downgrade while CandidateWindow or unresolved continuity exists.
+
+## Shared code and observability
+
+87. `source.single-implementation` A reusable list, dialog, confirmation, row menu, pager, filter,
+    tab strip, badge, toast, read or change runner has one implementation. Contributions compose
+    and configure it through dependency injection, and extend it rather than copying it.
+88. `source.server-data-path` Pages read and change server data only through
+    `IServerDataService`; no contribution imports a capability client or preload API.
+89. `design.token-colors` Proctor-authored stylesheets take every colour from a `--prctr-*`
+    token, so themes and high contrast reach all of it.
+90. `diagnostics.structured-logging` Proctor code logs through `ILogService` with a closed area
+    and reports unexpected errors through `onUnexpectedError`, never `console`. A telemetry event
+    is declared with a purpose and a classification for every field, and nothing leaves the
+    device except to a destination the owner has chosen.

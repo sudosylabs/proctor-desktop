@@ -26,6 +26,8 @@ export type SourcePolicy = {
 		readonly property: string;
 		readonly rationale: string;
 	}[];
+	/** Ratchet: Proctor stylesheets that still hold raw colours; each leaves the list once on tokens. */
+	readonly rawColorStylesheets?: readonly string[];
 };
 
 export type Composition = {

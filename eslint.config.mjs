@@ -9,6 +9,9 @@ const solution = JSON.parse(readFileSync(new URL('./tsconfig.json', import.meta.
 const legacyElementCreation = JSON.parse(
 	readFileSync(new URL('./build/lint/legacyElementCreation.json', import.meta.url), 'utf8')
 );
+const legacyServerDataPath = JSON.parse(
+	readFileSync(new URL('./build/lint/legacyServerDataPath.json', import.meta.url), 'utf8')
+);
 const transferred = [...transferredFiles(new FileSystemRepository(import.meta.dirname))];
 
 export default [
@@ -125,6 +128,36 @@ export default [
 		rules: {
 			'proctor/no-new-injectable': 'error',
 			'proctor/declare-service-brand': 'error'
+		}
+	},
+	{
+		// Proctor code logs through ILogService and reports unexpected errors with onUnexpectedError.
+		files: ['src/prctr/**/*.ts'],
+		ignores: transferred,
+		rules: { 'no-console': 'error' }
+	},
+	{
+		// Startup refusals print to the terminal before any log service exists.
+		files: ['src/prctr/code/electron-main/desktopDevelopmentMain.ts'],
+		rules: { 'no-console': 'off' }
+	},
+	{
+		// Pages read and change server data only through IServerDataService. Ratchet: files listed in
+		// legacyServerDataPath.json predate it and leave the list as they move onto the service.
+		files: ['src/prctr/workbench/contrib/**/*.ts', 'src/prctr/workbench/browser/**/*.ts'],
+		ignores: [...transferred, ...legacyServerDataPath],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							regex: 'services/(administration/common/administration|account/common/account)\\.js$',
+							message: 'Read and change server data through IServerDataService.'
+						}
+					]
+				}
+			]
 		}
 	},
 	{ files: ['test/**/*.ts'], rules: { 'proctor/no-focused-tests': 'error' } },

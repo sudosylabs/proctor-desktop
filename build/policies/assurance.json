@@ -93,7 +93,9 @@
         "toolchain.native-schema-authority",
         "toolchain.signed-capability-matrix",
         "toolchain.central-distribution",
-        "toolchain.attempt-safe-updates"
+        "toolchain.attempt-safe-updates",
+        "source.single-implementation",
+        "diagnostics.structured-logging"
       ],
       "evidence": ["docs/architecture/invariants.md"]
     },
@@ -136,6 +138,14 @@
       ]
     },
     {
+      "id": "server-data-path-lint",
+      "kind": "source",
+      "status": "active",
+      "owner": "source-organization",
+      "invariants": ["source.server-data-path", "diagnostics.structured-logging"],
+      "evidence": ["eslint.config.mjs", "build/lint/legacyServerDataPath.json"]
+    },
+    {
       "id": "tooling-graph",
       "kind": "source",
       "status": "active",
@@ -171,7 +181,8 @@
         "renderer.plain-dom",
         "design.shared-system",
         "design.static-registration",
-        "design.css-ownership"
+        "design.css-ownership",
+        "design.token-colors"
       ],
       "implementation": "source.css",
       "evidence": ["docs/architecture/design-system.md"]

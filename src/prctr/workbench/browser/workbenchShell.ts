@@ -4,6 +4,7 @@
 
 import { Disposable, DisposableStore, MutableDisposable } from '../../base/common/lifecycle.js';
 import { addDisposableListener } from '../../base/browser/dom.js';
+import { onUnexpectedError } from '../../base/common/errors.js';
 import type { WorkbenchComposition, WorkbenchPart } from '../common/composition.js';
 import { WorkbenchOverlayHost } from './overlayHost.js';
 import './workbenchShell.css';
@@ -30,7 +31,7 @@ export class WorkbenchShell extends Disposable {
 		if (this.#framed) { this.part('navigation').id = `${shellId}-navigation`; this.setSidebarPresentation('hidden', this.#initialSidebar); }
 		if (composition.layout.allowRegionResize && composition.layout.parts.includes('sidebar')) this.#createSash('sidebar', labels.resizeSidebar, document);
 		if (composition.layout.allowRegionResize && composition.layout.parts.includes('panel')) this.#createSash('panel', labels.resizePanel, document);
-		const reset = document.createElement('button'); reset.className = 'prctr-workbench__reset'; reset.type = 'button'; reset.textContent = labels.resetLayout; this.#resetButton = reset; if (composition.layout.allowRegionResize) this.part('titlebar').append(reset); this._register(addDisposableListener(reset, 'click', () => { void Promise.resolve(this.#resetLayoutAction()).catch(error => console.error('Reset layout action failed', error)); }));
+		const reset = document.createElement('button'); reset.className = 'prctr-workbench__reset'; reset.type = 'button'; reset.textContent = labels.resetLayout; this.#resetButton = reset; if (composition.layout.allowRegionResize) this.part('titlebar').append(reset); this._register(addDisposableListener(reset, 'click', () => { void Promise.resolve(this.#resetLayoutAction()).catch(onUnexpectedError); }));
 		host.append(this.element); this.overlayHost = this._register(new WorkbenchOverlayHost(host, this.element)); const observer = new ResizeObserver(() => this.#applyLayout()); observer.observe(this.element); this._register({ dispose: () => observer.disconnect() }); const preferences = new MutationObserver(() => this.#applyLayout()); preferences.observe(document.documentElement, { attributes: true, attributeFilter: ['data-prctr-density', 'data-prctr-theme-contrast', 'data-prctr-motion', 'dir'] }); preferences.observe(this.element, { attributes: true, attributeFilter: ['dir'] }); this._register({ dispose: () => preferences.disconnect() }); this.#applyLayout();
 	}
 	part(part: WorkbenchPart): HTMLElement { const value = this.#parts.get(part); if (value === undefined) throw new Error(`Composition ${this.composition.id} does not contain ${part}`); return value; }

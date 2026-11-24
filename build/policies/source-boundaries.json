@@ -1079,5 +1079,11 @@
       "kind": "data",
       "rationale": "Pinned grammar data shared by renderer and worker through the closed packaged grammar adapter."
     }
+  ],
+  "rawColorStylesheets": [
+    "src/prctr/base/browser/ui/segmented/segmentedControl.css",
+    "src/prctr/base/browser/ui/switch/switchControl.css",
+    "src/prctr/workbench/browser/authenticated/pages/media/pageDialog.css",
+    "src/prctr/workbench/contrib/account/settings/media/settingsPage.css"
   ]
 }

@@ -671,6 +671,8 @@ export const compositionCheck: Check = {
 
 const CASCADE = ['reset', 'theme', 'base', 'controls', 'workbench', 'contributions', 'overrides'];
 const DOCUMENT_RESET_PATH = 'src/prctr/workbench/browser/documentLayout.css';
+/** A hex, rgb() or hsl() colour written into a declaration instead of a token. */
+const RAW_COLOR = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?)\(/iu;
 const DOCUMENT_RESET_SELECTORS = new Set(['html', 'body']);
 export const cssCheck: Check = {
 	id: 'source.css',
@@ -682,6 +684,9 @@ export const cssCheck: Check = {
 		const policy = readJson<SourcePolicy>(repository, 'build/policies/source-boundaries.json');
 		const importantOverrides = policy.cssImportantOverrides ?? [];
 		const usedImportantOverrides = new Set<number>();
+		const transferred = transferredFiles(repository);
+		const rawColorStylesheets = new Set(policy.rawColorStylesheets ?? []);
+		const usedRawColorStylesheets = new Set<string>();
 		for (const path of repository
 			.files()
 			.filter(
@@ -762,6 +767,19 @@ export const cssCheck: Check = {
 							)
 						);
 					else usedImportantOverrides.add(overrideIndex);
+				}
+				// Proctor-authored stylesheets take colour from tokens, so themes and high contrast reach it.
+				if (!transferred.has(path) && RAW_COLOR.test(declaration.value)) {
+					if (rawColorStylesheets.has(path)) usedRawColorStylesheets.add(path);
+					else
+						diagnostics.push(
+							diagnostic(
+								'source.css',
+								path,
+								`${declaration.prop} uses a raw colour (${declaration.value}).`,
+								'Use a --prctr-* colour token.'
+							)
+						);
 				}
 				for (const token of declaration.toString().matchAll(/--([A-Za-z0-9_-]+)/g))
 					if (!(token[1] as string).startsWith('prctr-'))
@@ -854,6 +872,16 @@ export const cssCheck: Check = {
 						override.path,
 						`CSS important override for ${override.selector} ${override.property} is stale or duplicated.`,
 						'Remove stale exception evidence or restore its exact reviewed declaration.'
+					)
+				);
+		for (const path of rawColorStylesheets)
+			if (!usedRawColorStylesheets.has(path))
+				diagnostics.push(
+					diagnostic(
+						'source.css',
+						path,
+						'Stylesheet is listed as holding raw colours but holds none.',
+						'Remove it from rawColorStylesheets.'
 					)
 				);
 		return diagnostics;
