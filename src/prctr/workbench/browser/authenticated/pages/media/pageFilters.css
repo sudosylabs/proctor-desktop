@@ -5,20 +5,34 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
+		/* The table follows 16 pixels below, closer than the page's other blocks. */
+		margin-block-end: -8px;
 	}
 	.prctr-page-filters .prctr-page-filters__find {
 		align-items: center;
 		background: var(--prctr-color-background-card);
-		block-size: 34px;
-		border-radius: 8px;
+		block-size: 32px;
+		border-radius: var(--prctr-shape-radius-control);
 		box-shadow: inset 0 0 0 1px var(--prctr-color-border-field);
 		box-sizing: border-box;
 		color: var(--prctr-color-text-tertiary);
 		display: flex;
 		flex: 0 1 260px;
-		gap: 8px;
+		gap: 6px;
 		min-inline-size: 180px;
-		padding: 0 12px;
+		padding: 0 6px 0 10px;
+	}
+	/* The key that jumps to the search, drawn as a key. */
+	.prctr-page-filters .prctr-page-filters__key {
+		border-radius: 4px;
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
+		color: var(--prctr-color-text-secondary);
+		flex: none;
+		font: 400 11.5px/16px var(--prctr-typography-font-monospace);
+		padding: 1px 5px;
+	}
+	.prctr-page-filters .prctr-page-filters__find:focus-within .prctr-page-filters__key {
+		visibility: hidden;
 	}
 	.prctr-page-filters .prctr-page-filters__find:focus-within {
 		box-shadow: inset 0 0 0 2px var(--prctr-color-border-focus);
@@ -29,7 +43,7 @@
 		color: var(--prctr-color-text-primary);
 		flex: 1;
 		font: inherit;
-		font-size: 13.5px;
+		font-size: 13px;
 		min-inline-size: 0;
 		outline: none;
 	}
@@ -55,9 +69,11 @@
 	}
 	.prctr-page-filters .prctr-page-filters__selection {
 		align-items: center;
-		background: var(--prctr-color-interaction-selected);
-		block-size: 40px;
-		border-radius: 10px;
+		background: var(--prctr-color-interaction-selectedRow);
+		block-size: 44px;
+		border-radius: var(--prctr-shape-radius-card);
+		box-shadow: inset 0 0 0 1px
+			color-mix(in srgb, var(--prctr-color-brand-accent) 30%, transparent);
 		box-sizing: border-box;
 		display: flex;
 		flex: 1;

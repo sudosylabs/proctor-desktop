@@ -21,6 +21,7 @@
     "../test/electron/launchWindowScenario.ts",
     "../test/electron/launchWindowPreview.ts",
     "../test/electron/notificationsPreview.ts",
+    "../test/electron/pagePreviewMain.ts",
     "../test/electron/windowSkeleton.real.test.ts",
     "../test/electron/desktopIdentityMain.ts",
     "../test/electron/desktopIdentity.real.test.ts",

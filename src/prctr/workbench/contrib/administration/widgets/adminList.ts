@@ -4,7 +4,6 @@
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import {
@@ -297,7 +296,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		});
 		this.previous = this._register(
 			new ButtonControl(this.steps, {
-				variant: 'secondary',
+				variant: 'ghost',
 				size: 'small',
 				label: format.text('pagerPrevious'),
 				icon: proctorIconFactory('action.back', 14)
@@ -305,10 +304,10 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		);
 		this.next = this._register(
 			new ButtonControl(this.steps, {
-				variant: 'secondary',
+				variant: 'ghost',
 				size: 'small',
 				label: format.text('pagerNext'),
-				icon: proctorIconFactory('action.forward', 14)
+				trailingIcon: proctorIconFactory('action.forward', 14)
 			})
 		);
 		this.pageSizeButton = this._register(
@@ -316,7 +315,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 				variant: 'ghost',
 				size: 'small',
 				label: format.text('listPageSize', { count: format.count(this.pageSize) }),
-				icon: proctorIconFactory('action.expand', 14)
+				trailingIcon: proctorIconFactory('action.expand', 12)
 			})
 		);
 		this._register(this.pageSizeButton.onDidRequest(() => this.choosePageSize()));
@@ -430,7 +429,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		this.pageSize = size;
 		this.pageSizeButton.setState({
 			label: this.format.text('listPageSize', { count: this.format.count(size) }),
-			icon: proctorIconFactory('action.expand', 14)
+			trailingIcon: proctorIconFactory('action.expand', 12)
 		});
 		this.restart();
 	}
@@ -605,7 +604,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		});
 		this.next.setState({
 			label: this.format.text('pagerNext'),
-			icon: proctorIconFactory('action.forward', 14),
+			trailingIcon: proctorIconFactory('action.forward', 14),
 			disabled: !hasNext
 		});
 		this.updateFoot();
@@ -851,6 +850,8 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	}
 
 	private updatePageAll(): void {
+		// While anything is chosen, every row shows its checkbox in place of its picture.
+		this.table.dataset.choosing = String(this.chosen.size > 0);
 		if (this.pageAll === undefined) return;
 		const ids = this.shownItems().map((item) => this.options.rowId(item));
 		const count = ids.filter((id) => this.chosen.has(id)).length;
@@ -916,9 +917,9 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 							])
 				);
 			case 'status':
-				return createStatusBadge(this.body.ownerDocument, {
-					text: cell.text,
-					tone: cell.tone
+				return $('span.prctr-admin-list__status', {
+					textContent: cell.text,
+					data: { tone: cell.tone }
 				});
 			case 'check': {
 				const element = $('span.prctr-admin-list__check', {

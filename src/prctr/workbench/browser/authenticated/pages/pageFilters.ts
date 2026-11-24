@@ -120,7 +120,29 @@ export class PageFilters extends Disposable {
 			placeholder: label,
 			attrs: { 'aria-label': label, maxlength: '100' }
 		});
-		const field = $('label.prctr-page-filters__find', {}, icon.element, input);
+		const key = $('kbd.prctr-page-filters__key', {
+			textContent: '/',
+			attrs: { 'aria-hidden': 'true' }
+		});
+		input.setAttribute('aria-keyshortcuts', '/');
+		const field = $('label.prctr-page-filters__find', {}, icon.element, input, key);
+		// "/" jumps to the search from anywhere on the page that isn't already taking text.
+		this._register(
+			addDisposableListener(this.element.ownerDocument, 'keydown', (event) => {
+				if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+				const target = event.target;
+				if (
+					(target instanceof Element &&
+						target.closest('input, textarea, select, [contenteditable="true"]') !==
+							null) ||
+					!this.element.isConnected ||
+					this.element.closest('[hidden]') !== null
+				)
+					return;
+				event.preventDefault();
+				input.focus();
+			})
+		);
 		this.element.insertBefore(field, this.element.querySelector('.prctr-page-filters__spacer'));
 		let timer: ReturnType<typeof setTimeout> | undefined;
 		let last: string | undefined;
@@ -173,9 +195,12 @@ export class PageFilters extends Disposable {
 				label,
 				choices,
 				value,
-				icon: proctorIconFactory(icon, 16),
-				caret: proctorIconFactory('action.expand', 14),
-				fit: 'content'
+				icon: proctorIconFactory(icon, 14),
+				caret: proctorIconFactory('action.expand', 12),
+				fit: 'content',
+				prefix: label,
+				// A filter set to anything but its no-filter choice is filled, so the narrowing shows.
+				unset: value
 			})
 		);
 		this._register(

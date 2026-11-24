@@ -61,7 +61,11 @@ export const tasks: Readonly<Record<string, Task>> = {
 	'hooks:disable': { group: 'maintain', description: 'Stop using .githooks' },
 	dev: { group: 'develop', description: 'Run the desktop app for development' },
 	'preview:launch': { group: 'develop', description: 'Preview the launch window' },
-	'preview:notifications': { group: 'develop', description: 'Preview notifications' }
+	'preview:notifications': { group: 'develop', description: 'Preview notifications' },
+	'preview:pages': {
+		group: 'develop',
+		description: "Render AuthenticatedWindow pages with the design boards' data"
+	}
 };
 
 export function packageScripts(): string[] {

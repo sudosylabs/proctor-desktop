@@ -9541,7 +9541,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.affiliation.any": {
-      "message": "Any affiliation",
+      "message": "Any",
       "description": "The affiliation filter shows everyone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -9771,7 +9771,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.filter.active.any": {
-      "message": "Any time",
+      "message": "Any",
       "description": "Users filter choice: no filter on when people were last active.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -9801,7 +9801,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.filter.role.any": {
-      "message": "Any role",
+      "message": "Any",
       "description": "Users filter choice: no role filter.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -9825,7 +9825,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.filter.status.any": {
-      "message": "Any status",
+      "message": "Any",
       "description": "Users filter choice: active and disabled accounts.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -10169,7 +10169,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.unit.any": {
-      "message": "Any unit",
+      "message": "Any",
       "description": "The unit filter shows everyone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"

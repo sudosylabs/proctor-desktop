@@ -31,33 +31,42 @@
 	.prctr-admin-list .prctr-admin-list__table {
 		border-collapse: separate;
 		border-spacing: 0;
-		font-size: 13.5px;
+		font-size: var(--prctr-typography-body-size);
 		inline-size: 100%;
-		line-height: 20px;
+		line-height: var(--prctr-typography-body-lineHeight);
 		table-layout: fixed;
 	}
 	.prctr-admin-list th {
 		background: var(--prctr-color-background-surface);
-		block-size: 36px;
+		block-size: 40px;
 		box-shadow: inset 0 -1px 0 var(--prctr-color-border-default);
 		box-sizing: border-box;
 		color: var(--prctr-color-text-secondary);
-		font-size: 12.5px;
+		font-size: var(--prctr-typography-label-small-size);
 		font-weight: var(--prctr-typography-weight-medium);
-		padding: 0 12px;
+		line-height: var(--prctr-typography-label-small-lineHeight);
+		padding: 0 8px;
 		text-align: start;
 		vertical-align: middle;
 		white-space: nowrap;
 	}
 	.prctr-admin-list td {
-		block-size: 44px;
+		block-size: 40px;
 		box-shadow: inset 0 -1px 0 var(--prctr-color-border-default);
 		box-sizing: border-box;
-		padding: 0 12px;
+		padding: 4px 8px;
 		vertical-align: middle;
 	}
 	.prctr-admin-list tbody[data-lines='2'] td {
-		block-size: 56px;
+		block-size: 48px;
+	}
+	/* The table reaches 12 pixels past the page column, so its outer cells keep that inset. */
+	.prctr-admin-list tr > :first-child:not([data-kind='select']),
+	.prctr-admin-list tr > [data-kind='select'] + * {
+		padding-inline-start: 12px;
+	}
+	.prctr-admin-list tr > :last-child {
+		padding-inline-end: 12px;
 	}
 	.prctr-admin-list td[data-wrap='true'] {
 		padding-block: 10px;
@@ -69,13 +78,53 @@
 	.prctr-admin-list tbody tr[data-selected='true'] td {
 		background: var(--prctr-color-interaction-selectedRow);
 	}
-	.prctr-admin-list col[data-kind='select'],
 	.prctr-admin-list col[data-kind='more'] {
 		inline-size: 44px;
 		width: 44px;
 	}
+	/*
+	 * A row's checkbox takes no column: it sits over the person's picture, and shows on hover, on
+	 * keyboard focus, and on every row once anything is chosen. At rest the table is the board's.
+	 */
+	.prctr-admin-list col[data-kind='select'] {
+		inline-size: 0;
+		width: 0;
+	}
 	.prctr-admin-list [data-kind='select'] {
-		padding: 0 0 0 14px;
+		overflow: visible;
+		padding: 0;
+		position: relative;
+	}
+	.prctr-admin-list [data-kind='select'] .prctr-admin-list__select {
+		inset-block-start: 50%;
+		inset-inline-start: 18px;
+		opacity: 0;
+		position: absolute;
+		transform: translateY(-50%);
+		z-index: 2;
+	}
+	.prctr-admin-list tr:hover [data-kind='select'] .prctr-admin-list__select,
+	.prctr-admin-list tr:focus-within [data-kind='select'] .prctr-admin-list__select,
+	.prctr-admin-list table[data-choosing='true'] [data-kind='select'] .prctr-admin-list__select {
+		opacity: 1;
+	}
+	.prctr-admin-list tbody tr:hover .prctr-admin-list__avatar,
+	.prctr-admin-list tbody tr:focus-within .prctr-admin-list__avatar,
+	.prctr-admin-list table[data-choosing='true'] tbody .prctr-admin-list__avatar {
+		visibility: hidden;
+	}
+	/* The page checkbox appears with the row checkboxes, and the first heading steps aside. */
+	.prctr-admin-list thead:hover [data-kind='select'] .prctr-admin-list__select,
+	.prctr-admin-list
+		table[data-choosing='true']
+		thead
+		[data-kind='select']
+		.prctr-admin-list__select {
+		opacity: 1;
+	}
+	.prctr-admin-list table[data-choosing='true'] thead [data-kind='select'] + th,
+	.prctr-admin-list thead:hover [data-kind='select'] + th {
+		padding-inline-start: 46px;
 	}
 	.prctr-admin-list td[data-kind='more'],
 	.prctr-admin-list th[data-kind='more'] {
@@ -185,14 +234,14 @@
 	.prctr-admin-list .prctr-admin-list__avatar {
 		align-items: center;
 		background: var(--prctr-color-avatar-background);
-		block-size: 24px;
+		block-size: 28px;
 		border-radius: 50%;
 		color: var(--prctr-color-avatar-foreground);
 		display: flex;
 		flex: none;
-		font-size: 10.5px;
+		font-size: 11px;
 		font-weight: var(--prctr-typography-weight-semibold);
-		inline-size: 24px;
+		inline-size: 28px;
 		justify-content: center;
 		overflow: hidden;
 	}
@@ -230,9 +279,22 @@
 		font-variant-numeric: tabular-nums;
 	}
 	.prctr-admin-list .prctr-admin-list__secondary {
-		color: var(--prctr-color-text-tertiary);
-		font-size: 12.5px;
-		line-height: 18px;
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-size);
+		line-height: var(--prctr-typography-label-lineHeight);
+	}
+	/* A status is a plain word: grey, amber when it waits on you, red when it went wrong. */
+	.prctr-admin-list .prctr-admin-list__status {
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-size);
+		font-weight: var(--prctr-typography-weight-medium);
+		white-space: nowrap;
+	}
+	.prctr-admin-list .prctr-admin-list__status[data-tone='attention'] {
+		color: var(--prctr-color-status-attention);
+	}
+	.prctr-admin-list .prctr-admin-list__status[data-tone='failure'] {
+		color: var(--prctr-color-feedback-error);
 	}
 	.prctr-admin-list .prctr-admin-list__secondary[data-tone='fail'] {
 		color: var(--prctr-color-feedback-error);
@@ -285,17 +347,16 @@
 		display: flex;
 		gap: 16px;
 		justify-content: space-between;
-		min-block-size: 32px;
-		padding-block-start: 12px;
+		min-block-size: 48px;
 	}
 	.prctr-admin-list .prctr-admin-list__foot[hidden] {
 		display: none;
 	}
 	.prctr-admin-list .prctr-admin-list__notes {
-		color: var(--prctr-color-text-tertiary);
+		color: var(--prctr-color-text-secondary);
 		display: flex;
 		flex-wrap: wrap;
-		font-size: 13px;
+		font-size: var(--prctr-typography-label-size);
 		font-variant-numeric: tabular-nums;
 		gap: 4px 16px;
 		min-inline-size: 0;
@@ -328,10 +389,17 @@
 		outline: 2px solid var(--prctr-color-border-focus);
 		outline-offset: 1px;
 	}
+	/* Previous and Next are quiet, in the text colour, and faded when they can't move. */
 	.prctr-admin-list .prctr-admin-list__steps {
 		display: flex;
 		flex: none;
-		gap: 8px;
+		gap: 4px;
+	}
+	.prctr-admin-list .prctr-admin-list__steps .prctr-button {
+		color: var(--prctr-color-text-primary);
+	}
+	.prctr-admin-list .prctr-admin-list__steps .prctr-button:disabled {
+		opacity: 0.4;
 	}
 	.prctr-admin-list .prctr-admin-list__foot [hidden] {
 		display: none;

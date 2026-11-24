@@ -38,8 +38,11 @@ export interface PageContent {
 	readonly id: string;
 	readonly title: string;
 	readonly description: string;
-	/** Tables and wide lists use the wider column; reading pages keep the narrow one. */
-	readonly width?: 'narrow' | 'wide';
+	/**
+	 * The page column: `narrow` (760) for Account's reading pages, `record` (880) for one record,
+	 * `wide` (1080) for tables and lists.
+	 */
+	readonly width?: 'narrow' | 'record' | 'wide';
 	/** Builds the page into the pane's body and header actions with the pane's services. */
 	create(
 		instantiationService: IInstantiationService,

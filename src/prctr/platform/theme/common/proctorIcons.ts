@@ -45,6 +45,7 @@ const icons = {
 	'admin.progression': 'graduation-cap',
 
 	'action.add': 'plus',
+	'action.saveView': 'bookmark-simple',
 	'action.back': 'caret-left',
 	'action.changePhoto': 'camera',
 	'action.close': 'x',

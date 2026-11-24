@@ -18,6 +18,7 @@ const regular = [
 	'arrow-right',
 	'arrow-square-out',
 	'arrow-up',
+	'bookmark-simple',
 	'arrows-left-right',
 	'browser',
 	'buildings',

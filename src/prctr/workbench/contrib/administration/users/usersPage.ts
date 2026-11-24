@@ -85,7 +85,7 @@ export class UsersPage extends Disposable implements PageView {
 	private enableButton: ButtonControl | undefined;
 	private disableButton: ButtonControl | undefined;
 	private readonly invite = this._register(new MutableDisposable<InviteDialog>());
-	private query: AdminListQuery<'users'> = {};
+	private query: AdminListQuery<'users'> = { includeDisabled: true };
 	/** Each person's picture, read once: their own or the default the server draws. Bounded. */
 	private readonly photos = new Map<string, string>();
 
@@ -123,14 +123,14 @@ export class UsersPage extends Disposable implements PageView {
 		const $ = createElementFactory(body.ownerDocument);
 		this.tabsHolder = $('div.prctr-admin-users-views__tabs');
 		this.viewTools = $('div.prctr-admin-users-views__tools');
-		this.viewsHost = $('div.prctr-admin-users-views', {}, this.tabsHolder, this.viewTools);
+		this.viewsHost = $('div.prctr-admin-users-views', {}, this.tabsHolder);
 		body.append(this.viewsHost);
 		this.saveView = this._register(
 			new ButtonControl(this.viewTools, {
 				variant: 'ghost',
 				size: 'small',
 				label: format.text('viewsSaveAs'),
-				icon: proctorIconFactory('action.add', 14)
+				icon: proctorIconFactory('action.saveView', 14)
 			})
 		);
 		this.removeView = this._register(
@@ -146,12 +146,14 @@ export class UsersPage extends Disposable implements PageView {
 		this._register(this.lists.onDidChange(() => this.renderViews()));
 		this.filters = this._register(new PageFilters(body));
 		const filters = this.filters;
+		// Save as view and Remove view end the filter row.
+		filters.element.append(this.viewTools);
 		this.search = filters.addSearch(format.text('usersFind'), (q) => this.setQuery({ q }));
 		this.status = filters.addSelect<Status>(
 			format.text('usersStatus'),
 			'status.success',
 			this.statusChoices(false),
-			'active',
+			'any',
 			(status) =>
 				// Only an Institution-wide viewer may ask for disabled accounts alone.
 				this.setQuery(
@@ -363,9 +365,14 @@ export class UsersPage extends Disposable implements PageView {
 		const views = this.lists.userViews;
 		const filtered = Object.keys(this.savedFilter()).length > 0;
 		const onView = this.currentView !== EVERYONE;
-		this.saveView.element.hidden = !filtered || onView || views.length >= MAX_SAVED_USER_VIEWS;
+		// Save as view stays on Everyone, as the boards draw it; saving needs a filter set.
+		this.saveView.element.hidden = onView || views.length >= MAX_SAVED_USER_VIEWS;
+		this.saveView.setState({
+			label: this.format.text('viewsSaveAs'),
+			icon: proctorIconFactory('action.saveView', 14),
+			disabled: !filtered
+		});
 		this.removeView.element.hidden = !onView;
-		this.viewsHost.hidden = views.length === 0 && this.saveView.element.hidden;
 		if (this.currentView === EVERYONE) {
 			const total = this.list.totalCount;
 			if (total !== undefined)
@@ -385,7 +392,7 @@ export class UsersPage extends Disposable implements PageView {
 			...(this.affiliation.value === ANY ? {} : { affiliation: [this.affiliation.value] }),
 			...(this.unit.value === ANY ? {} : { academicUnitId: this.unit.value }),
 			...(this.role.value === ANY ? {} : { roleIds: [this.role.value] }),
-			...(status === 'active' ? {} : { status }),
+			...(status === 'any' ? {} : { status }),
 			...(this.lastActive.value === 'any' ? {} : { lastActive: this.lastActive.value })
 		};
 	}
@@ -399,11 +406,12 @@ export class UsersPage extends Disposable implements PageView {
 				? {}
 				: { academicUnitId: filter.academicUnitId }),
 			...(filter.roleIds === undefined ? {} : { roleIds: filter.roleIds }),
+			// Everyone, whatever their status, unless the view narrows it.
 			...(filter.status === 'disabled'
 				? { state: 'disabled' as const }
-				: filter.status === 'any'
-					? { includeDisabled: true }
-					: {}),
+				: filter.status === 'active'
+					? {}
+					: { includeDisabled: true }),
 			...(filter.lastActive === 'never' ? { neverSignedIn: true } : {}),
 			...(filter.lastActive === 'recent' ? { lastActiveAfter: now - 30 * DAY } : {}),
 			...(filter.lastActive === 'idle' ? { lastActiveBefore: now - 90 * DAY } : {})
@@ -415,7 +423,7 @@ export class UsersPage extends Disposable implements PageView {
 		this.currentView = id;
 		const filter = id === EVERYONE ? {} : (this.lists.userViews[Number(id)]?.filter ?? {});
 		this.search.value = filter.q ?? '';
-		this.status.setValue(filter.status ?? 'active');
+		this.status.setValue(filter.status ?? 'any');
 		this.affiliation.setValue(filter.affiliation?.[0] ?? ANY);
 		this.unit.setValue(filter.academicUnitId ?? ANY);
 		this.role.setValue(filter.roleIds?.[0] ?? ANY);
