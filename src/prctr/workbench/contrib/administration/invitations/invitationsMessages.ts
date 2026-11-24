@@ -6,6 +6,16 @@ import { defineMessage } from '../../../../base/common/localization.js';
 
 /** Text of the Invitations page and the Invite people dialog. */
 export const invitationsMessages = Object.freeze({
+	invitationsByYou: defineMessage({
+		id: 'administration.invitations.by.you',
+		defaultMessage: 'You',
+		description: 'Invited by: the signed-in person sent this invitation.'
+	}),
+	invitationsByFormer: defineMessage({
+		id: 'administration.invitations.by.former',
+		defaultMessage: 'A former user',
+		description: 'Invited by: the sender’s account was removed.'
+	}),
 	inviteTitle: defineMessage({
 		id: 'administration.invitations.invite.title',
 		defaultMessage: 'Invite people',
@@ -136,7 +146,7 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationsFind: defineMessage({
 		id: 'administration.invitations.find',
-		defaultMessage: 'Find by exact email',
+		defaultMessage: 'Find by email',
 		description:
 			'Search field above the list of invitations; the server matches whole addresses.'
 	}),
@@ -157,7 +167,7 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationsAnyKind: defineMessage({
 		id: 'administration.invitations.filter.any.kind',
-		defaultMessage: 'Any invitation',
+		defaultMessage: 'Any',
 		description: 'Kind filter choice that shows every invitation.'
 	}),
 	invitationStatePending: defineMessage({
@@ -187,17 +197,17 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationBounced: defineMessage({
 		id: 'administration.invitations.state.bounced',
-		defaultMessage: 'Not delivered',
+		defaultMessage: 'Bounced',
 		description: 'The invitation email could not be delivered.'
 	}),
 	invitationKindStudent: defineMessage({
 		id: 'administration.invitations.kind.student',
-		defaultMessage: 'Student in a class',
+		defaultMessage: 'Student',
 		description: 'Invitation to join a class as a student.'
 	}),
 	invitationKindTeacher: defineMessage({
 		id: 'administration.invitations.kind.teacher',
-		defaultMessage: 'Teacher in a unit',
+		defaultMessage: 'Teacher',
 		description: 'Invitation to teach in an academic unit.'
 	}),
 	invitationKindUnitRole: defineMessage({

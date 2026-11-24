@@ -13,7 +13,6 @@
   "src/prctr/workbench/contrib/administration/class/classPage.ts",
   "src/prctr/workbench/contrib/administration/imports/importPage.ts",
   "src/prctr/workbench/contrib/administration/imports/uploadImportDialog.ts",
-  "src/prctr/workbench/contrib/administration/invitations/invitationsPage.ts",
   "src/prctr/workbench/contrib/administration/invitations/inviteDialog.ts",
   "src/prctr/workbench/contrib/administration/operations/deliveryDialog.ts",
   "src/prctr/workbench/contrib/administration/operations/jobPage.ts",

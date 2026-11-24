@@ -984,6 +984,12 @@ const invitationShape = {
 	email: 'text',
 	revision: 'count',
 	inviterId: 'id',
+	/** Left out for a removed account or one the reader can't see. */
+	inviterName: { optional: 'text' },
+	/** The role the invitation grants, when it grants one. */
+	roleName: { optional: 'text' },
+	/** Where it grants it: the institution, a unit or a class. */
+	scopeName: { optional: 'text' },
 	acceptedUserId: { optional: 'id' },
 	academicUnitId: { optional: 'id' },
 	classId: { optional: 'id' },

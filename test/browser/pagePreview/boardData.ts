@@ -159,17 +159,73 @@ function userEntry(person: Person, index: number) {
 	};
 }
 
-function invitation(index: number, expiresAt: number) {
+/** The Invitations board's rows: invitee, role, where, invited by, expiry day, bounced. */
+const INVITATIONS: readonly (readonly [
+	string,
+	string | undefined,
+	string,
+	string,
+	number,
+	boolean
+])[] = [
+	['m.chen@northbridge.example', undefined, 'Data Mining (DS501)', 'Priya Raman', 12, false],
+	['j.okoro@northbridge.example', 'Teacher', 'Computer Science', 'Grace Adeyemi', 14, false],
+	['r.silva@northbridge-alumni.example', undefined, 'Databases (CS204)', 'Priya Raman', 15, true],
+	[
+		'a.kowalski@northbridge.example',
+		'Records officer',
+		'Northbridge University',
+		'You',
+		16,
+		false
+	],
+	[
+		'f.haddad@northbridge.example',
+		undefined,
+		'Linear Algebra (MA101)',
+		'Tomás Ortega',
+		18,
+		false
+	],
+	['e.walsh@northbridge.example', undefined, 'Linear Algebra (MA101)', 'Tomás Ortega', 18, false],
+	['n.ibrahim@northbridge.example', 'Teacher', 'Mathematics', 'Grace Adeyemi', 19, false],
+	['k.tanaka@northbridge.example', undefined, 'Databases (CS204)', 'Priya Raman', 20, false],
+	['l.osei@northbridge.example', undefined, 'Databases (CS204)', 'Priya Raman', 20, false],
+	['m.rossi@northbridge.example', 'Teacher', 'Physics', 'Grace Adeyemi', 21, false]
+];
+
+function invitation(
+	[email, role, scope, by, day, bounced]: (typeof INVITATIONS)[number],
+	index: number
+) {
 	return {
 		id: boardId(100 + index),
-		purpose: 'student_class',
+		purpose:
+			role === undefined
+				? 'student_class'
+				: role === 'Teacher'
+					? 'teacher_academic_unit'
+					: 'institution_role',
 		state: 'pending',
-		email: `invitee-${index}@northbridge.example`,
+		email,
 		revision: 1,
-		inviterId: boardId(3),
+		inviterId: by === 'You' ? 'p'.repeat(26) : boardId(800 + index),
+		...(by === 'You' ? {} : { inviterName: by }),
+		...(role === undefined || role === 'Teacher' ? {} : { roleName: role }),
+		scopeName: scope,
 		createdAt: BOARD_NOW - 3 * DAY,
-		expiresAt,
-		startAt: BOARD_NOW - 3 * DAY
+		expiresAt: Date.UTC(2026, 10, day, 12),
+		startAt: BOARD_NOW - 3 * DAY,
+		...(bounced
+			? {
+					delivery: {
+						state: 'failed',
+						recipient: 'r***@northbridge-alumni.example',
+						failureCode: 'mail.bounced',
+						updatedAt: BOARD_NOW - DAY
+					}
+				}
+			: {})
 	};
 }
 
@@ -227,12 +283,8 @@ export class BoardAdministration implements AdministrationClient {
 			}
 			case 'invitations':
 				return data('invitations', {
-					items: Array.from({ length: Math.min(intent.limit, 18) }, (_, index) =>
-						invitation(
-							index,
-							index < 5 ? BOARD_NOW + (index + 1) * DAY : BOARD_NOW + 20 * DAY
-						)
-					),
+					items: INVITATIONS.map(invitation).slice(0, intent.limit),
+					cursor: 'page-2',
 					total: 18,
 					totalAtLeast: false
 				});

@@ -5216,6 +5216,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
+    "administration.invitations.by.former": {
+      "message": "A former user",
+      "description": "Invited by: the sender’s account was removed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.by.you": {
+      "message": "You",
+      "description": "Invited by: the signed-in person sent this invitation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
     "administration.invitations.column.by": {
       "message": "Invited by",
       "description": "Invitations column naming who sent the invitation.",
@@ -5291,7 +5303,7 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.filter.any.kind": {
-      "message": "Any invitation",
+      "message": "Any",
       "description": "Kind filter choice that shows every invitation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5309,7 +5321,7 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.find": {
-      "message": "Find by exact email",
+      "message": "Find by email",
       "description": "Search field above the list of invitations; the server matches whole addresses.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5565,13 +5577,13 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.kind.student": {
-      "message": "Student in a class",
+      "message": "Student",
       "description": "Invitation to join a class as a student.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.kind.teacher": {
-      "message": "Teacher in a unit",
+      "message": "Teacher",
       "description": "Invitation to teach in an academic unit.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5625,7 +5637,7 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.state.bounced": {
-      "message": "Not delivered",
+      "message": "Bounced",
       "description": "The invitation email could not be delivered.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -6846,7 +6858,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.imports.description": {
-      "message": "Add many people at once from a spreadsheet, and review each row before anything changes.",
+      "message": "Add many people at once from a spreadsheet. Proctor checks every row first, and nothing changes until you review it.",
       "description": "One-line description under the Imports heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -6858,7 +6870,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.invitations.description": {
-      "message": "Invitations to join classes, units and roles, and how their emails are doing.",
+      "message": "People asked to join, and what they were invited to.",
       "description": "One-line description under the Invitations heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"

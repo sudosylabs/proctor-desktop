@@ -109,8 +109,7 @@ const sharedMessages = Object.freeze({
 	}),
 	invitationsDescription: defineMessage({
 		id: 'administration.page.invitations.description',
-		defaultMessage:
-			'Invitations to join classes, units and roles, and how their emails are doing.',
+		defaultMessage: 'People asked to join, and what they were invited to.',
 		description: 'One-line description under the Invitations heading.'
 	}),
 	importsTitle: defineMessage({
@@ -121,7 +120,7 @@ const sharedMessages = Object.freeze({
 	importsDescription: defineMessage({
 		id: 'administration.page.imports.description',
 		defaultMessage:
-			'Add many people at once from a spreadsheet, and review each row before anything changes.',
+			'Add many people at once from a spreadsheet. Proctor checks every row first, and nothing changes until you review it.',
 		description: 'One-line description under the Imports heading.'
 	}),
 	structureTitle: defineMessage({

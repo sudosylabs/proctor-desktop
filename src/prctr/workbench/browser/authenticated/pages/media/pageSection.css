@@ -60,6 +60,7 @@
 	.prctr-page-section .prctr-page-section__card[data-plain='true'] {
 		background: transparent;
 		border: 0;
+		box-shadow: none;
 		border-radius: 0;
 		overflow: visible;
 	}
