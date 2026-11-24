@@ -30,7 +30,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { adminRead } from '../widgets/adminReads.js';
 import { IMPORT_MODE_TEXT, IMPORT_STATE_TEXT } from './importText.js';
 

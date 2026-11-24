@@ -14,7 +14,7 @@ import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneC
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import { AdminList, type AdminListItem, type AdminTone } from '../widgets/adminList.js';
 
 type Job = AdminListItem<'jobs'>;
@@ -62,7 +62,7 @@ export class JobsPage extends Disposable implements PageView {
 	) {
 		super();
 		this.changes = this._register(instantiationService.createInstance(AdminChanges));
-		const filters = this._register(new AdminFilters(body));
+		const filters = this._register(new PageFilters(body));
 		// Finished and routine runs are under Done, so the page opens on what may need you.
 		filters.addSelect<State | typeof ANY | typeof NOT_DONE | typeof DONE>(
 			format.text('jobsStatus'),

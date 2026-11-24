@@ -32,7 +32,7 @@ import { strongSignInStep } from '../../../../platform/identity/common/signInSta
 import { IAccountService } from '../../../services/account/common/account.js';
 import type { SignInRequirement } from '../../../browser/authenticated/pages/signInCheck.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import { DeliveryDialog } from './deliveryDialog.js';
 import {
 	AdminList,
@@ -100,7 +100,7 @@ export class MailPage extends Disposable implements PageView {
 				title: format.text('mailHealth')
 			})
 		);
-		const filters = this._register(new AdminFilters(body));
+		const filters = this._register(new PageFilters(body));
 		filters.addSelect<State | typeof ANY>(
 			format.text('mailState'),
 			'status.success',

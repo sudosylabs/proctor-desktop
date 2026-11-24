@@ -28,14 +28,14 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import {
 	AdminFormDialog,
 	type AdminFormField,
 	type AdminFormValues
 } from '../widgets/adminFormDialog.js';
 import { AdminList, type AdminListItem } from '../widgets/adminList.js';
-import { AdminTabs } from '../widgets/adminTabs.js';
+import { PageTabs } from '../../../browser/authenticated/pages/pageTabs.js';
 import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { readOnce, readPages } from '../widgets/adminReads.js';
 import { UnitTree, type AdminUnit } from './unitTree.js';
@@ -73,7 +73,7 @@ export class StructurePage extends Disposable implements PageView {
 	private readonly members = this._register(new MutableDisposable<AdminList<'unitMembers'>>());
 	private readonly membersHost: HTMLElement;
 	private readonly memberAction = this._register(new MutableDisposable());
-	private readonly views: AdminTabs<'contents' | 'members'>;
+	private readonly views: PageTabs<'contents' | 'members'>;
 	private readonly classesHost: HTMLElement;
 	private readonly classAction = this._register(new MutableDisposable());
 	private readonly menu: PageMenuButton;
@@ -167,7 +167,7 @@ export class StructurePage extends Disposable implements PageView {
 			})
 		);
 		this.views = this._register(
-			new AdminTabs(
+			new PageTabs(
 				main,
 				format.text('structureViews'),
 				[

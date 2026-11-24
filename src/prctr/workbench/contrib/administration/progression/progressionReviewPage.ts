@@ -28,7 +28,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { adminRead } from '../widgets/adminReads.js';
 import { PROGRESSION_STATE, progressionName } from './progressionPage.js';
 

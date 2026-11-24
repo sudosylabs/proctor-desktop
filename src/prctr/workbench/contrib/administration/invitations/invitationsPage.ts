@@ -21,7 +21,7 @@ import { IAuthenticatedNavigationService } from '../../../services/authenticated
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import {
 	AdminList,
 	type AdminListItem,
@@ -94,7 +94,7 @@ export class InvitationsPage extends Disposable implements PageView {
 		};
 		this._register(invite.onDidRequest(openInvite));
 
-		const filters = this._register(new AdminFilters(body));
+		const filters = this._register(new PageFilters(body));
 		filters.addSearch(format.text('invitationsFind'), (text) =>
 			this.setQuery({ email: text !== undefined && EMAIL.test(text) ? text : undefined })
 		);

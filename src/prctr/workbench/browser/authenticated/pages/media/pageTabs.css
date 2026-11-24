@@ -1,11 +1,11 @@
 /* An underlined tab strip: the chosen tab is ink with an accent line under it. */
-@layer contributions {
-	.prctr-admin-tabs {
+@layer workbench {
+	.prctr-page-tabs {
 		box-shadow: inset 0 -1px 0 var(--prctr-color-border-default);
 		display: flex;
 		gap: 4px;
 	}
-	.prctr-admin-tabs .prctr-admin-tabs__tab {
+	.prctr-page-tabs .prctr-page-tabs__tab {
 		align-items: center;
 		background: transparent;
 		block-size: 38px;
@@ -18,31 +18,31 @@
 		gap: 8px;
 		padding: 0 12px;
 	}
-	.prctr-admin-tabs .prctr-admin-tabs__tab:hover {
+	.prctr-page-tabs .prctr-page-tabs__tab:hover {
 		color: var(--prctr-color-text-primary);
 	}
-	.prctr-admin-tabs .prctr-admin-tabs__tab[aria-selected='true'] {
+	.prctr-page-tabs .prctr-page-tabs__tab[aria-selected='true'] {
 		box-shadow: inset 0 -2px 0 var(--prctr-color-brand-accent);
 		color: var(--prctr-color-text-primary);
 		font-weight: var(--prctr-typography-weight-semibold);
 	}
-	.prctr-admin-tabs .prctr-admin-tabs__tab:focus-visible {
+	.prctr-page-tabs .prctr-page-tabs__tab:focus-visible {
 		border-radius: 6px;
 		outline: 2px solid var(--prctr-color-border-focus);
 		outline-offset: -2px;
 	}
-	.prctr-admin-tabs .prctr-admin-tabs__count {
+	.prctr-page-tabs .prctr-page-tabs__count {
 		color: var(--prctr-color-text-tertiary);
 		font-size: 12px;
 		font-variant-numeric: tabular-nums;
 		font-weight: var(--prctr-typography-weight-medium);
 	}
-	.prctr-admin-tabs .prctr-admin-tabs__count[hidden] {
+	.prctr-page-tabs .prctr-page-tabs__count[hidden] {
 		display: none;
 	}
 
 	@media (forced-colors: active) {
-		.prctr-admin-tabs .prctr-admin-tabs__tab[aria-selected='true'] {
+		.prctr-page-tabs .prctr-page-tabs__tab[aria-selected='true'] {
 			border-block-end: 2px solid Highlight;
 			box-shadow: none;
 		}

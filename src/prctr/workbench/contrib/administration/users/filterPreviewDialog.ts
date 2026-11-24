@@ -22,7 +22,7 @@ import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneC
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { AdminChanges } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { readOnce } from '../widgets/adminReads.js';
 import './media/filterPreviewDialog.css';
 

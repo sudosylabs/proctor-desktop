@@ -27,7 +27,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminFormDialog, type AdminFormValues } from '../widgets/adminFormDialog.js';
 import { AdminList } from '../widgets/adminList.js';
 import { adminRead, readOnce } from '../widgets/adminReads.js';

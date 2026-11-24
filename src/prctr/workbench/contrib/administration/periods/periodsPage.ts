@@ -15,7 +15,7 @@ import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneC
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import { AdminFormDialog, type AdminFormValues } from '../widgets/adminFormDialog.js';
 import { AdminList, type AdminListItem, type AdminTone } from '../widgets/adminList.js';
 import { readOnce, readUnitTree, unitLabel } from '../widgets/adminReads.js';
@@ -47,7 +47,7 @@ export class PeriodsPage extends Disposable implements PageView {
 			})
 		);
 		this._register(create.onDidRequest(() => void this.edit(undefined)));
-		const filters = this._register(new AdminFilters(body));
+		const filters = this._register(new PageFilters(body));
 		filters.addSearch(format.text('periodsFind'), (q) =>
 			this.list.setQuery(q === undefined ? {} : { q })
 		);

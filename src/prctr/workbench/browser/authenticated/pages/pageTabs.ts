@@ -6,9 +6,9 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import './media/adminTabs.css';
+import './media/pageTabs.css';
 
-export interface AdminTab<T extends string> {
+export interface PageTab<T extends string> {
 	readonly id: T;
 	readonly label: string;
 }
@@ -18,25 +18,25 @@ export interface AdminTab<T extends string> {
  * tab strip. Arrow keys, Home and End move between tabs and choose; only the chosen tab is in
  * the tab order. The owner shows the chosen view.
  */
-export class AdminTabs<T extends string> extends Disposable {
+export class PageTabs<T extends string> extends Disposable {
 	readonly element: HTMLElement;
 	private readonly tabs: readonly { readonly id: T; readonly button: HTMLButtonElement }[];
 	private readonly counts = new Map<T, HTMLElement>();
 	private current: T;
 	private static next = 0;
-	private readonly prefix = `prctr-admin-tabs-${AdminTabs.next++}`;
+	private readonly prefix = `prctr-page-tabs-${PageTabs.next++}`;
 	private readonly changeEmitter = this._register(new Emitter<T>());
 	readonly onDidChange: Event<T> = this.changeEmitter.event;
 
-	constructor(host: HTMLElement, label: string, tabs: readonly AdminTab<T>[], value: T) {
+	constructor(host: HTMLElement, label: string, tabs: readonly PageTab<T>[], value: T) {
 		super();
 		const $ = createElementFactory(host.ownerDocument);
 		this.current = value;
 		this.tabs = tabs.map((tab) => {
-			const count = $('span.prctr-admin-tabs__count', { hidden: true });
+			const count = $('span.prctr-page-tabs__count', { hidden: true });
 			this.counts.set(tab.id, count);
 			const button = $(
-				'button.prctr-admin-tabs__tab',
+				'button.prctr-page-tabs__tab',
 				{ type: 'button', id: `${this.prefix}-${tab.id}`, attrs: { role: 'tab' } },
 				$('span', { textContent: tab.label }),
 				count
@@ -47,7 +47,7 @@ export class AdminTabs<T extends string> extends Disposable {
 			return { id: tab.id, button };
 		});
 		this.element = $(
-			'div.prctr-admin-tabs',
+			'div.prctr-page-tabs',
 			{ attrs: { role: 'tablist', 'aria-label': label } },
 			...this.tabs.map((tab) => tab.button)
 		);

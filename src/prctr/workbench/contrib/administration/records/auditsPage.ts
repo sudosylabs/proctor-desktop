@@ -9,7 +9,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import { AdminList, type AdminListItem, type AdminListQuery } from '../widgets/adminList.js';
 import { readOnce } from '../widgets/adminReads.js';
 import { AdminPersonFilter } from '../widgets/adminPersonFilter.js';
@@ -43,7 +43,7 @@ function since(period: Period, now: number): AdminListQuery<'audits'> {
 export class AuditsPage extends Disposable implements PageView {
 	private readonly list: AdminList<'audits'>;
 	private readonly names = new Map<string, string>();
-	private readonly filters: AdminFilters;
+	private readonly filters: PageFilters;
 	private query: AdminListQuery<'audits'>;
 
 	constructor(
@@ -56,7 +56,7 @@ export class AuditsPage extends Disposable implements PageView {
 	) {
 		super();
 		this.query = { ...since('week', format.now()), auditKind: 'change' };
-		this.filters = this._register(new AdminFilters(body));
+		this.filters = this._register(new PageFilters(body));
 		this.filters.addSelect<Period>(
 			format.text('auditsPeriod'),
 			'object.calendar',

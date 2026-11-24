@@ -236,7 +236,7 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 		// A whole page chosen from a longer list offers everyone matching; nothing is sent.
 		root.querySelector<HTMLInputElement>('thead .prctr-admin-list__select')!.click();
 		const link = (): HTMLButtonElement | null =>
-			root.querySelector<HTMLButtonElement>('.prctr-admin-filters__link:not([hidden])');
+			root.querySelector<HTMLButtonElement>('.prctr-page-filters__link:not([hidden])');
 		await wait(() => link() !== null, 'select all matching link');
 		check(
 			link()!.textContent === 'Select all 14 matching these filters',
@@ -245,7 +245,7 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 		const before = administration.intents.length;
 		link()!.click();
 		await wait(
-			() => visibleText('.prctr-admin-filters__count').join() === 'All 14 matching',
+			() => visibleText('.prctr-page-filters__count').join() === 'All 14 matching',
 			'everyone chosen'
 		);
 		check(administration.intents.length === before, 'Choosing everyone sends nothing');

@@ -29,7 +29,7 @@ import { IAuthenticatedNavigationService } from '../../../services/authenticated
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { UserActions, type AdminUser } from '../users/userActions.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminFormDialog, type AdminFormOptions } from '../widgets/adminFormDialog.js';
 import { initialsOf } from '../widgets/adminList.js';
 import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';

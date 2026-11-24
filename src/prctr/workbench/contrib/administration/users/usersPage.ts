@@ -19,7 +19,7 @@ import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneC
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { InviteDialog } from '../invitations/inviteDialog.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import {
 	AdminList,
 	type AdminCell,
@@ -31,7 +31,7 @@ import { BulkUserChanges } from './bulkUserChanges.js';
 import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { UserActions, type AdminUser } from './userActions.js';
 import { SaveViewDialog } from './saveViewDialog.js';
-import { AdminTabs } from '../widgets/adminTabs.js';
+import { PageTabs } from '../../../browser/authenticated/pages/pageTabs.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import {
 	MAX_SAVED_USER_VIEWS,
@@ -61,7 +61,7 @@ export const AFFILIATION_TEXT: Readonly<Record<AffiliationKind, AdministrationTe
 /** Everyone with an account, found by name, email or username, ten at a time. */
 export class UsersPage extends Disposable implements PageView {
 	private readonly list: AdminList<'users'>;
-	private readonly filters: AdminFilters;
+	private readonly filters: PageFilters;
 	private readonly unit: SelectControl<string>;
 	private readonly status: SelectControl<Status>;
 	private readonly role: SelectControl<string>;
@@ -75,7 +75,7 @@ export class UsersPage extends Disposable implements PageView {
 	private readonly viewTools: HTMLElement;
 	private readonly saveView: ButtonControl;
 	private readonly removeView: ButtonControl;
-	private readonly viewTabs = this._register(new MutableDisposable<AdminTabs<string>>());
+	private readonly viewTabs = this._register(new MutableDisposable<PageTabs<string>>());
 	private readonly viewDialog = this._register(new MutableDisposable<SaveViewDialog>());
 	/** The tab shown: Everyone, or a saved view by its place. */
 	private currentView = EVERYONE;
@@ -144,7 +144,7 @@ export class UsersPage extends Disposable implements PageView {
 		this._register(this.saveView.onDidRequest(() => this.openSaveView()));
 		this._register(this.removeView.onDidRequest(() => void this.removeCurrentView()));
 		this._register(this.lists.onDidChange(() => this.renderViews()));
-		this.filters = this._register(new AdminFilters(body));
+		this.filters = this._register(new PageFilters(body));
 		const filters = this.filters;
 		this.search = filters.addSearch(format.text('usersFind'), (q) => this.setQuery({ q }));
 		this.status = filters.addSelect<Status>(
@@ -321,7 +321,7 @@ export class UsersPage extends Disposable implements PageView {
 		const views = this.lists.userViews;
 		if (this.currentView !== EVERYONE && Number(this.currentView) >= views.length)
 			this.currentView = EVERYONE;
-		const tabs = new AdminTabs<string>(
+		const tabs = new PageTabs<string>(
 			this.tabsHolder,
 			this.format.text('viewsLabel'),
 			[

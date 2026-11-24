@@ -30,7 +30,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
 import { adminRead } from '../widgets/adminReads.js';
 import './media/policyPage.css';

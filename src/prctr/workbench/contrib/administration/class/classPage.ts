@@ -24,11 +24,11 @@ import { IAuthenticatedNavigationService } from '../../../services/authenticated
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { InviteDialog } from '../invitations/inviteDialog.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { AdminFilters } from '../widgets/adminFilters.js';
+import { PageFilters } from '../../../browser/authenticated/pages/pageFilters.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
 import { AdminList, type AdminListItem } from '../widgets/adminList.js';
 import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
-import { AdminTabs } from '../widgets/adminTabs.js';
+import { PageTabs } from '../../../browser/authenticated/pages/pageTabs.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 
 type ClassTab = 'students' | 'teachers' | 'invitations';
@@ -46,7 +46,7 @@ export class ClassPage extends Disposable implements PageView {
 	private readonly members: AdminList<'classMembers'>;
 	private readonly teachers: AdminList<'roleBindings'>;
 	private readonly invitations: AdminList<'invitations'>;
-	private readonly tabs: AdminTabs<ClassTab>;
+	private readonly tabs: PageTabs<ClassTab>;
 	private readonly hosts: Readonly<Record<ClassTab, HTMLElement>>;
 	private readonly roleNames = new Map<string, string>();
 	private rolesLoaded = false;
@@ -96,7 +96,7 @@ export class ClassPage extends Disposable implements PageView {
 		// Students, Teachers and Invitations are tabs, each its own list with its count.
 		const $ = createElementFactory(body.ownerDocument);
 		this.tabs = this._register(
-			new AdminTabs<ClassTab>(
+			new PageTabs<ClassTab>(
 				body,
 				format.text('classViews'),
 				[
@@ -119,7 +119,7 @@ export class ClassPage extends Disposable implements PageView {
 		for (const [id, host] of Object.entries(this.hosts))
 			this.tabs.setPanel(id as ClassTab, host);
 		this._register(this.tabs.onDidChange(() => this.showTab()));
-		const filters = this._register(new AdminFilters(studentsHost));
+		const filters = this._register(new PageFilters(studentsHost));
 		filters.addSelect<'current' | 'history'>(
 			format.text('classEnrollment'),
 			'status.success',

@@ -27,7 +27,7 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { permissionMatrix, readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
-import { renderDetails } from '../widgets/adminDetails.js';
+import { renderDetails } from '../../../browser/authenticated/pages/pageDetails.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
 import { PageMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import { readPages } from '../widgets/adminReads.js';

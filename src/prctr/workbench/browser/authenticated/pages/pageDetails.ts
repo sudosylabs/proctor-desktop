@@ -7,9 +7,9 @@ import {
 	createStatusBadge,
 	type StatusBadgeTone
 } from '../../../../base/browser/ui/badge/statusBadge.js';
-import './media/adminDetails.css';
+import './media/pageDetails.css';
 
-export interface AdminDetail {
+export interface PageDetail {
 	readonly label: string;
 	readonly value: string;
 	/** The value is missing, shown in the quiet colour. */
@@ -19,18 +19,18 @@ export interface AdminDetail {
 }
 
 /** Replaces `host`'s content with a list of labelled values, one per line. */
-export function renderDetails(host: HTMLElement, details: readonly AdminDetail[]): void {
+export function renderDetails(host: HTMLElement, details: readonly PageDetail[]): void {
 	const $ = createElementFactory(host.ownerDocument);
 	host.replaceChildren(
 		$(
-			'dl.prctr-admin-details',
+			'dl.prctr-page-details',
 			{},
 			...details.map((detail) =>
 				$(
-					'div.prctr-admin-details__row',
+					'div.prctr-page-details__row',
 					{},
-					$('dt.prctr-admin-details__label', { textContent: detail.label }),
-					$('dd.prctr-admin-details__value', {
+					$('dt.prctr-page-details__label', { textContent: detail.label }),
+					$('dd.prctr-page-details__value', {
 						textContent: detail.value,
 						data: { empty: String(detail.empty === true) }
 					}),
@@ -38,7 +38,7 @@ export function renderDetails(host: HTMLElement, details: readonly AdminDetail[]
 						? []
 						: [
 								$(
-									'dd.prctr-admin-details__note',
+									'dd.prctr-page-details__note',
 									{},
 									createStatusBadge(host.ownerDocument, {
 										text: detail.note.text,
