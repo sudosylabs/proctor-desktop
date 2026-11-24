@@ -899,10 +899,10 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'.prctr-page-row__chip-more'
 		)!;
 		check(
-			moreScopes.textContent === '2 more' &&
+			moreScopes.textContent === 'and 2 more' &&
 				moreScopes.getAttribute('aria-expanded') === 'false' &&
 				!moreScopes.hasAttribute('aria-label'),
-			'More than three permissions fold behind "N more", named by its own words'
+			'More than three permissions fold behind "and N more", named by its own words'
 		);
 		moreScopes.click();
 		check(

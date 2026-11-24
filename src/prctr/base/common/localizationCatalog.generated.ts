@@ -2070,7 +2070,7 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "page.pager.shown.open": "Page {page}, items {first} to {last}",
     "page.row.actions": "Actions for {name}",
     "page.row.chips.fewer": "Show fewer",
-    "page.row.chips.more": "{count} more",
+    "page.row.chips.more": "and {count} more",
     "page.state.busy": "Another change is being applied. Try again when it finishes.",
     "page.state.load.failed": "This couldn’t be loaded. {reason}",
     "page.state.loading": "Loading…",

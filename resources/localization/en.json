@@ -13078,7 +13078,7 @@
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
     "page.row.chips.more": {
-      "message": "{count} more",
+      "message": "and {count} more",
       "description": "Opens the labels not shown in the row, such as \"7 more\".",
       "placeholders": [
         "count"

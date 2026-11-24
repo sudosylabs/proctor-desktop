@@ -182,7 +182,7 @@ export const pageMessages = Object.freeze({
 	}),
 	moreChips: defineMessage({
 		id: 'page.row.chips.more',
-		defaultMessage: '{count} more',
+		defaultMessage: 'and {count} more',
 		description: 'Opens the labels not shown in the row, such as "7 more".'
 	}),
 	confirmItsYouTitle: defineMessage({
