@@ -52,6 +52,8 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
 - [Toolchain and release](./architecture/toolchain.md) — package authority,
   compilation, generation, tests, native builds, packaging, updates, CI, and
   release provenance
+- [Observability](./architecture/observability.md) — logging levels and content,
+  unexpected errors, and declared telemetry with no destination yet.
 - [Repository enforcement](./architecture/repository-enforcement.md) — assurance
   controls, typed checks, policies, exceptions, CI, and dependency automation
 - [Invariants](./architecture/invariants.md) — accepted rules every future

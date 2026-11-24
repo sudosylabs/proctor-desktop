@@ -70,6 +70,11 @@ Read [`docs/architecture/design-system.md`](docs/architecture/design-system.md)
 before changing a user-facing surface, token, theme, icon, reusable control,
 DOM, CSS, layout, overlay, or visual verification.
 
+Proctor code logs through `ILogService`, reports unexpected errors through
+`onUnexpectedError`, and declares every telemetry event with a classified field
+list. Read [`docs/architecture/observability.md`](docs/architecture/observability.md)
+before adding logging, error reporting, or telemetry.
+
 The accepted repository controls map every architecture invariant to active or
 objectively deferred evidence. Read
 [`docs/architecture/repository-enforcement.md`](docs/architecture/repository-enforcement.md)

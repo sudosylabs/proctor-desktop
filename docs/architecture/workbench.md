@@ -155,6 +155,30 @@ self-context projection changes. That projection is a routing input, not a
 grant. Disabled account, no current affiliation, and no assigned access receive
 distinct presentations.
 
+## Authenticated pages
+
+Every AuthenticatedWindow page (Account, Administration, and later Exams and
+Activity) is assembled from one shared toolkit and reads its data one way.
+
+- **Shared pieces.** Pure controls (status badge, pager, menus, toasts) live in
+  `base/browser/ui`. Page pieces that need services (list, section, form dialog,
+  confirmation, row menu, filters, tabs, change runner) live in
+  `workbench/browser/authenticated/pages` and are created with
+  `createInstance`. A contribution configures them with its columns, messages
+  and failure wording; when it needs a behaviour they lack, it extends the
+  shared piece rather than writing its own.
+- **One data path.** A page follows reads and sends changes through
+  `IServerDataService`. Main owns the cache, what a change re-reads, and the
+  queue that keeps changes to the same data in order; the service owns what a
+  view shows while it waits. Contributions never import a capability client or
+  preload API.
+- **Where a new page's code goes.** Its contribution folder holds the page, its
+  dialogs, its messages and its `common/` presentation logic. Anything a second
+  page would also need belongs in the shared toolkit.
+
+Logging and telemetry for these pages follow
+[observability](./observability.md).
+
 ## Manifests and contribution loading
 
 `WorkbenchComposition` is an immutable description of window identity,
