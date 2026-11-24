@@ -157,7 +157,8 @@ const sharedMessages = Object.freeze({
 	}),
 	rolesDescription: defineMessage({
 		id: 'administration.page.roles.description',
-		defaultMessage: 'What each role lets people do, and where.',
+		defaultMessage:
+			'What each role lets people do. Built-in roles can’t be changed; custom roles can.',
 		description: 'One-line description under the Roles heading.'
 	}),
 	policyTitle: defineMessage({

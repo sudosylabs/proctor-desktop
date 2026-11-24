@@ -588,6 +588,45 @@ export class BoardAdministration implements AdministrationClient {
 					total: 36,
 					totalAtLeast: false
 				});
+			case 'studentProgressions':
+				return data('studentProgressions', {
+					items: (
+						[
+							[
+								'Programming 1',
+								'Programming 2',
+								Date.UTC(2027, 0, 11),
+								131,
+								'preview_ready'
+							],
+							['Calculus 1', 'Calculus 2', Date.UTC(2027, 0, 11), 88, 'parsing'],
+							[
+								'Databases',
+								'Distributed Systems',
+								Date.UTC(2026, 8, 1),
+								124,
+								'completed'
+							],
+							[
+								'Modern History 1',
+								'Modern History 2',
+								Date.UTC(2026, 8, 1),
+								57,
+								'canceled'
+							]
+						] as const
+					).map(([source, destination, effectiveAt, students, state], index) => ({
+						...onboardingImport(IMPORTS[0]!, index),
+						id: boardId(1700 + index),
+						mode: 'student_progression',
+						fileName: undefined,
+						state,
+						totalRows: students,
+						sourceClassName: source,
+						destinationClassName: destination,
+						effectiveAt
+					}))
+				});
 			case 'academicPeriods':
 				return data('academicPeriods', {
 					items: (
@@ -611,8 +650,88 @@ export class BoardAdministration implements AdministrationClient {
 						endAt
 					}))
 				});
-			case 'roles':
-				return data(intent.kind, { items: [] });
+			case 'roles': {
+				const all = [
+					'exam.view',
+					'exam.create',
+					'exam.manage',
+					'exam.publish',
+					'exam_sitting.view',
+					'exam_sitting.create',
+					'exam_sitting.manage',
+					'submission.view',
+					'submission.release',
+					'submission.review',
+					'record.manage',
+					'record.export',
+					'browser_activity.view',
+					'class.view',
+					'class.manage'
+				];
+				const role = (
+					index: number,
+					name: string,
+					builtIn: boolean,
+					description: string,
+					permissions: readonly string[]
+				) => ({
+					id: boardId(700 + index),
+					name: name.toLowerCase().replace(/ /g, '_'),
+					displayName: name,
+					description,
+					builtIn,
+					permissions
+				});
+				return data('roles', {
+					items: [
+						role(
+							0,
+							'Institution administrator',
+							true,
+							'Runs Proctor for the institution.',
+							all
+						),
+						role(
+							1,
+							'Exam manager',
+							true,
+							'Runs the exams of the places they’re granted in: creating, publishing and supervising them.',
+							all.filter((code) => !code.startsWith('record.'))
+						),
+						role(2, 'Teacher', true, 'Teaches classes and supervises their sittings.', [
+							'exam.view',
+							'exam.create',
+							'exam_sitting.view',
+							'submission.view',
+							'submission.review',
+							'class.view'
+						]),
+						role(
+							3,
+							'Teaching assistant',
+							false,
+							'Helps a teacher supervise sittings and review submissions, without publishing anything.',
+							[
+								'exam.view',
+								'exam_sitting.view',
+								'exam_sitting.manage',
+								'submission.view',
+								'submission.review',
+								'record.export',
+								'browser_activity.view',
+								'class.view'
+							]
+						),
+						role(
+							4,
+							'Records officer',
+							false,
+							'Keeps exam records complete and exports them.',
+							['record.manage', 'record.export', 'class.view']
+						)
+					]
+				});
+			}
 			default:
 				return { kind: 'error', reason: 'unavailable' };
 		}

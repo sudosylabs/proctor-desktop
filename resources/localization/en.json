@@ -7256,7 +7256,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.roles.description": {
-      "message": "What each role lets people do, and where.",
+      "message": "What each role lets people do. Built-in roles can’t be changed; custom roles can.",
       "description": "One-line description under the Roles heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -8389,6 +8389,78 @@
       "description": "Category of records.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.roles.grid.browser": {
+      "message": "Browser activity",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.change": {
+      "message": "Change",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.classes": {
+      "message": "Classes",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.create": {
+      "message": "Create",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.exams": {
+      "message": "Exams",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.export": {
+      "message": "Export",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.publish": {
+      "message": "Publish",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.records": {
+      "message": "Records",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.review": {
+      "message": "Review",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.sittings": {
+      "message": "Sittings",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.submissions": {
+      "message": "Submissions",
+      "description": "A row of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.roles.grid.view": {
+      "message": "View",
+      "description": "A column of the permission grid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.sidebar.count.imports.many": {
       "message": "{count} open imports",
