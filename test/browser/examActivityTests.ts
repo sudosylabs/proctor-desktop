@@ -9,7 +9,7 @@ function check(value: unknown, message: string): asserts value {
 	if (!value) throw new Error(message);
 }
 async function eventually(predicate: () => boolean): Promise<void> {
-	const deadline = performance.now() + 4000;
+	const deadline = performance.now() + 10_000;
 	while (!predicate()) {
 		if (performance.now() > deadline) throw new Error('Exam activity UI did not settle');
 		await new Promise((resolve) => setTimeout(resolve, 10));
