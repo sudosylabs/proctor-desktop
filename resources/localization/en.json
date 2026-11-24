@@ -9509,25 +9509,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
-    "administration.user.description": {
-      "message": "{email} · Username {username} · Member since {date}",
-      "description": "Description under a user’s name; email may be absent.",
-      "placeholders": [
-        "email",
-        "username",
-        "date"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
-    },
-    "administration.user.description.no.email": {
-      "message": "Username {username} · Member since {date}",
-      "description": "Description under a user’s name when they have no email.",
-      "placeholders": [
-        "username",
-        "date"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
-    },
     "administration.user.disable.reason": {
       "message": "Reason",
       "description": "Label of why an account is disabled.",
@@ -9954,6 +9935,14 @@
       "message": "No open sessions",
       "description": "A user with no open sessions.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.since": {
+      "message": "Since {date}",
+      "description": "When a person joined, on their record line: “Since September 2025”.",
+      "placeholders": [
+        "date"
+      ],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.starts": {

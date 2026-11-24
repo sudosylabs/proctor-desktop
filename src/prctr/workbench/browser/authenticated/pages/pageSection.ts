@@ -6,10 +6,7 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import {
-	createStatusBadge,
-	type StatusBadgeTone
-} from '../../../../base/browser/ui/badge/statusBadge.js';
+import type { StatusBadgeTone } from '../../../../base/browser/ui/badge/statusBadge.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import {
@@ -51,9 +48,12 @@ export interface PageRowStatus {
 	readonly tone: StatusBadgeTone;
 }
 
-/** A row status as a badge. */
+/** A row status as the boards draw it: one word in its tone, no pill. */
 export function createRowBadge(document: Document, status: PageRowStatus): HTMLElement {
-	return createStatusBadge(document, status);
+	return createElementFactory(document)('span.prctr-page-row__word', {
+		textContent: status.text,
+		data: { tone: status.tone }
+	});
 }
 
 export interface PageRowModel {
@@ -550,7 +550,7 @@ export class PageSection extends Disposable {
 		);
 		if (row.titleBadge !== undefined) title.append(createRowBadge(document, row.titleBadge));
 		if (row.here !== undefined)
-			title.append(createStatusBadge(document, { text: row.here, tone: 'neutral' }));
+			title.append(createRowBadge(document, { text: row.here, tone: 'neutral' }));
 		const text = $('span.prctr-page-row__text', {}, title);
 		if (row.chips !== undefined && row.chips.length > 0)
 			text.append(this.createChips($, row.chips));

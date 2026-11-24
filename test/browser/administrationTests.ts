@@ -290,8 +290,12 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 			'The trail leads back to Users'
 		);
 		check(
-			visibleText('.prctr-page-pane__status').join() === 'Active',
-			'The status reads Active'
+			visibleText('.prctr-page-pane__status').join() === '',
+			'An active account shows no status word'
+		);
+		check(
+			visibleText('.prctr-page-pane__record span').some((text) => text.startsWith('Since')),
+			'The record line says since when'
 		);
 		await wait(
 			() => visibleText('.prctr-page-row__title').includes('Student'),

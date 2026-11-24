@@ -3,10 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import {
-	createStatusBadge,
-	type StatusBadgeTone
-} from '../../../../base/browser/ui/badge/statusBadge.js';
+import type { StatusBadgeTone } from '../../../../base/browser/ui/badge/statusBadge.js';
 import './media/pageDetails.css';
 
 export interface PageDetail {
@@ -30,22 +27,24 @@ export function renderDetails(host: HTMLElement, details: readonly PageDetail[])
 					'div.prctr-page-details__row',
 					{},
 					$('dt.prctr-page-details__label', { textContent: detail.label }),
-					$('dd.prctr-page-details__value', {
-						textContent: detail.value,
-						data: { empty: String(detail.empty === true) }
-					}),
-					...(detail.note === undefined
-						? []
-						: [
-								$(
-									'dd.prctr-page-details__note',
-									{},
-									createStatusBadge(host.ownerDocument, {
-										text: detail.note.text,
-										tone: detail.note.tone
+					$(
+						'dd.prctr-page-details__value',
+						{ data: { empty: String(detail.empty === true) } },
+						detail.value,
+						// A note reads after the value as one more fact: "… · Verified".
+						...(detail.note === undefined
+							? []
+							: [
+									$('span.prctr-page-details__separator', {
+										textContent: '·',
+										attrs: { 'aria-hidden': 'true' }
+									}),
+									$('span.prctr-page-details__note', {
+										textContent: detail.note.text,
+										data: { tone: detail.note.tone }
 									})
-								)
-							])
+								])
+					)
 				)
 			)
 		)

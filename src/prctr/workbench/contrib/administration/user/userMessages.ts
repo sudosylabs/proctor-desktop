@@ -6,15 +6,10 @@ import { defineMessage } from '../../../../base/common/localization.js';
 
 /** Text of one user’s page. */
 export const userMessages = Object.freeze({
-	userDescription: defineMessage({
-		id: 'administration.user.description',
-		defaultMessage: '{email} · Username {username} · Member since {date}',
-		description: 'Description under a user’s name; email may be absent.'
-	}),
-	userDescriptionNoEmail: defineMessage({
-		id: 'administration.user.description.no.email',
-		defaultMessage: 'Username {username} · Member since {date}',
-		description: 'Description under a user’s name when they have no email.'
+	userSince: defineMessage({
+		id: 'administration.user.since',
+		defaultMessage: 'Since {date}',
+		description: 'When a person joined, on their record line: “Since September 2025”.'
 	}),
 	userTrailUsers: defineMessage({
 		id: 'administration.user.trail.users',

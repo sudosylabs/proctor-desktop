@@ -384,6 +384,38 @@ export class BoardAdministration implements AdministrationClient {
 					totalAtLeast: false
 				});
 			}
+			case 'user': {
+				const index = PEOPLE.findIndex((_, i) => boardId(i + 1) === intent.id);
+				const person = PEOPLE[index];
+				if (person === undefined) return { kind: 'error', reason: 'notFound' };
+				const { summary: _summary, ...user } = userEntry(person, index);
+				return data('user', { ...user, locale: 'en-GB', timezone: 'Europe/London' });
+			}
+			case 'affiliations':
+				return data('affiliations', {
+					items: [
+						{
+							id: boardId(1800),
+							kind: 'student',
+							startAt: Date.UTC(2025, 8, 15)
+						}
+					]
+				});
+			case 'roleBindings':
+				return data('roleBindings', {
+					items: [
+						{
+							id: boardId(1810),
+							roleId: boardId(703),
+							userId: intent.userId ?? boardId(2),
+							scopeType: 'class',
+							scopeId: boardId(1402),
+							startAt: Date.UTC(2026, 8, 22)
+						}
+					]
+				});
+			case 'userSessions':
+				return data('userSessions', { items: [] });
 			case 'invitations':
 				return data('invitations', {
 					items: INVITATIONS.map(invitation).slice(0, intent.limit),

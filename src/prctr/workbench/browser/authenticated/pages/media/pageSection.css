@@ -327,6 +327,26 @@
 	.prctr-page-section .prctr-page-row__glyph[data-tone='failure'] {
 		color: var(--prctr-color-feedback-error);
 	}
+	.prctr-page-section .prctr-page-row__word {
+		color: var(--prctr-color-text-secondary);
+		flex: none;
+		font-size: 13px;
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: 18px;
+		white-space: nowrap;
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='attention'] {
+		color: var(--prctr-color-status-attention);
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='failure'] {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='safeguard'] {
+		color: var(--prctr-color-status-safeguard);
+	}
+	.prctr-page-section .prctr-page-row__word[data-tone='progress'] {
+		color: var(--prctr-color-text-link);
+	}
 	.prctr-page-section .prctr-page-row__trailing {
 		color: var(--prctr-color-text-secondary);
 		flex: none;
