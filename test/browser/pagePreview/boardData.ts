@@ -590,15 +590,26 @@ export class BoardAdministration implements AdministrationClient {
 				});
 			case 'academicPeriods':
 				return data('academicPeriods', {
-					items: [
-						{
-							...structured(PERIOD, 'Autumn 2026'),
-							ownerType: 'institution',
-							ownerId: boardId(900),
-							startAt: Date.UTC(2026, 8, 15),
-							endAt: Date.UTC(2026, 11, 12)
-						}
-					]
+					items: (
+						[
+							['Autumn 2026', -1, Date.UTC(2026, 8, 15), Date.UTC(2026, 11, 12)],
+							['Spring 2027', -1, Date.UTC(2027, 0, 11), Date.UTC(2027, 3, 2)],
+							['Summer 2027', -1, Date.UTC(2027, 3, 26), Date.UTC(2027, 5, 18)],
+							[
+								'MSc Data Science 2026–27',
+								3,
+								Date.UTC(2026, 8, 21),
+								Date.UTC(2027, 8, 10)
+							],
+							['Resit period 2027', 2, Date.UTC(2027, 7, 16), Date.UTC(2027, 7, 27)]
+						] as const
+					).map(([name, owner, startAt, endAt], index) => ({
+						...structured(index === 0 ? PERIOD : boardId(1100 + index), name),
+						ownerType: owner < 0 ? 'institution' : 'academic_unit',
+						ownerId: owner < 0 ? boardId(900) : unitId(owner),
+						startAt,
+						endAt
+					}))
 				});
 			case 'roles':
 				return data(intent.kind, { items: [] });

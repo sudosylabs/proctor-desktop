@@ -523,9 +523,19 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'Current',
 		description: 'A period running now.'
 	}),
+	periodsNext: defineMessage({
+		id: 'administration.structure.periods.next',
+		defaultMessage: 'Next',
+		description: 'Status of the soonest academic period still to start.'
+	}),
+	periodsOwnedNote: defineMessage({
+		id: 'administration.structure.periods.owned.note',
+		defaultMessage: 'A period owned by a unit is only offered to that unit’s classes.',
+		description: 'Explains academic periods above their table.'
+	}),
 	periodsUpcoming: defineMessage({
 		id: 'administration.structure.periods.upcoming',
-		defaultMessage: 'Upcoming',
+		defaultMessage: 'Planned',
 		description: 'A period starting later.'
 	}),
 	periodsPast: defineMessage({

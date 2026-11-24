@@ -7200,7 +7200,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.page.periods.description": {
-      "message": "The terms and years that classes and enrolments belong to.",
+      "message": "Terms and years that classes run in. A class belongs to one period, and exams are planned inside it.",
       "description": "One-line description under the Academic periods heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
@@ -8902,6 +8902,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
+    "administration.structure.periods.next": {
+      "message": "Next",
+      "description": "Status of the soonest academic period still to start.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.owned.note": {
+      "message": "A period owned by a unit is only offered to that unit’s classes.",
+      "description": "Explains academic periods above their table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
     "administration.structure.periods.owner": {
       "message": "Belongs to",
       "description": "Field: the institution or a unit.",
@@ -8936,7 +8948,7 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.periods.upcoming": {
-      "message": "Upcoming",
+      "message": "Planned",
       "description": "A period starting later.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"

@@ -146,7 +146,8 @@ const sharedMessages = Object.freeze({
 	}),
 	periodsDescription: defineMessage({
 		id: 'administration.page.periods.description',
-		defaultMessage: 'The terms and years that classes and enrolments belong to.',
+		defaultMessage:
+			'Terms and years that classes run in. A class belongs to one period, and exams are planned inside it.',
 		description: 'One-line description under the Academic periods heading.'
 	}),
 	rolesTitle: defineMessage({

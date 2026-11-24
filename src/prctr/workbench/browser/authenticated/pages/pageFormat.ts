@@ -26,6 +26,8 @@ export interface PageFormat {
 	date(time: number): string;
 	/** "27 Oct" within this year, "27 Oct 2025" otherwise. */
 	shortDate(time: number): string;
+	/** Two days as one compact range: "15 Sep – 12 Dec 2026", "16 – 27 Aug 2027". */
+	dateRange(start: number, end: number): string;
 	/** The time of day, as "09:12". */
 	time(time: number): string;
 	dateTime(time: number): string;
@@ -142,6 +144,14 @@ export class PageFormatService implements IPageFormatService {
 
 	time(time: number): string {
 		return new Intl.DateTimeFormat(this.locale, { timeStyle: 'short' }).format(time);
+	}
+
+	dateRange(start: number, end: number): string {
+		return new Intl.DateTimeFormat(this.locale, {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric'
+		}).formatRange(start, end);
 	}
 
 	shortDate(time: number): string {

@@ -74,6 +74,10 @@ export class AccountFormatService implements IAccountFormatService {
 		return this.page.shortDate(time);
 	}
 
+	dateRange(start: number, end: number): string {
+		return this.page.dateRange(start, end);
+	}
+
 	time(time: number): string {
 		return this.page.time(time);
 	}
