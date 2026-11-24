@@ -65,12 +65,13 @@ const SOFT = { light: [0.955, 0.025], dark: [0.27, 0.04] } as const;
 
 /**
  * Values the boards fix by hand rather than by step: the desk behind the window, the window
- * glass, the selected row, and the solid red of a destructive button.
+ * glass, the selected row, and the solid red of a destructive button. The glass is opaque here:
+ * the shell lays it over the window material at 80%, as the boards draw it.
  */
 const FIXED = {
 	light: {
 		desk: '#DCD5E0',
-		glass: '#F4EFF6CC',
+		glass: '#F4EFF6',
 		glassEdge: '#201C221A',
 		glassSelected: '#201C2212',
 		selectedRow: '#F6F0FC',
@@ -79,7 +80,7 @@ const FIXED = {
 	},
 	dark: {
 		desk: '#0E0B10',
-		glass: '#1B171DCC',
+		glass: '#1B171D',
 		glassEdge: '#FFFFFF1A',
 		glassSelected: '#FFFFFF17',
 		selectedRow: '#2A2338',
