@@ -507,7 +507,12 @@ export class BoardAdministration implements AdministrationClient {
 					availability: 'ready',
 					minimumRelease: '1.4.0',
 					message: '',
-					revokedBuilds: [],
+					revokedBuilds: [
+						{
+							buildId: '2026.10.14-win-x64',
+							reason: 'Screen recording could be paused'
+						}
+					],
 					updatedAt: Date.UTC(2026, 9, 1, 10)
 				});
 			case 'retentionControl':

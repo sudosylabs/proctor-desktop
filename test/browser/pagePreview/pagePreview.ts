@@ -129,6 +129,8 @@ const PAGE_LABELS: Readonly<Record<string, string>> = {
 	users: 'Users',
 	invitations: 'Invitations',
 	imports: 'Imports',
+	institution: 'Institution',
+	desktop: 'Proctor Desktop',
 	structure: 'Structure',
 	periods: 'Academic periods',
 	progression: 'Progression',

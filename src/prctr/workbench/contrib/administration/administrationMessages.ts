@@ -212,6 +212,117 @@ const sharedMessages = Object.freeze({
 			'Work Proctor runs in the background, such as imports, cleanup and key rotation.',
 		description: 'One-line description under the Jobs heading.'
 	}),
+	institutionTitle: defineMessage({
+		id: 'administration.page.institution.title',
+		defaultMessage: 'Institution',
+		description: 'Heading of the Institution page.'
+	}),
+	institutionDescription: defineMessage({
+		id: 'administration.page.institution.description',
+		defaultMessage: 'How {institution} appears in Proctor.',
+		description: 'One-line description under the Institution heading.'
+	}),
+	institutionDescriptionGeneric: defineMessage({
+		id: 'administration.page.institution.description.generic',
+		defaultMessage: 'How your institution appears in Proctor.',
+		description: 'Institution description when the name is unknown.'
+	}),
+	institutionIdentity: defineMessage({
+		id: 'administration.institution.identity',
+		defaultMessage: 'Identity',
+		description: 'Section of the institution’s name and description.'
+	}),
+	institutionName: defineMessage({
+		id: 'administration.institution.name',
+		defaultMessage: 'Name',
+		description: 'The institution’s name.'
+	}),
+	institutionDescriptionLabel: defineMessage({
+		id: 'administration.institution.description.label',
+		defaultMessage: 'Description',
+		description: 'The institution’s description.'
+	}),
+	institutionServer: defineMessage({
+		id: 'administration.institution.server',
+		defaultMessage: 'Server',
+		description: 'Where Proctor Desktop connects for this institution.'
+	}),
+	desktopTitle: defineMessage({
+		id: 'administration.page.desktop.title',
+		defaultMessage: 'Proctor Desktop',
+		description: 'Heading of the Proctor Desktop page.'
+	}),
+	desktopDescription: defineMessage({
+		id: 'administration.page.desktop.description',
+		defaultMessage:
+			'Which releases of Proctor Desktop may connect, and whether exams are open on Desktop right now.',
+		description: 'One-line description under the Proctor Desktop heading.'
+	}),
+	desktopAvailability: defineMessage({
+		id: 'administration.desktop.availability',
+		defaultMessage: 'Availability',
+		description: 'Section of whether exams are open on Desktop.'
+	}),
+	desktopExams: defineMessage({
+		id: 'administration.desktop.exams',
+		defaultMessage: 'Exams on Proctor Desktop',
+		description: 'Whether exams can start on Desktop.'
+	}),
+	desktopOpen: defineMessage({
+		id: 'administration.desktop.open',
+		defaultMessage: 'Open',
+		description: 'Exams can start on Desktop.'
+	}),
+	desktopNoNewExams: defineMessage({
+		id: 'administration.desktop.no.new',
+		defaultMessage: 'No new exams start',
+		description: 'Note beside maintenance.'
+	}),
+	desktopMessage: defineMessage({
+		id: 'administration.desktop.message',
+		defaultMessage: 'Message for candidates',
+		description: 'Shown in Proctor Desktop during maintenance.'
+	}),
+	desktopReleases: defineMessage({
+		id: 'administration.desktop.releases',
+		defaultMessage: 'Releases',
+		description: 'Section of which releases may connect.'
+	}),
+	desktopOldest: defineMessage({
+		id: 'administration.desktop.oldest',
+		defaultMessage: 'Oldest release allowed',
+		description: 'Older releases are asked to update.'
+	}),
+	desktopAnyRelease: defineMessage({
+		id: 'administration.desktop.any',
+		defaultMessage: 'Any release',
+		description: 'No oldest release is set.'
+	}),
+	desktopBlocked: defineMessage({
+		id: 'administration.desktop.blocked',
+		defaultMessage: 'Blocked builds',
+		description: 'Section of builds that cannot sign in.'
+	}),
+	desktopBlockedNote: defineMessage({
+		id: 'administration.desktop.blocked.note',
+		defaultMessage: 'A blocked build can’t sign in, whatever the oldest release allowed.',
+		description: 'Explains blocked builds.'
+	}),
+	desktopNoneBlocked: defineMessage({
+		id: 'administration.desktop.none.blocked',
+		defaultMessage: 'No builds are blocked.',
+		description: 'Shown when no build is blocked.'
+	}),
+	desktopBuild: defineMessage({
+		id: 'administration.desktop.build',
+		defaultMessage: 'Build',
+		description: 'Column of a blocked build.'
+	}),
+	desktopWhy: defineMessage({
+		id: 'administration.desktop.why',
+		defaultMessage: 'Why',
+		description: 'Column of why a build is blocked.'
+	}),
 	mailTitle: defineMessage({
 		id: 'administration.page.mail.title',
 		defaultMessage: 'Mail',

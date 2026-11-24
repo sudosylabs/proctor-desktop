@@ -7,7 +7,9 @@ import type { PageView } from '../../browser/authenticated/pages/pagePane.js';
 import type { AdministrationPage } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import type { IAdministrationFormatService } from './administrationFormat.js';
 import type { AdministrationMessage } from './administrationMessages.js';
+import { DesktopPage } from './desktop/desktopPage.js';
 import { ImportPage } from './imports/importPage.js';
+import { InstitutionPage } from './institution/institutionPage.js';
 import { ImportsPage } from './imports/importsPage.js';
 import { ClassPage } from './class/classPage.js';
 import { InvitationsPage } from './invitations/invitationsPage.js';
@@ -117,6 +119,12 @@ export const administrationPageRegistry: Readonly<
 	import: record('importTitle', 'record', (i, body, actions, id) =>
 		i.createInstance(ImportPage, body, actions, id)
 	),
+	institution: list(
+		'institutionTitle',
+		(f) => f.institutionText('institutionDescription', 'institutionDescriptionGeneric'),
+		'record',
+		(i, body, actions) => i.createInstance(InstitutionPage, body, actions)
+	),
 	structure: list(
 		'structureTitle',
 		(f) => f.text('structureDescription'),
@@ -152,6 +160,12 @@ export const administrationPageRegistry: Readonly<
 		(f) => f.institutionText('policyDescription', 'policyDescriptionGeneric'),
 		'record',
 		(i, body, actions) => i.createInstance(PolicyPage, body, actions)
+	),
+	desktop: list(
+		'desktopTitle',
+		(f) => f.text('desktopDescription'),
+		'record',
+		(i, body, actions) => i.createInstance(DesktopPage, body, actions)
 	),
 	audits: list(
 		'auditsTitle',

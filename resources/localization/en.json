@@ -4680,6 +4680,84 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
     },
+    "administration.desktop.any": {
+      "message": "Any release",
+      "description": "No oldest release is set.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.availability": {
+      "message": "Availability",
+      "description": "Section of whether exams are open on Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.blocked": {
+      "message": "Blocked builds",
+      "description": "Section of builds that cannot sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.blocked.note": {
+      "message": "A blocked build can’t sign in, whatever the oldest release allowed.",
+      "description": "Explains blocked builds.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.build": {
+      "message": "Build",
+      "description": "Column of a blocked build.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.exams": {
+      "message": "Exams on Proctor Desktop",
+      "description": "Whether exams can start on Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.message": {
+      "message": "Message for candidates",
+      "description": "Shown in Proctor Desktop during maintenance.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.no.new": {
+      "message": "No new exams start",
+      "description": "Note beside maintenance.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.none.blocked": {
+      "message": "No builds are blocked.",
+      "description": "Shown when no build is blocked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.oldest": {
+      "message": "Oldest release allowed",
+      "description": "Older releases are asked to update.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.open": {
+      "message": "Open",
+      "description": "Exams can start on Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.releases": {
+      "message": "Releases",
+      "description": "Section of which releases may connect.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.desktop.why": {
+      "message": "Why",
+      "description": "Column of why a build is blocked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.duration.hours": {
       "message": "{count} h",
       "description": "A short duration in hours, as in \"2 h\".",
@@ -5475,6 +5553,30 @@
       "description": "Toast after a file is uploaded.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.institution.description.label": {
+      "message": "Description",
+      "description": "The institution’s description.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.institution.identity": {
+      "message": "Identity",
+      "description": "Section of the institution’s name and description.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.institution.name": {
+      "message": "Name",
+      "description": "The institution’s name.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.institution.server": {
+      "message": "Server",
+      "description": "Where Proctor Desktop connects for this institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.invitations.action.resend": {
       "message": "Resend email",
@@ -7197,6 +7299,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.page.desktop.description": {
+      "message": "Which releases of Proctor Desktop may connect, and whether exams are open on Desktop right now.",
+      "description": "One-line description under the Proctor Desktop heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.desktop.title": {
+      "message": "Proctor Desktop",
+      "description": "Heading of the Proctor Desktop page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.page.import.title": {
       "message": "Import",
       "description": "Heading of one onboarding import before its details load.",
@@ -7212,6 +7326,26 @@
     "administration.page.imports.title": {
       "message": "Imports",
       "description": "Heading of the Administration Imports page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.institution.description": {
+      "message": "How {institution} appears in Proctor.",
+      "description": "One-line description under the Institution heading.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.institution.description.generic": {
+      "message": "How your institution appears in Proctor.",
+      "description": "Institution description when the name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.institution.title": {
+      "message": "Institution",
+      "description": "Heading of the Institution page.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
@@ -10869,6 +11003,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },
+    "authenticated.nav.administration.desktop": {
+      "message": "Proctor Desktop",
+      "description": "Administration sidebar page for which Desktop releases may connect.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
     "authenticated.nav.administration.group.access": {
       "message": "Access",
       "description": "Administration sidebar heading over Roles and Access policy.",
@@ -10902,6 +11042,12 @@
     "authenticated.nav.administration.imports": {
       "message": "Imports",
       "description": "Administration sidebar page for onboarding imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.institution": {
+      "message": "Institution",
+      "description": "Administration sidebar page for how the institution appears.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },

@@ -12,6 +12,8 @@ import {
 import type { AdministrationResponse } from '../../../../platform/administration/common/administrationProtocol.js';
 import { PageRead } from '../../../browser/authenticated/pages/pageRead.js';
 import type { IAdministrationService } from '../../../services/administration/common/administration.js';
+import { ServerRead } from '../../../browser/authenticated/pages/serverRead.js';
+import type { IServerDataService } from '../../../services/serverData/common/serverData.js';
 import { administrationFailureWithdraws } from '../common/administrationPresentation.js';
 import type { AdminListItem, AdminListKind, AdminListQuery } from './adminList.js';
 
@@ -133,4 +135,20 @@ export async function readUnitTree(
 /** A unit's picker label, indented by its depth with figure spaces so the tree reads in a list. */
 export function unitLabel(unit: AdminUnitChoice): string {
 	return `${'  '.repeat(unit.depth)}${unit.name}`;
+}
+
+/**
+ * A page's read of one Administration resource through the one data path, `IServerDataService`;
+ * the value is the resource the read asked for.
+ */
+export function administrationRead<K extends AdministrationReadKind>(
+	serverData: IServerDataService,
+	intent: AdministrationIntentOf<K>
+): ServerRead<'administration', AdministrationValue<K>> {
+	const kind: string = (intent as { readonly kind: string }).kind;
+	return new ServerRead(serverData, 'administration', intent, (answer) =>
+		answer.kind === 'data' && answer.data.resource === kind
+			? (answer.data.value as AdministrationValue<K>)
+			: undefined
+	);
 }
